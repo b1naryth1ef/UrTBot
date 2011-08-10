@@ -22,12 +22,13 @@ import socket
 import re
 
 class Player:
-	def __init__(self, name, kills, ping, address=None, bot=-1):
-		self.name = name
+	def __init__(self, idy, name, kills, ping, address=None, bot=-1):
+		self.name = name.strip('^7')
 		self.kills = kills
 		self.ping = ping
 		self.address = address
 		self.bot = bot
+		self.uid = idy
 	def __str__(self):
 		return self.name
 	def __repr__(self):
@@ -113,7 +114,7 @@ class PyQuake3:
 	def update(self):
 		cmd, data = self.command('getstatus')
 		self.vars = self.parse_status(data)
-	def rcon_update(self):
+	def rcon_update(self): # idy, name, kills, ping, address=None, bot=-1
 		cmd, data = self.rcon('status')
 		lines = data.split('\n')
 		players = lines[3:]
@@ -126,7 +127,8 @@ class PyQuake3:
 			if p == '':
 				continue
 			p = p.split(' ')
-			self.players.append(Player(p[3][:-2], p[0], p[1], p[5], p[6]))
+			#self.players.append(Player(p[3][:-2], p[0], p[1], p[5], p[6]))
+			self.players.append(Player(p[0],p[3],p[1],p[2],p[5],p[6]))
 
 if __name__ == '__main__':
 	q = PyQuake3('localhost:27960','hello')

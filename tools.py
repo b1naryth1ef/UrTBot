@@ -3,3 +3,7 @@ def error(code,err):
 		print "CRITICAL: "+err
 	elif code == "1":
 		print "ERROR: "+err
+	elif code == "00":
+		print "MOD CRITICAL: "+err
+	elif code == "01":
+		print "MOD ERROR: "+err
