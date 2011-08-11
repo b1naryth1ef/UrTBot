@@ -9,10 +9,10 @@ class Mod(object):
 		self.hooks = {}
 	def cmdreg(self,cmd,exe):
 		self.cmds[cmd] = exe
-		main.cmdreg(cmd,exe)
+		main.CR(cmd,exe)
 	def hookreg(self,event,exe):
 		if not self.hooks:
 			self.hooks[event] = [exe]
 		else:
 			self.hooks[event].append(exe)
-		main.listenreg(event,exe)
+		main.LR(event,exe)
