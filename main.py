@@ -1,18 +1,23 @@
+#----------IMPORTS----------#
 import subprocess, time, os, sys, imp
 from tools import error
 import tools
 from pyquake3 import PyQuake3
 
+#----------Objects----------#
 Q = PyQuake3('localhost:27960', rcon_password='123abc')
+
+#----------Vars----------#
 Ev = []
 li = {}
-id = 0 #Global Event ID @DEP Removing soon in place of new ID system.
+id = 0
 cmds = {}
 home = os.getcwd()
 prefix = "^1[^3Boteh^1]"
 
-def listenreg(event,exe):
-	if not li:
+#----------Command Stuff----------#
+def LR(event,exe): #Register listening events
+    if not li:
 		li[event] = [exe]
 	else:
 		li[event].append(exe)
@@ -25,12 +30,27 @@ def L(event,api): #Listener
 	else:
 		pass
 
-def cmdreg(cmd,exe):
-	print '@reg'
+class Cmd(object):
+    def __init__(self,name,cmd,exe,active=True):
+        self.name = name #Not used yet, DO NOT TRY TO CALL THIS! name = cmd always!
+        self.cmd = cmd
+        self.exe = exe
+        self.active = active
+    def exe(self,a)
+        #open thread
+        self.exe(a)
+
+
+def CR(cmd,exe): #Register commands
+	mycmd = Cmd(cmd,cmd,exe)
 	if cmd in cmds:
 		error(00,"Command "+cmd+" already registered!")
 	else:
-		cmds[cmd]=exe
+		cmds[cmd]=mycmd
+
+
+#----------Class Definitions----------#
+
 
 class Api(object):
 	def __init__(self,obj=None):
@@ -46,61 +66,58 @@ class Api(object):
 	def plist(self):
 		Q.update()
 		return Q.players
+    
+        
 class Event(object):
 	def __init__(self, typex=None, data=None, id=0):
 		if typex == "kill":
-			self.kill(data,id)
+			self.kill(data)
 		elif typex == "death":
-			self.death(data,id)
+			self.death(data)
 		elif typex == "kick":
-			self.kick(data,id)
+			self.kick(data)
 		elif typex == "ban":
-			self.ban(data,id)
+			self.ban(data)
 		elif typex == "conn":
-			self.conn(data,id)
+			self.conn(data)
 		elif typex == "msg":
-			self.msg(data,id)
+			self.msg(data)
 		else:
 			error(0,"Event type invalid")
 
-	def kill(self,data,id):
-		id += 1
-		self.id = id
+	def kill(self,data):
 		self.type = "kill"
 		self.atk = data[0] #Attacker
 		self.kil = data[1] #Killed person
 		self.meth = data[2] #Method
 
-	def death(self,data,id):
-		id += 1
-		self.id = id
+	def death(self,data):
 		self.type = "death"
 		self.per = data[0] #Person killed
 		self.meth = data[1] #Method
 
-	def kick(self,data,id):
-		id += 1
-		self.id = id
+	def kick(self,data):
+        self.type = "kick"
 		self.per = data[0] #Person kicked
 		self.adm = data[1] #Admin/kicker
 	
-	def ban(self,data,id):
-		id += 1
-		self.id = id
+	def ban(self,data):
+        self.type = "ban"
 		self.per = data[0] #Person banned
 		self.adm = data[1] #Admin/banner
 
-	def conn(self,data,id):
-		id += 1
-		self.id = id
+	def conn(self,data):
+        self.type = "conn"
 		self.per = data[0] #Person connected
 		self.uid = data[1] #Persons ID
 
-	def msg(self, data,id):
-		id += 1
-		self.id = id
+	def msg(self, data):
+        self.type = "msg"
 		self.sender = data[0]
 		self.msg = data[1]
+
+
+#----------Main Function Defs----------#
 
 def _kill(atk,kil,meth):
 	obj = Event('kill',(atk,kil,meth))
@@ -120,8 +137,7 @@ def parse(inp):
 		obj = _msg(new[1],new[2].rstrip())
 		if new[2].strip() in cmds:
 			A = Api(obj)
-			cmds[new[2].strip()](A) #api goes in there
-
+			cmds[new[2].strip()].exe(A)
 	elif 'ClientConnect:' in inp:
 		#We need to check if the client was already connected, and possibly remove the old event?
 		newy = inp.split(":")
@@ -151,6 +167,7 @@ def exe():
 
 def load():
 	filenames = []
+    fail = True
 	for fn in os.listdir(os.path.join(home, 'mods')): 
 		if fn.endswith('.py') and not fn.startswith('_'): 
 			filenames.append(os.path.join(home, 'mods', fn))
@@ -159,13 +176,18 @@ def load():
 		try:
 			mod = imp.load_source(fname, filename)
 		except Exception, e: 
-			print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)   
-load()
-P = loop()
+			print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
+            fail = False
+    return fail
+
+Load = load()
+if load is True:
+    P = loop()
+else:
+    error(0,"Module failed to load... Cannot start loop!")
+
+
 #ClientConnect: 0
 #ClientUserInfo
 #say:
 #['Kill:', '0', '1', '19:', 'Adminy', 'killed', 'Adminy_1', 'by', 'UT_MOD_LR300\n']
-#4: Killer
-#5: Victim
-#7: Method
