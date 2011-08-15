@@ -1,6 +1,7 @@
 #---IMPORTS---#
 import subprocess, time, os, sys, imp
 from pyquake3 import PyQuake3
+#import db
 
 #---Pre Vars---#
 home = os.getcwd()
@@ -8,6 +9,7 @@ Events = {}
 Commands = {}
 Q = PyQuake3('localhost:27960', rcon_password='Norp73')
 prefix = "^1[^3Boteh^1]"
+hj=[]
 
 #---System Wide Handlers---#
 def error(t,msg):
@@ -23,24 +25,6 @@ def error(t,msg):
 		print "MOD ERROR: "+msg
 
 #---MODULE FUNCS---#
-def RegE(eve,exe):
-	"""Registers a modules usage of an event"""
-	if eve not in Events:
-		Events[eve] = [exe]
-		print "Adding event"
-		print Events
-	else:
-		Events[eve].append(exe)
-
-def RegC(cmd,exe):
-	print "@reg2"
-	if cmd not in Commands:
-		print "Adding command"
-		Commands[cmd] = exe
-		print Commands
-	else:
-		error(002,"Command already registered... Ignoring new Register Request.")
-
 def Listen(event,obj):
 	if event in Events:
 		for i in Events[event]:
@@ -50,18 +34,9 @@ def Listen(event,obj):
 
 #---CLASSES---#
 class Api(object):
-	
 	def __init__(self):
 		self.N = "API"
 		self.q = Q
-	def register(self,tp,data):
-		print "@reg"
-		if tp.lower() == "event":
-			RegE(data[0],data[1])
-		elif tp.lower() == "command":
-			RegC(data[0],data[1])
-		else:
-			error(002,"Unknown register call:"+tp)
 	def ping(self):
 		"""API Method: Simple system to test modules"""
 		print "Pong!"
@@ -126,21 +101,35 @@ def load():
 				fn.append(os.path.join(home, 'mods', i))
 	for f in fn:
 		fname = os.path.basename(f)[:-3]
-		try:
+		if 1==1:
 			mod = imp.load_source(fname, f)
-		except Exception, e:
-			print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
+			for x in getattr(mod,"_funcs"):
+				xev = getattr(mod,x+"_events")
+				xcmd = getattr(mod,x+"_commands")
+				for i in xev:
+					if i in Events:
+						Events[i].append(xev[i])
+					else:
+						Events[i] = [xev[i]] 
+				for i in xcmd:
+					if i in Commands:
+						print "Error" #@TODO call error
+					else:
+						Commands[i] = xcmd[i]
+		#except Exception, e:
+		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
 
 def parse(inp):
 	if inp.startswith("say:"):
-		print Commands
 		newy = inp.split(':',2)
 		nsender = newy[1]
 		nmsg = newy[2].rstrip()
-		ncmd = nmsg.split(" ")[0]
-		print ncmd
-		print nmsg
+		ncmd1 = nmsg.strip(" ")
+		ncmd = ncmd1.split(" ")[0]
+		print "'"+ncmd+"'"
+		print hj
 		if ncmd.lower() in Commands:
+			print "@CMD TRUE"
 			obj = _msg(nsender,nmsg,True)
 			Commands[ncmd](obj)
 	elif inp.startswith('ClientConnect:'):
@@ -157,6 +146,7 @@ def loop():
 		if proc_read:
 			print proc_read.rstrip()
 			parse(proc_read)
+
 	return proc
 
 
