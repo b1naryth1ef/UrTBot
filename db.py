@@ -12,10 +12,10 @@ c = db.cursor()
 
 class User(object):
     """A simple User class"""
-    def __init__(self, userid, name=None, first_name=None, last_name=None,checkins=None):
+    def __init__(self, userid, name=None, ips=None, last_ip=None,guid=None):
         self.id = userid
         self.name = name
-        self.first_name = ips
-        self.last_name = last_ip
-        self.checkins = checkins
+        self.ips=ips
+        self.last_ip = last_ip
+        self.guid = guid
 
