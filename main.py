@@ -1,14 +1,14 @@
 #---IMPORTS---#
 import subprocess, time, os, sys, imp
 from pyquake3 import PyQuake3
-#import db
 
 #---Pre Vars---#
 home = os.getcwd()
 Events = {}
 Commands = {}
-Q = PyQuake3('localhost:27960', rcon_password='Norp73')
-prefix = "^1[^3Boteh^1]"
+Modules = {} #(module,unload)
+Q = PyQuake3('localhost:27960', rcon_password='Norp73') #Import from config file
+prefix = "^1[^3Boteh^1]" #@DEV This should import from the config file
 hj=[]
 
 #---System Wide Handlers---#
@@ -23,6 +23,13 @@ def error(t,msg):
 		sys.exit()
 	elif t == 012:
 		print "MOD ERROR: "+msg
+
+def exit(code,msg):
+	if code == 000: #Exit now
+		sys.exit()
+	elif code == 001: #Close safely
+		for i in Modules:
+			Modules[i][1]() #unload
 
 #---MODULE FUNCS---#
 def Listen(event,obj):
@@ -103,6 +110,9 @@ def load():
 		fname = os.path.basename(f)[:-3]
 		if 1==1:
 			mod = imp.load_source(fname, f)
+			unload = getattr(mod,"_unload")
+			modname = getattr(mod,"_name")
+			Modules[modname] = (mod,unload)
 			for x in getattr(mod,"_funcs"):
 				xev = getattr(mod,x+"_events")
 				xcmd = getattr(mod,x+"_commands")
