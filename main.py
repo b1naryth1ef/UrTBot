@@ -33,6 +33,7 @@ def exit(code,msg):
 
 #---MODULE FUNCS---#
 def Listen(event,obj):
+	global Events
 	if event in Events:
 		for i in Events[event]:
 			i(obj)
@@ -55,8 +56,7 @@ class Api(object):
 		return Q.rcon(cmd)
 	def plist(self):
 		Q.update()
-		return Q.players
-		
+		return Q.players		
 
 class Event(object):
 	def kill(self,data):
@@ -100,6 +100,7 @@ def _conn(uid):
 
 #---MODULE SETUP---#
 def load():
+	global Events, Commands, Modules
 	fn = []
 	county = 0
 	for i in os.listdir(os.path.join(home, 'mods')):
@@ -110,6 +111,8 @@ def load():
 		fname = os.path.basename(f)[:-3]
 		if 1==1:
 			mod = imp.load_source(fname, f)
+			mod.
+
 			unload = getattr(mod,"_unload")
 			modname = getattr(mod,"_name")
 			Modules[modname] = (mod,unload)
@@ -130,6 +133,7 @@ def load():
 		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
 
 def parse(inp):
+	global BOT
 	if inp.startswith("say:"):
 		newy = inp.split(':',2)
 		nsender = newy[1]
@@ -138,7 +142,7 @@ def parse(inp):
 		ncmd = ncmd1.split(" ")[0]
 		print "'"+ncmd+"'"
 		print hj
-		if ncmd.lower() in Commands:
+		if ncmd.lower() in BOT.Commands:
 			print "@CMD TRUE"
 			obj = _msg(nsender,nmsg,True)
 			Commands[ncmd](obj)
@@ -158,7 +162,6 @@ def loop():
 			parse(proc_read)
 
 	return proc
-
 
 if __name__ == "__main__":
 	load()
