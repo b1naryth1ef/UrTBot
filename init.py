@@ -1,0 +1,220 @@
+#---IMPORTS---#
+import subprocess, time, os, sys, imp, player
+from pyquake3 import PyQuake3
+
+#--SETTRZ--#
+home = os.getcwd()
+
+class Bot():
+	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
+		self.prefix = prefix
+		self.ip = ip
+		self.rcon = rcon
+		self.Q = PyQuake3(self.ip, rcon_password=self.rcon)
+
+		self.Modules = {}
+		self.Listeners = {}
+		self.Commands = {}
+
+		self.Players = {}
+
+BOT = Bot(rcon="Norp73")
+
+def regEve(self, event, func):
+	x = BOT.Listeners
+	for i in x.keys():
+		if i == event and x[i] != None:
+			x[i].append(func)
+			break
+	x[event] = [func]
+
+def regCmd(self, cmd, func, desc="None"):
+	x = BOT.Commands
+	for i in x.keys():
+		if i == cmd:
+			print "Can't add command %s, already exsists!" % (cmd)
+			break
+	x[cmd] = (func,desc)
+
+class API():
+	cRED = '^1'
+	cGREEN = '^2'
+	cYELLOW = '^3'
+	cBLUE = '^4'
+	cCYAN = '^5'
+	cMAGENTA = '^6'
+	cWHITE = '^7'
+	cBLACK = '^8'
+
+	rEve = regEve
+	rCmd = regCmd
+	def __init__(self):
+		self.B = BOT
+		self.Q = BOT.Q
+	def tester(self):
+		print "TESTING! 1! 2! 3!"
+	def say(self,msg):
+		self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
+	def tell(self,uid,msg):
+		self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
+	def rcon(self,cmd):
+		return self.Q.rcon(cmd)
+	def plist(self):
+		self.Q.update()
+		return self.Q.players
+	def getPlayer(self, iid=0):
+		if len(self.B.Players) != 0:
+			return self.B.Players[iid]
+		else:
+			return None
+	def getPlayers(self): return self.B.Players
+	def getCommands(self): return self.B.Commands
+
+class Event(object):
+	def kill(self,data):
+		self.type = "kill"
+		self.attacker = data[0]
+		self.victim = data[1]
+		self.method = data[2]
+	def msg(self,data):
+		self.type = "msg"
+		self.sender = data[0]
+		self.msg = data[1]
+		self.iscmd = data[2] #Bool, should be true if ! is in front
+	def conn(self,data):
+		self.type = "conn"
+		self.uid = data[0]
+		self.name = data[1]
+		self.ip = data[2]
+	def suicide(self,data):
+		self.type = "suicide"
+		self.victim = data[0]
+		self.method = data[1]
+
+	i = {'kill':kill,'msg':msg,'conn':conn,'suicide':suicide}
+	def __init__(self,typex,data):
+		if typex in self.i:
+			self.i[typex](self,data)
+
+def Listen(event, obj):
+	global BOT
+	if event in BOT.Listeners:
+		for i in BOT.Listeners[event]:
+			i(obj)
+	else:
+		pass
+
+#---EVENTS---#
+def _suicide(vic, meth):
+	obj = Event('suicide',(vic, meth))
+	Listen('suicide', obj)
+	return obj
+
+def _kill(atk,vic,meth):
+	obj = Event('kill',(atk,vic,meth))
+	Listen('kill',obj)
+	return obj
+
+def _msg(sen,msg,iscmd=False):
+	obj = Event('msg',(sen,msg,iscmd))
+	Listen('msg',obj)
+	return obj
+
+def _conn(uid):
+	global BOT
+	BOT.Q.rcon_update()
+	for i in BOT.Q.players:
+		if i.uid == uid:
+			name = i.name
+			ip = i.ip
+	obj = Event('conn',(uid,name,ip))
+	Listen('conn',obj)
+	return obj
+
+def load():
+	global BOT
+	fn = []
+	county = 0
+	for i in os.listdir(os.path.join(home, 'mods')):
+		if i.endswith('.py') and not i.startswith("_"):
+			fn.append(os.path.join(home, 'mods', i))
+	for f in fn:
+		fname = os.path.basename(f)[:-3]
+		if 1==1:
+			mod = imp.load_source(fname, f)
+			modz = getattr(mod, "_MODS_")
+			for i in modz:
+				BOT.Modules[i] = modz[i](API(), BOT)
+		#except Exception, e:
+		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
+	for i in BOT.Modules.values():
+		i.load()
+		print "Loaded: %s V%s by %s" % (i.name, i.version, i.author)
+
+def parseUserInfo(inp):
+	global BOT
+	varz = {}
+	m = inp.split("\\")
+	uid = m[0].split(" ")[1]
+	x = m[1]
+	y = 1
+	while len(x) > y:
+		varz[x[y-1]] = x[y]
+		y+=2
+	BOT.Players[int(uid)] = player.Player(int(uid), varz)
+
+def parseUserInfoChange(inp):
+	global BOT
+	varz = {}
+	varz2 = {}
+	m = inp.split(" ")
+	x = m[2].split("\\")
+	y = 1
+	while len(x) > y:
+		varz[x[y-1]] = x[y]
+		y+=2
+	BOT.Players[int(m[1])].name = varz['n']
+	BOT.Players[int(m[1])].team = varz['t']
+
+def parse(inp):
+	global BOT
+	if inp.startswith("say:"):
+		newy = inp.split(':',2)
+		nsender = newy[1]
+		nmsg = newy[2].rstrip()
+		ncmd1 = nmsg.strip(" ")
+		ncmd = ncmd1.split(" ")[0]
+		print "'"+ncmd+"'"
+		if ncmd.lower() in BOT.Commands:
+			print "@CMD TRUE"
+			obj = _msg(nsender,nmsg,True)
+			BOT.Commands[ncmd][0](obj)
+	elif inp.startswith('ClientConnect:'):
+		new = inp.split(":")[1].strip()
+		_conn(new)
+	elif inp.startswith('ClientUserinfo:'):
+		parseUserInfo(inp)
+	elif inp.startswith('ClientUserinfoChanged:'):
+		parseUserInfoChange(inp)
+	elif inp.startswith('Kill:'):
+		newy = inp.split(" ")
+		if newy[4] == newy[6] or newy[8] == "MOD_SUICIDE": _suicide(newy[4], newy[8].rstrip())
+		else: _kill(newy[4],newy[6],newy[8].rstrip())
+		
+def loop():
+	# try:
+	proc = subprocess.Popen('~/UrbanTerror/ioUrbanterror.386 +set dedicated 2 +exec server.cfg',shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	while True:
+		proc_read = proc.stdout.readline()
+		if proc_read:
+			print proc_read.rstrip()
+			parse(proc_read)
+	return proc
+	# except Exception, e:
+	# 	print e
+	# 	proc.kill()
+	# 	sys.exit()
+
+if __name__ == "__main__":
+	load()
+	loop()
