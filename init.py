@@ -1,9 +1,12 @@
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player
 from pyquake3 import PyQuake3
+import const
 
 #--SETTRZ--#
 home = os.getcwd()
+lastsent = None
+keepLoop = True
 
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
@@ -18,7 +21,7 @@ class Bot():
 
 		self.Players = {}
 
-BOT = Bot(rcon="Norp73")
+BOT = Bot(rcon="Norp123")
 
 def regEve(self, event, func):
 	x = BOT.Listeners
@@ -48,27 +51,30 @@ class API():
 
 	rEve = regEve
 	rCmd = regCmd
-	def __init__(self):
+	def __init__(self, auth=None):
 		self.B = BOT
 		self.Q = BOT.Q
-	def tester(self):
-		print "TESTING! 1! 2! 3!"
-	def say(self,msg):
-		self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
-	def tell(self,uid,msg):
-		self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
+		self.auth = auth
+	def tester(self): print "TESTING! 1! 2! 3!"
+	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
+	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd):
-		return self.Q.rcon(cmd)
+		time.sleep(.5)
+		return self.Q.rcon(cmd)	
 	def plist(self):
 		self.Q.update()
 		return self.Q.players
 	def getPlayer(self, iid=0):
-		if len(self.B.Players) != 0:
-			return self.B.Players[iid]
-		else:
-			return None
+		if len(self.B.Players) != 0: return self.B.Players[iid]
+		else: return None
 	def getPlayers(self): return self.B.Players
 	def getCommands(self): return self.B.Commands
+	def whatTeam(self, num): return const.teams[num]
+	def exitProc(self): proc.kill()
+	def bootProc(self): 
+		keepLoop = False
+		#Need a way of rebooting el boto
+
 
 class Event(object):
 	def kill(self,data):
@@ -140,16 +146,17 @@ def load():
 			fn.append(os.path.join(home, 'mods', i))
 	for f in fn:
 		fname = os.path.basename(f)[:-3]
-		if 1==1:
+		try:
 			mod = imp.load_source(fname, f)
-			modz = getattr(mod, "_MODS_")
+			name = getattr(mod, "_name")
+			author = getattr(mod, "_author")
+			version = getattr(mod, "_version")
+			mod.init(API())
+			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
 			for i in modz:
-				BOT.Modules[i] = modz[i](API(), BOT)
-		#except Exception, e:
-		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (fname, e)
-	for i in BOT.Modules.values():
-		i.load()
-		print "Loaded: %s V%s by %s" % (i.name, i.version, i.author)
+				BOT.Modules[i] = mod
+		except Exception, e:
+			print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
 
 def parseUserInfo(inp):
 	global BOT
@@ -184,31 +191,31 @@ def parse(inp):
 		nmsg = newy[2].rstrip()
 		ncmd1 = nmsg.strip(" ")
 		ncmd = ncmd1.split(" ")[0]
-		print "'"+ncmd+"'"
 		if ncmd.lower() in BOT.Commands:
-			print "@CMD TRUE"
 			obj = _msg(nsender,nmsg,True)
 			BOT.Commands[ncmd][0](obj)
 	elif inp.startswith('ClientConnect:'):
 		new = inp.split(":")[1].strip()
 		_conn(new)
-	elif inp.startswith('ClientUserinfo:'):
-		parseUserInfo(inp)
-	elif inp.startswith('ClientUserinfoChanged:'):
-		parseUserInfoChange(inp)
+	elif inp.startswith('ClientUserinfo:'): parseUserInfo(inp)
+	elif inp.startswith('ClientUserinfoChanged:'): parseUserInfoChange(inp)
 	elif inp.startswith('Kill:'):
 		newy = inp.split(" ")
 		if newy[4] == newy[6] or newy[8] == "MOD_SUICIDE": _suicide(newy[4], newy[8].rstrip())
 		else: _kill(newy[4],newy[6],newy[8].rstrip())
 		
 def loop():
+	global proc, keepLoop
 	# try:
-	proc = subprocess.Popen('~/UrbanTerror/ioUrbanterror.386 +set dedicated 2 +exec server.cfg',shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	proc = subprocess.Popen('~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg',shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	while True:
-		proc_read = proc.stdout.readline()
-		if proc_read:
-			print proc_read.rstrip()
-			parse(proc_read)
+		if keepLoop is True:
+			proc_read = proc.stdout.readline()
+			if proc_read:
+				print proc_read.rstrip()
+				parse(proc_read)
+		else:
+			break
 	return proc
 	# except Exception, e:
 	# 	print e

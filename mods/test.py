@@ -1,39 +1,24 @@
-class ExampleMod():
-	enabled = False
-	log = {}
-	name = "ExampleMod"
-	version = 0.1
-	author = "B1naryth1ef"
+import time, sys
 
-	def __init__(self, api, game):
-		self.enabled = True
-		self.A = api
-		self.G = game
+_name = "Default/Built-in Plugin"
+_author = "B1naryth1ef"
+_version = 0.1
 
-	def cmdHelp(self, obj):
-		a = self.A
-		a.tell(0, a.cRED+"Sup bitch!")
-		# print obj.Sender.split(" ")[1]
-		# sendy = int(obj.sender.split(" ")[1])
-		# if len(obj.msg.split(" ")) == 1:
-		# 	a.tell(sendy, "%sUrTBot Help:" % (a.colorRED))
-		# 	cmds = a.getCommands()
-		# 	for i in cmds:
-		# 		print a.colorBLUE+i+a.colorCYAN+":"+a.colorYELLOW+cmds[i][1]
-		# elif len(obj.msg.split(" ")) == 2:
-		# 	print obj.sender
-		# 	cmds = a.getCommands()
-		# 	a.tell(sendy, "%s%s%s: %s%s" % (a.colorBLUE, obj.msg.split(" ")[1], a.colorCYAN, a.colorYELLOW, cmds[obj.msg.split(" ")[1]][1]))
-	
-	def cmdList(self, obj):
-		a = self.A
-		a.say("PLAYER LIST:")
-		i = a.getPlayer(0)
-		msg = a.colorRED+"["+i.name+"]"+a.colorBLUE+i.team
-		self.A.say(msg)
+def cmdHelp(obj): pass
+def cmdList(obj): pass
+def cmdSlap(obj): pass
+def cmdSet(obj): pass
+def cmdMap(obj): pass
+def cmdStop(obj): pass
+def cmdRestart(obj): pass
 
-	def load(self):
-		self.A.rCmd('!help', self.cmdHelp)
-		self.A.rCmd('!list', self.cmdList, "List all users (with UID's)")
-
-_MODS_ = {'ExampleMod':ExampleMod}
+def init(A):
+	global api
+	api = A
+	api.rCmd('!help', cmdHelp, "List all commands")
+	api.rCmd('!list', cmdList, "List all users (with UID's)")
+	api.rCmd('!slap', cmdSlap, "Slap a player")
+	api.rCmd('!set', cmdSet, "Set a Q3 Variable")
+	api.rCmd('!map', cmdMap, "Load a map")
+	api.rCmd('!stop', cmdStop, "Stop the server/bot")
+	api.rCmd('!restart', cmdRestart, "Restart the server/bot")

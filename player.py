@@ -1,7 +1,7 @@
 
 class Player():
 	def __init__(self, uid, data):
-		self.uid = uid
+		self.uid = int(uid) #@DEV Meh...
 		self.data = data
 		try:
 			self.name = data['name']
