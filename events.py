@@ -1,5 +1,7 @@
 import time
 
+
+
 class Event(): pass
 
 class EventDeath():
@@ -134,3 +136,13 @@ class WEAPON_HK69_HIT(EventDeath): pass
 class WEAPON_M4(EventDeath): pass
 class WEAPON_FLAG(EventDeath): pass
 class WEAPON_GOOMBA(EventDeath): pass
+
+evez = {
+	'MOD_WATER': DEATH_WATER,
+	'MOD_LAVA': DEATH_LAVA,
+	'MOD_TELEFRAG': DEATH_TELEFRAG,
+	'MOD_FALLING': DEATH_FALLING,
+	'MOD_SUICIDE': DEATH_SUICIDE,
+	'MOD_TRIGGER_HURT': DEATH_TRIGGER_HURT,
+	'MOD_CHANGE_TEAM': DEATH_CHANGE_TEAM
+}

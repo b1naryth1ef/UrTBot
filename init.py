@@ -39,6 +39,14 @@ def regCmd(self, cmd, func, desc="None"):
 			break
 	x[cmd] = (func,desc)
 
+def Listen(event, obj):
+	global BOT
+	if event in BOT.Listeners:
+		for i in BOT.Listeners[event]:
+			i(obj)
+	else:
+		pass
+
 class API():
 	cRED = '^1'
 	cGREEN = '^2'
@@ -59,8 +67,8 @@ class API():
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd):
-		time.sleep(.5)
-		return self.Q.rcon(cmd)	
+		time.sleep(.8) #@DEV we need a better way of doing this!
+		return self.Q.rcon(cmd)
 	def plist(self):
 		self.Q.update()
 		return self.Q.players
@@ -71,44 +79,12 @@ class API():
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): proc.kill()
-	def bootProc(self): 
-		keepLoop = False
-		#Need a way of rebooting el boto
+	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
 
-
-class Event(object):
-	def kill(self,data):
-		self.type = "kill"
-		self.attacker = data[0]
-		self.victim = data[1]
-		self.method = data[2]
-	def msg(self,data):
-		self.type = "msg"
-		self.sender = data[0]
-		self.msg = data[1]
-		self.iscmd = data[2] #Bool, should be true if ! is in front
-	def conn(self,data):
-		self.type = "conn"
-		self.uid = data[0]
-		self.name = data[1]
-		self.ip = data[2]
-	def suicide(self,data):
-		self.type = "suicide"
-		self.victim = data[0]
-		self.method = data[1]
-
-	i = {'kill':kill,'msg':msg,'conn':conn,'suicide':suicide}
-	def __init__(self,typex,data):
-		if typex in self.i:
-			self.i[typex](self,data)
-
-def Listen(event, obj):
-	global BOT
-	if event in BOT.Listeners:
-		for i in BOT.Listeners[event]:
-			i(obj)
-	else:
-		pass
+def spawnEvent(Type, data): 
+	if data['type'] in events.evez: 
+		if data['type'] BOT.Listeners: BOT.Listeners[data['type']]
+		return events.evez[data['type']](data)
 
 #---EVENTS---#
 def _suicide(vic, meth):
@@ -201,8 +177,11 @@ def parse(inp):
 	elif inp.startswith('ClientUserinfoChanged:'): parseUserInfoChange(inp)
 	elif inp.startswith('Kill:'):
 		newy = inp.split(" ")
-		if newy[4] == newy[6] or newy[8] == "MOD_SUICIDE": _suicide(newy[4], newy[8].rstrip())
-		else: _kill(newy[4],newy[6],newy[8].rstrip())
+		x = {}
+		x['type'] = newy[8]
+		x['victim'] = newy[6]
+		x['attacker'] = newy[4]
+		spawnEvent(x)
 		
 def loop():
 	global proc, keepLoop
