@@ -123,7 +123,8 @@ def load():
 			fn.append(os.path.join(home, 'mods', i))
 	for f in fn:
 		fname = os.path.basename(f)[:-3]
-		try:
+		#try:
+		if 1==1:
 			mod = imp.load_source(fname, f)
 			modz.append[mod]
 			name = getattr(mod, "_name")
@@ -133,8 +134,8 @@ def load():
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
 			for i in modz:
 				BOT.Modules[i] = mod
-		except Exception, e:
-			print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
+		#except Exception, e:
+		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
 
 def parseUserInfo(inp):
 	global BOT
