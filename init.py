@@ -116,6 +116,7 @@ def _conn(uid):
 def load():
 	global BOT
 	fn = []
+	modz = []
 	county = 0
 	for i in os.listdir(os.path.join(home, 'mods')):
 		if i.endswith('.py') and not i.startswith("_"):
@@ -124,6 +125,7 @@ def load():
 		fname = os.path.basename(f)[:-3]
 		try:
 			mod = imp.load_source(fname, f)
+			modz.append[mod]
 			name = getattr(mod, "_name")
 			author = getattr(mod, "_author")
 			version = getattr(mod, "_version")
