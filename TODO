@@ -6,6 +6,9 @@
 - Threading
 
 
+TODOS:
+- Finish adding events
+
 CMDS:
 !set - Sets a server variable
 !stop - Stop bot/server

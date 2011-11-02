@@ -21,6 +21,7 @@ class DEATH_WATER(EventDeath):
 	def __init__(self, data):
 		self.id = 1
 		self.type = 'suicide'
+		self.name = 'MOD_WATER'
 		self.fireTime = time.time()
 		self.initTime = time.time()
 		self.data = data
@@ -34,6 +35,7 @@ class DEATH_WATER(EventDeath):
 class DEATH_LAVA(EventDeath):
 	def __init__(self, data):
 		self.id = 3
+		self.name = 'MOD_LAVA'
 		self.type = 'suicide'
 		self.fireTime = time.time()
 		self.initTime = time.time()
@@ -51,6 +53,7 @@ class DEATH_FALLING(EventDeath):
 	def __init__(self, data):
 		self.id = 6
 		self.type = 'suicide'
+		self.type = 'MOD_FALLING'
 		self.fireTime = time.time()
 		self.initTime = time.time()
 		self.data = data
@@ -65,6 +68,7 @@ class DEATH_SUICIDE(EventDeath): #@NOTE Seems like this is non-world
 	def __init__(self, data):
 		self.id = 7
 		self.type = 'suicide'
+		self.name = "MOD_SUICIDE"
 		self.fireTime = time.time()
 		self.initTime = time.time()
 		self.data = data
@@ -79,6 +83,7 @@ class DEATH_TRIGGER_HURT(EventDeath):
 	def __init__(self, data):
 		self.id = 9
 		self.type = 'suicide'
+		self.name = 'MOD_TRIGGER_HURT'
 		self.fireTime = time.time()
 		self.initTime = time.time()
 		self.data = data
@@ -93,6 +98,7 @@ class DEATH_CHANGE_TEAM(EventDeath):
 	def __init__(self, data):
 		self.id = 10
 		self.type = 'suicide'
+		self.name = "MOD_CHANGE_TEAM"
 		self.fireTime = time.time()
 		self.initTime = time.time()
 		self.data = data
