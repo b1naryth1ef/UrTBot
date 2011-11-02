@@ -1,0 +1,12 @@
+- Kick/Banning
+- Slapping/Nuking
+- Team Killing
+- Match Managment
+- Database
+- Threading
+
+
+CMDS:
+!set - Sets a server variable
+!stop - Stop bot/server
+!map - Switch to a map
