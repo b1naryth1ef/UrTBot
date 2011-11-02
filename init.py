@@ -83,7 +83,7 @@ class API():
 
 def spawnEvent(Type, data): 
 	if data['type'] in events.evez: 
-		if data['type'] BOT.Listeners: BOT.Listeners[data['type']]
+		if data['type'] in BOT.Listeners: BOT.Listeners[data['type']]
 		return events.evez[data['type']](data)
 
 #---EVENTS---#
