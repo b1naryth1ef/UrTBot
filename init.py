@@ -116,7 +116,7 @@ def _conn(uid):
 def load():
 	global BOT
 	fn = []
-	modz = []
+	modx = []
 	county = 0
 	for i in os.listdir(os.path.join(home, 'mods')):
 		if i.endswith('.py') and not i.startswith("_"):
@@ -126,13 +126,13 @@ def load():
 		#try:
 		if 1==1:
 			mod = imp.load_source(fname, f)
-			modz.append[mod]
+			modx.append[mod]
 			name = getattr(mod, "_name")
 			author = getattr(mod, "_author")
 			version = getattr(mod, "_version")
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-			for i in modz:
+			for i in modx:
 				BOT.Modules[i] = mod
 		#except Exception, e:
 		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
