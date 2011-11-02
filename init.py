@@ -126,14 +126,14 @@ def load():
 		#try:
 		if 1==1:
 			mod = imp.load_source(fname, f)
-			modx.append[mod]
+			#modx.append[mod]
 			name = getattr(mod, "_name")
 			author = getattr(mod, "_author")
 			version = getattr(mod, "_version")
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-			for i in modx:
-				BOT.Modules[i] = mod
+			#for i in modx:
+			#	BOT.Modules[i] = mod
 		#except Exception, e:
 		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
 
@@ -189,7 +189,7 @@ def parse(inp):
 def loop():
 	global proc, keepLoop
 	# try:
-	proc = subprocess.Popen('~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg',shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	proc = subprocess.Popen('~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	while True:
 		if keepLoop is True:
 			proc_read = proc.stdout.readline()
