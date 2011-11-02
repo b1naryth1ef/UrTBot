@@ -1,5 +1,7 @@
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player
+from events import *
+import events
 from pyquake3 import PyQuake3
 import const
 
