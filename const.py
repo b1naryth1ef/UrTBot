@@ -1,11 +1,12 @@
 teams = {
+0:'zombie',
 1:'red',
 2:'blue',
 3:'spec'
 }
 
 gametypes = {
-0: 'ffa',
+0: 'ffa', #free for all
 1: None,
 2: None,
 3: 'tdm', #Team death match
@@ -17,41 +18,41 @@ gametypes = {
 }
 
 
-# //begin credit B3 project
-DEATH_WATER='1'
-DEATH_LAVA='3'
-DEATH_TELEFRAG='5'
-DEATH_FALLING='6'
-DEATH_SUICIDE='7'
-DEATH_TRIGGER_HURT='9'
-DEATH_CHANGE_TEAM='10'
-WEAPON_KNIFE='12'
-WEAPON_KNIFE_THROWN='13'
-WEAPON_BERETTA='14'
-WEAPON_DEAGLE='15'
-WEAPON_SPAS='16'
-WEAPON_UMP45='17'
-WEAPON_MP5K='18'
-WEAPON_LR300='19'
-WEAPON_G36='20'
-WEAPON_PSG1='21'
-WEAPON_HK69='22'
-WEAPON_BLED='23'
-DEATH_KICKED='24'
-WEAPON_HEGRENADE='25'
-WEAPON_FLASH=None #@DEV One of these is 26, the other 27. Time to investigate...
-WEAPON_SMOKE=None
-WEAPON_SR8='28'
-WEAPON_AK103='30'
-WEAPON_SPLODED='31'
-WEAPON_SLAPPED='32'
-WEAPON_BOMBED='33'
-WEAPON_NUKED='34'
-WEAPON_NEGEV='35'
-WEAPON_HK69_HIT='37'
-WEAPON_M4='38'
-WEAPON_FLAG='39'
-WEAPON_GOOMBA='40'
+#@TODO These should all be URTNAME = {id:#, event:OUR_NAME}
+DEATH_WATER = {id:'1'}
+DEATH_LAVA ={id:'3'}
+DEATH_TELEFRAG ={id:'5'}
+DEATH_FALLING={id:'6'}
+DEATH_SUICIDE={id:'7'}
+DEATH_TRIGGER_HURT={id:'9'}
+DEATH_CHANGE_TEAM={id:'10'}
+WEAPON_KNIFE={id:'12'}
+WEAPON_KNIFE_THROWN={id:'13'}
+WEAPON_BERETTA={id:'14'}
+WEAPON_DEAGLE={id:'15'}
+WEAPON_SPAS={id:'16'}
+WEAPON_UMP45={id:'17'}
+WEAPON_MP5K={id:'18'}
+WEAPON_LR300={id:'19'}
+WEAPON_G36={id:'20'}
+WEAPON_PSG1={id:'21'}
+WEAPON_HK69={id:'22'}
+WEAPON_BLED={id:'23'}
+DEATH_KICKED={id:'24'}
+WEAPON_HEGRENADE={id:'25'}
+WEAPON_FLASH={id:None} #@DEV One of these is 26, the other 27. Time to investigate...
+WEAPON_SMOKE={id:None}
+WEAPON_SR8={id:'28'}
+WEAPON_AK103={id:'30'}
+WEAPON_SPLODED={id:'31'}
+WEAPON_SLAPPED={id:'32'}
+WEAPON_BOMBED={id:'33'}
+WEAPON_NUKED={id:'34'}
+WEAPON_NEGEV={id:'35'}
+WEAPON_HK69_HIT={id:'37'}
+WEAPON_M4={id:'38'}
+WEAPON_FLAG={id:'39'}
+WEAPON_GOOMBA={id:'40'}
 
 damage = {
 	'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
@@ -78,7 +79,7 @@ damage = {
     WEAPON_GOOMBA: [100, 100, 100, 100, 100, 100, 100, 100],
      }
 
-#//end credit b3 project
+
 
 gearInfo = {
 	#Sidearms
@@ -122,9 +123,6 @@ Much content in this file has been found in the B3 source.
 We thank the entire BigBrotherBot team for there contributions 
 to the Urban Terror community, and credit much of the data/content 
 in this file to them.
-
-Teams: Give it a team integer and it will return the team name
-Gametypes: give it a gametype integer and it will return the gametype name
 """
 
         

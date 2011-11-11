@@ -29,6 +29,7 @@ class Player:
 		self.ip = address
 		self.bot = bot
 		self.uid = idy
+		self.lastsent = 100
 	def __str__(self):
 		return self.name
 	def __repr__(self):
@@ -73,7 +74,17 @@ class PyQuake3:
 				return self.parse_packet(data)
 			retries -= 1
 		raise Exception('Server response timed out')
+	def timedRcon(self, cmd):
+		new = time.time()
+		if new-self.lastsent >= .6:
+			r = self.command('rcon "%s" %s' % (self.rcon_password, cmd))
+			if r[1] == 'No rconpassword set on the server.\n' or r[1] == 'Bad rconpassword.\n':
+				raise Exception(r[1][:-1])
+		else:
+			print new-self.lastsent
+		return r
 	def rcon(self, cmd):
+		time.sleep(.5) #This is a safe number, until we figure out a better method this should work.
 		r = self.command('rcon "%s" %s' % (self.rcon_password, cmd))
 		if r[1] == 'No rconpassword set on the server.\n' or r[1] == \
 				'Bad rconpassword.\n':

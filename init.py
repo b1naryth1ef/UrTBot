@@ -88,7 +88,7 @@ def spawnEvent(Type, data):
 		if data['type'] in BOT.Listeners: BOT.Listeners[data['type']]
 		return events.evez[data['type']](data)
 
-#---EVENTS---#
+#---EVENTS--- (DEP ALL THESE!)#
 def _suicide(vic, meth):
 	obj = Event('suicide',(vic, meth))
 	Listen('suicide', obj)
@@ -125,19 +125,15 @@ def load():
 			fn.append(os.path.join(home, 'mods', i))
 	for f in fn:
 		fname = os.path.basename(f)[:-3]
-		#try:
-		if 1==1:
+		try:
 			mod = imp.load_source(fname, f)
-			#modx.append[mod]
 			name = getattr(mod, "_name")
 			author = getattr(mod, "_author")
 			version = getattr(mod, "_version")
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-			#for i in modx:
-			#	BOT.Modules[i] = mod
-		#except Exception, e:
-		#	print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
+		except Exception, e:
+			print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
 
 def parseUserInfo(inp):
 	global BOT
@@ -178,8 +174,12 @@ def parse(inp):
 	elif inp.startswith('ClientConnect:'):
 		new = inp.split(":")[1].strip()
 		_conn(new)
-	elif inp.startswith('ClientUserinfo:'): parseUserInfo(inp)
-	elif inp.startswith('ClientUserinfoChanged:'): parseUserInfoChange(inp)
+	elif inp.startswith('ClientUserinfo:'): 
+		ret = parseUserInfo(inp)
+		#@DEV Add UserInfo event here
+	elif inp.startswith('ClientUserinfoChanged:'): 
+		ret = parseUserInfoChange(inp)
+		#@DEV Add InfoChange event here
 	elif inp.startswith('Kill:'):
 		newy = inp.split(" ")
 		x = {}
