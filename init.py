@@ -50,6 +50,7 @@ def Listen(event, obj):
 		pass
 
 class API():
+	#@DEV Can these just be api.RED???
 	cRED = '^1'
 	cGREEN = '^2'
 	cYELLOW = '^3'
