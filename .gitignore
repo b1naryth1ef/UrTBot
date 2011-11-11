@@ -1,2 +1,4 @@
 /ioUrbanTerror.app/
 *.pyc
+*.DS_Store
+*~
