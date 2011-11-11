@@ -17,29 +17,15 @@ class Bot():
 		self.rcon = rcon
 		self.Q = PyQuake3(self.ip, rcon_password=self.rcon)
 
-		self.Modules = {}
-		self.Listeners = {}
-		self.Commands = {}
+		self.Modules = {} #Plugins
+		self.Listeners = {} #Plugins waiting for Triggers
+		self.Triggers = {} #Possible Triggers
+		self.Commands = {} #Commands
+
 
 		self.Players = {}
 
 BOT = Bot(rcon="Norp123")
-
-def regEve(self, event, func):
-	x = BOT.Listeners
-	for i in x.keys():
-		if i == event and x[i] != None:
-			x[i].append(func)
-			break
-	x[event] = [func]
-
-def regCmd(self, cmd, func, desc="None"):
-	x = BOT.Commands
-	for i in x.keys():
-		if i == cmd:
-			print "Can't add command %s, already exsists!" % (cmd)
-			break
-	x[cmd] = (func,desc)
 
 def Listen(event, obj):
 	global BOT
@@ -60,8 +46,22 @@ class API():
 	cWHITE = '^7'
 	cBLACK = '^8'
 
-	rEve = regEve
-	rCmd = regCmd
+	def rEve(self, event, func):
+		x = BOT.Listeners
+		for i in x.keys():
+			if i == event and x[i] != None:
+				x[i].append(func)
+				break
+		x[event] = [func]
+
+	def rCmd(self, cmd, func, desc="None"):
+		x = BOT.Commands
+		for i in x.keys():
+			if i == cmd:
+				print "Can't add command %s, already exsists!" % (cmd)
+				break
+		x[cmd] = (func,desc)
+
 	def __init__(self, auth=None):
 		self.B = BOT
 		self.Q = BOT.Q
