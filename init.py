@@ -10,6 +10,12 @@ home = os.getcwd()
 lastsent = None
 keepLoop = True
 
+#--GLOB--#
+config_prefix = None
+config_rcon = None
+config_rconip = None
+config_bootcommand = None
+
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
 		self.prefix = prefix
@@ -22,10 +28,7 @@ class Bot():
 		self.Triggers = {} #Possible Triggers
 		self.Commands = {} #Commands
 
-
 		self.Players = {}
-
-BOT = Bot(rcon="Norp123")
 
 def Listen(event, obj):
 	global BOT
@@ -134,9 +137,9 @@ def load():
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
 		except Exception, e:
-			print >> sys.stderr, "ERROR LOADING %s: %s" % (name, e)
+			print "ERROR LOADING %s: %s" % (name, e)
 
-def parseUserInfo(inp):
+def parseUserInfo(inp): #@DEV Change with regex
 	global BOT
 	varz = {}
 	m = inp.split("\\")
@@ -148,7 +151,7 @@ def parseUserInfo(inp):
 		y+=2
 	BOT.Players[int(uid)] = player.Player(int(uid), varz)
 
-def parseUserInfoChange(inp):
+def parseUserInfoChange(inp): #@DEV Change with regex
 	global BOT
 	varz = {}
 	varz2 = {}
@@ -161,7 +164,7 @@ def parseUserInfoChange(inp):
 	BOT.Players[int(m[1])].name = varz['n']
 	BOT.Players[int(m[1])].team = varz['t']
 
-def parse(inp):
+def parse(inp): #Change with regex?
 	global BOT
 	if inp.startswith("say:"):
 		newy = inp.split(':',2)
@@ -189,10 +192,21 @@ def parse(inp):
 		x['attacker'] = newy[4]
 		spawnEvent(x)
 		
+def loadConfig():
+	global config_prefix, config_rcon, config_rconip, config_bootcommand
+	#try:
+	if 1==1:
+		from config import botConfig
+		config_prefix = botConfig['prefix']
+		config_rcon = botConfig['rcon']
+		config_rconip = botConfig['rconip']
+		config_bootcommand = botConfig['servercommand']
+	#except Exception, e:
+	#	print "Error loading config! %s" % (e)
+	#	print "Exiting..."
+
 def loop():
 	global proc, keepLoop
-	# try:
-	proc = subprocess.Popen('~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	while True:
 		if keepLoop is True:
 			proc_read = proc.stdout.readline()
@@ -202,11 +216,10 @@ def loop():
 		else:
 			break
 	return proc
-	# except Exception, e:
-	# 	print e
-	# 	proc.kill()
-	# 	sys.exit()
 
 if __name__ == "__main__":
+	loadConfig()
+	BOT = Bot(config_prefix, config_rconip, config_rcon)
 	load()
+	proc = subprocess.Popen(config_bootcommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	loop()
