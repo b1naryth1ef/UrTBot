@@ -56,53 +56,53 @@ WEAPON_GOOMBA={id:'40'}
 
 damage = {
 	'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
-    DEATH_TELEFRAG: [0, 0, 0, 0, 0, 0, 0, 0],
-    WEAPON_KNIFE: [100, 60, 44, 35, 20, 20, 44, 100],
-    WEAPON_KNIFE_THROWN: [100, 60, 44, 35, 20, 20, 44, 100],
-    WEAPON_BERETTA: [100, 34, 30, 20, 11, 11, 30, 100],
-    WEAPON_DEAGLE: [100, 66, 57, 38, 22, 22, 57, 100],
-    WEAPON_SPAS: [25, 25, 25, 25, 25, 25, 25, 100],
-    WEAPON_UMP45: [100, 51, 44, 29, 17, 17, 44, 100],
-    WEAPON_MP5K: [50, 34, 30, 20, 11, 11, 30, 100],
-    WEAPON_LR300: [100, 51, 44, 29, 17, 17, 44, 100],
-    WEAPON_G36: [100, 51, 44, 29, 17, 17, 44, 100],
-    WEAPON_PSG1: [100, 63, 97, 63, 36, 36, 97, 100],
-    WEAPON_HK69: [50, 50, 50, 50, 50, 50, 50, 100],
-    WEAPON_BLED: [15, 15, 15, 15, 15, 15, 15, 15],
-    DEATH_KICKED: [20, 20, 20, 20, 20, 20, 20, 100],
-    WEAPON_HEGRENADE: [50, 50, 50, 50, 50, 50, 50, 100],
-    WEAPON_SR8: [100, 100, 100, 100, 50, 50, 100, 100],
-    WEAPON_AK103: [100, 58, 51, 34, 19, 19, 51, 100],
-    WEAPON_NEGEV: [50, 34, 30, 20, 11, 11, 30, 100],
-    WEAPON_HK69_HIT: [20, 20, 20, 20, 20, 20, 20, 100],
-    WEAPON_M4: [100, 51, 44, 29, 17, 17, 44, 100],
-    WEAPON_GOOMBA: [100, 100, 100, 100, 100, 100, 100, 100],
+    DEATH_TELEFRAG[id]: [0, 0, 0, 0, 0, 0, 0, 0],
+    WEAPON_KNIFE[id]: [100, 60, 44, 35, 20, 20, 44, 100],
+    WEAPON_KNIFE_THROWN[id]: [100, 60, 44, 35, 20, 20, 44, 100],
+    WEAPON_BERETTA[id]: [100, 34, 30, 20, 11, 11, 30, 100],
+    WEAPON_DEAGLE[id]: [100, 66, 57, 38, 22, 22, 57, 100],
+    WEAPON_SPAS[id]: [25, 25, 25, 25, 25, 25, 25, 100],
+    WEAPON_UMP45[id]: [100, 51, 44, 29, 17, 17, 44, 100],
+    WEAPON_MP5K[id]: [50, 34, 30, 20, 11, 11, 30, 100],
+    WEAPON_LR300[id]: [100, 51, 44, 29, 17, 17, 44, 100],
+    WEAPON_G36[id]: [100, 51, 44, 29, 17, 17, 44, 100],
+    WEAPON_PSG1[id]: [100, 63, 97, 63, 36, 36, 97, 100],
+    WEAPON_HK69[id]: [50, 50, 50, 50, 50, 50, 50, 100],
+    WEAPON_BLED[id]: [15, 15, 15, 15, 15, 15, 15, 15],
+    DEATH_KICKED[id]: [20, 20, 20, 20, 20, 20, 20, 100],
+    WEAPON_HEGRENADE[id]: [50, 50, 50, 50, 50, 50, 50, 100],
+    WEAPON_SR8[id]: [100, 100, 100, 100, 50, 50, 100, 100],
+    WEAPON_AK103[id]: [100, 58, 51, 34, 19, 19, 51, 100],
+    WEAPON_NEGEV[id]: [50, 34, 30, 20, 11, 11, 30, 100],
+    WEAPON_HK69_HIT[id]: [20, 20, 20, 20, 20, 20, 20, 100],
+    WEAPON_M4[id]: [100, 51, 44, 29, 17, 17, 44, 100],
+    WEAPON_GOOMBA[id]: [100, 100, 100, 100, 100, 100, 100, 100],
      }
 
 
 
 gearInfo = {
 	#Sidearms
-	'F':{'id':WEAPON_BERETTA, 'name':'beretta', 'damage':damage[WEAPON_BERETTA]},
-	'G':{'id':WEAPON_DEAGLE,'name':'desert eagle', 'damage':damage[WEAPON_DEAGLE]},
+	'F':{'id':WEAPON_BERETTA[id], 'name':'beretta', 'damage':damage[WEAPON_BERETTA[id]]},
+	'G':{'id':WEAPON_DEAGLE[id],'name':'desert eagle', 'damage':damage[WEAPON_DEAGLE[id]]},
 
 	#Primary
-	'K':{'id':WEAPON_HK69, 'name':'hk69', 'damage': damage[WEAPON_HK69]},
-	'L':{'id':WEAPON_LR300, 'name':'lr300', 'damage': damage[WEAPON_LR300]},
-	'M':{'id':WEAPON_G36, 'name':'g36', 'damage': damage[WEAPON_G36]},
-	'N':{'id':WEAPON_PSG1, 'name':'psg1','damage': damage[WEAPON_PSG1]},
-	'Z':{'id':WEAPON_SR8,'name':'sr8','damage': damage[WEAPON_SR8]},
-	'a':{'id':WEAPON_AK103,'name':'ak103','damage': damage[WEAPON_AK103]},
-	'c':{'id':WEAPON_NEGEV,'name':'negav','damage': damage[WEAPON_NEGEV]},
-	'e':{'id':WEAPON_M4,'name':'m4','damage': damage[WEAPON_M4]},
+	'K':{'id':WEAPON_HK69[id], 'name':'hk69', 'damage': damage[WEAPON_HK69[id]]},
+	'L':{'id':WEAPON_LR300[id], 'name':'lr300', 'damage': damage[WEAPON_LR300[id]]},
+	'M':{'id':WEAPON_G36[id], 'name':'g36', 'damage': damage[WEAPON_G36[id]]},
+	'N':{'id':WEAPON_PSG1[id], 'name':'psg1','damage': damage[WEAPON_PSG1[id]]},
+	'Z':{'id':WEAPON_SR8[id],'name':'sr8','damage': damage[WEAPON_SR8[id]]},
+	'a':{'id':WEAPON_AK103[id],'name':'ak103','damage': damage[WEAPON_AK103[id]]},
+	'c':{'id':WEAPON_NEGEV[id],'name':'negav','damage': damage[WEAPON_NEGEV[id]]},
+	'e':{'id':WEAPON_M4[id],'name':'m4','damage': damage[WEAPON_M4[id]]},
 
 	#Primary and Secondary
-	'H':{'id':WEAPON_SPAS,'name':'spas', 'damage': damage[WEAPON_SPAS]},
-	'I':{'id':WEAPON_MP5K,'name':'mp5k', 'damage': damage[WEAPON_MP5K]},
-	'J':{'id':WEAPON_UMP45,'name':'ump45', 'damage': damage[WEAPON_UMP45]},
+	'H':{'id':WEAPON_SPAS[id],'name':'spas', 'damage': damage[WEAPON_SPAS[id]]},
+	'I':{'id':WEAPON_MP5K[id],'name':'mp5k', 'damage': damage[WEAPON_MP5K[id]]},
+	'J':{'id':WEAPON_UMP45[id],'name':'ump45', 'damage': damage[WEAPON_UMP45[id]]},
 
 	#Grenades
-	'O':{'id':WEAPON_HEGRENADE, 'name':'he grenade', 'damage': damage[WEAPON_HEGRENADE]},
+	'O':{'id':WEAPON_HEGRENADE[id], 'name':'he grenade', 'damage': damage[WEAPON_HEGRENADE[id]]},
 	'Q':None, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
 
 	#Items
