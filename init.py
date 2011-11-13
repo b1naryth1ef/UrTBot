@@ -1,5 +1,5 @@
 #---IMPORTS---#
-import subprocess, time, os, sys, imp, player
+import subprocess, time, os, sys, imp, player, string, re
 from events import *
 import events
 from pyquake3 import PyQuake3
@@ -17,6 +17,13 @@ config_rconip = None
 config_bootcommand = None
 config_groups = None
 config_plugins = None
+
+def canInt(i):
+	try:
+		int(i)
+		return True
+	except:
+		return False
 
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
@@ -115,23 +122,40 @@ def load():
 		except Exception, e:
 			print "ERROR LOADING %s: %s" % (name, e)	
 
-def parseUserInfo(inp): #@DEV Replace with regex
-	varz = {}
-	inp = inp.split("\\")
-	uid = int(inp[0].split(" ")[1])
-	x = inp[1]
-	y = 1
-	while len(x) > y:
-		varz[x[y-1]] = x[y]
-		y+=2
+def parseUserInfo(inp, varz={}, y=1): #@DEV Replace with regex
+	inp2 = inp.split(' ', 2)
+	uid = inp2[1]
+	varz = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+	print varz
 	return uid,varz
+	
+	#print re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+
+	# varz = {}
+	# if inp.startswith('\\'):
+	# 	pass
+	# else:
+	# 	m[2] = "\\"+m[2]
+	# inp = inp.split("\\")
+	# uid = int(inp[0].split(" ")[1])
+	# x = inp[1]
+	# y = 1
+	# while len(x) > y:
+	# 	varz[x[y-1]] = x[y]
+	# 	y+=2
+	# return uid,varz
 
 def parseUserInfoChange(inp): #@DEV Replace with regex
+	#r is team, 
 	global BOT
 	varz = {}
 	varz2 = {}
-	m = inp.split(" ")
+	m = inp.split(" ") 
 	uid = int(m[1])
+	if m[2].startswith('\\'):
+		pass
+	else:
+		m[2] = "\\"+m[2]
 	x = m[2].split("\\")
 	y = 1
 	while len(x) > y:
