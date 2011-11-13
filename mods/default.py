@@ -24,7 +24,7 @@ def cmdLoadout(obj): pass
 def cmdTester(obj):
 	global api
 	print api.B.Clients
-	for client in api.B.Clients:
+	for client in api.B.Clients.values():
 		print client.uid,":",client.name,":",client.ip
 		print client.gear
 
