@@ -163,6 +163,7 @@ def parse(inp):
 				print "Natural fire"
 				BOT.Commands[inp[2].split(' ')[0]][0](0) #@TEMP 0 should become chat object
 			else:
+				print "Unnatural fire"
 				BOT.Commands['!test'][0](0)
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
