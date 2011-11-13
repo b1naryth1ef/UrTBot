@@ -1,148 +1,63 @@
 import time
 
-
-
-class Event(): pass
-
-class EventDeath():
+class Event():
 	def __init__(self, data):
-		self.id = 0
 		self.fireTime = time.time()
-		self.initTime = time.time()
 		self.data = data
-
 class EventServer(): pass
-
 class EventClient(): pass
-
 class EventOther(): pass
+class EventMessage(): pass
 
 
-#DEATHS
-class DEATH_WATER(EventDeath):
-	def __init__(self, data):
-		self.id = 1
-		self.type = 'suicide'
-		self.name = 'MOD_WATER'
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = 'WORLD'
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = -1
-		self.isWorld = True
+def CHAT_MESSAGE(data): pass
+def TEAMCHAT_MESSAGE(data): pass
 
-class DEATH_LAVA(EventDeath):
-	def __init__(self, data):
-		self.id = 3
-		self.name = 'MOD_LAVA'
-		self.type = 'suicide'
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = 'WORLD'
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = -1
-		self.isWorld = True
+def CLIENT_SAY(data): pass
+def CLIENT_SAYTEAM(data): pass
+def CLIENT_TELL(data): pass
+def CLIENT_JOIN(data): pass
+def CLIENT_CONNECT(data): pass
+def CLIENT_USERINFO(data): pass
+def CLIENT_QUIT(data): pass
+def CLIENT_KICKED(data): pass
+def CLIENT_SWITCHTEAM(data): pass
+def CLIENT_KILL(data): pass
+def CLIENT_GENERICDEATH(data): pass
+def CLIENT_KILLTEAM(data): pass
+def CLIENT_SUICIDE(data): pass
+def CLIENT_WORLDDEATH(data): pass
+def CLIENT_INFLICTDAMAGE(data): pass
+def CLIENT_DAMAGED(data): pass
+def CLIENT_PICKUPITEM(data): pass
+def CLIENT_CHANGENAME(data): pass
+def CLIENT_CHANGELOADOUT(data): pass
 
-class DEATH_TELEFRAG(EventDeath): pass
-	
-class DEATH_FALLING(EventDeath):
-	def __init__(self, data):
-		self.id = 6
-		self.type = 'suicide'
-		self.type = 'MOD_FALLING'
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = 'WORLD'
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = -1
-		self.isWorld = True 
-
-class DEATH_SUICIDE(EventDeath): #@NOTE Seems like this is non-world
-	def __init__(self, data):
-		self.id = 7
-		self.type = 'suicide'
-		self.name = "MOD_SUICIDE"
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = data['attacker']
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = -1
-		self.isWorld = False
-
-class DEATH_TRIGGER_HURT(EventDeath):
-	def __init__(self, data):
-		self.id = 9
-		self.type = 'suicide'
-		self.name = 'MOD_TRIGGER_HURT'
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = 'WORLD'
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = -1
-		self.isWorld = True
-
-class DEATH_CHANGE_TEAM(EventDeath):
-	def __init__(self, data):
-		self.id = 10
-		self.type = 'suicide'
-		self.name = "MOD_CHANGE_TEAM"
-		self.fireTime = time.time()
-		self.initTime = time.time()
-		self.data = data
-	
-		self.attacker = data['attacker']
-		self.victim = data['victim']
-		self.attackerScore = 0
-		self.victimScore = 0
-		self.isWorld = False
-
-class WEAPON_KNIFE(EventDeath): pass
-class WEAPON_KNIFE_THROWN(EventDeath): pass
-class WEAPON_BERETTA(EventDeath): pass
-class WEAPON_DEAGLE(EventDeath): pass
-class WEAPON_SPAS(EventDeath): pass
-class WEAPON_UMP45(EventDeath): pass
-class WEAPON_MP5K(EventDeath): pass
-class WEAPON_LR300(EventDeath): pass
-class WEAPON_G36(EventDeath): pass
-class WEAPON_PSG1(EventDeath): pass
-class WEAPON_HK69(EventDeath): pass
-class WEAPON_BLED(EventDeath): pass
-class DEATH_KICKED(EventDeath): pass
-class WEAPON_HEGRENADE(EventDeath): pass
-class WEAPON_SR8(EventDeath): pass
-class WEAPON_AK103(EventDeath): pass
-class WEAPON_SPLODED(EventDeath): pass
-class WEAPON_SLAPPED(EventDeath): pass
-class WEAPON_BOMBED(EventDeath): pass
-class WEAPON_NUKED(EventDeath): pass
-class WEAPON_NEGEV(EventDeath): pass
-class WEAPON_HK69_HIT(EventDeath): pass
-class WEAPON_M4(EventDeath): pass
-class WEAPON_FLAG(EventDeath): pass
-class WEAPON_GOOMBA(EventDeath): pass
-
-evez = {
-	'MOD_WATER': DEATH_WATER,
-	'MOD_LAVA': DEATH_LAVA,
-	'MOD_TELEFRAG': DEATH_TELEFRAG,
-	'MOD_FALLING': DEATH_FALLING,
-	'MOD_SUICIDE': DEATH_SUICIDE,
-	'MOD_TRIGGER_HURT': DEATH_TRIGGER_HURT,
-	'MOD_CHANGE_TEAM': DEATH_CHANGE_TEAM
+EVENTS = {
+	'CHAT_MESSAGE':None, #
+	'TEAMCHAT_MESSAGE':None,# 
+	'CLIENT_SAY':None, # 
+	'CLIENT_SAYTEAM':None, #
+	'CLIENT_TELL':None, #
+	'CLIENT_JOIN':None, #
+	'CLIENT_CONNECT':None, #
+	'CLIENT_USERINFO':None, #
+	'CLIENT_QUIT':None, #
+	'CLIENT_KICKED':None, #
+	'CLIENT_SWITCHTEAM':None, #
+	'CLIENT_KILL':None, #
+	'CLIENT_GENERICDEATH':None, #
+	'CLIENT_KILLTEAM':None, #
+	'CLIENT_SUICIDE':None, #
+	'CLIENT_WORLDDEATH':None,
+	'CLIENT_INFLICTDAMAGE':None,
+	'CLIENT_DAMAGED':None,
+	'CLIENT_PICKUPITEM':None,
+	'CLIENT_CHANGENAME':None,
+	'CLIENT_CHANGELOADOUT':None,
+	'GAME_ROUND_START':None,
+	'GAME_ROUND_END':None,
+	'GAME_MATCH_END':None,
+	'GAME_MATCH_START':None,
+	'GENERIC':None,
 }

@@ -2,8 +2,6 @@ EVENTS:
 	api.registerEve('event', function)
 	Should pull events from const (deaths) and allow for dynamic ones, so modules can do, api.registerHook('hook', **args) and then api.fireHook('hook')
 
-
-
 - Kick/Banning
 - Slapping/Nuking
 - Team Killing
@@ -13,13 +11,7 @@ EVENTS:
 
 
 TODOS:
-- Make sure RCON is workin [!!!!]
-- Add a DB handler (either/both sqlite or mysql)
-- Add basic commands, work on API
-- Add lots of events
-- etc
+- Add a DB handler [In progress]
+- Add basic commands, work on API [Waiting...]
+- Add lots of events [Semi-in progress]
 
-CMDS:
-!set - Sets a server variable
-!stop - Stop bot/server
-!map - Switch to a map

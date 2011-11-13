@@ -15,6 +15,8 @@ config_prefix = None
 config_rcon = None
 config_rconip = None
 config_bootcommand = None
+config_groups = None
+config_plugins = None
 
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
@@ -25,45 +27,22 @@ class Bot():
 
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers
-		self.Triggers = {} #Possible Triggers
+		self.Triggers = {} #Possible Triggers (Events)
 		self.Commands = {} #Commands
 
-		self.Players = {}
+		self.Clients = {} #AKA players
 
-def Listen(event, obj):
-	global BOT
-	if event in BOT.Listeners:
-		for i in BOT.Listeners[event]:
-			i(obj)
-	else:
-		pass
+	def eventFire(event, data): pass
 
 class API():
-	#@DEV Can these just be api.RED???
-	cRED = '^1'
-	cGREEN = '^2'
-	cYELLOW = '^3'
-	cBLUE = '^4'
-	cCYAN = '^5'
-	cMAGENTA = '^6'
-	cWHITE = '^7'
-	cBLACK = '^8'
-
-	def rEve(self, event, func):
-		x = BOT.Listeners
-		for i in x.keys():
-			if i == event and x[i] != None:
-				x[i].append(func)
-				break
-		x[event] = [func]
-
-	def rCmd(self, cmd, func, desc="None"):
-		x = BOT.Commands
-		for i in x.keys():
-			if i == cmd:
-				print "Can't add command %s, already exsists!" % (cmd)
-				break
-		x[cmd] = (func,desc)
+	RED = '^1'
+	GREEN = '^2'
+	YELLOW = '^3'
+	BLUE = '^4'
+	CYAN = '^5'
+	MAGENTA = '^6'
+	WHITE = '^7'
+	BLACK = '^8'
 
 	def __init__(self, auth=None):
 		self.B = BOT
@@ -72,9 +51,7 @@ class API():
 	def tester(self): print "TESTING! 1! 2! 3!"
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
-	def rcon(self,cmd):
-		time.sleep(.8) #@DEV we need a better way of doing this!
-		return self.Q.rcon(cmd)
+	def rcon(self,cmd): return self.Q.rcon(cmd)
 	def plist(self):
 		self.Q.update()
 		return self.Q.players
@@ -86,27 +63,26 @@ class API():
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): proc.kill()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
+	def addEvent(self, event, func):
+		for i in self.B.Listeners.keys():
+			if i == event and self.B.Listeners[i] != None:
+				self.B.Listeners[i].append(func)
+				return True
+		self.B.Listeners[event] = [func]
 
-def spawnEvent(Type, data): 
-	if data['type'] in events.evez: 
-		if data['type'] in BOT.Listeners: BOT.Listeners[data['type']]
-		return events.evez[data['type']](data)
+	def addCmd(self, cmd, func, desc='None'):
+		if cmd in self.B.Commands.keys():
+			print "Can't add command %s, another plugin already added it!" % (cmd)
+			return False
+		self.B.Commands[cmd] = (func,desc)
+		return True
 
-#---EVENTS--- (DEP ALL THESE!)#
-def _suicide(vic, meth):
-	obj = Event('suicide',(vic, meth))
-	Listen('suicide', obj)
-	return obj
-
-def _kill(atk,vic,meth):
-	obj = Event('kill',(atk,vic,meth))
-	Listen('kill',obj)
-	return obj
-
-def _msg(sen,msg,iscmd=False):
-	obj = Event('msg',(sen,msg,iscmd))
-	Listen('msg',obj)
-	return obj
+	def addTrigger(self, trigger):
+		if trigger in self.B.Triggers.keys():
+			print "Can't add trigger %s, another plugin already added it!" % (trigger)
+			return False
+		self.B.Triggers[trigger] = []
+		return True
 
 def _conn(uid):
 	global BOT
@@ -137,73 +113,118 @@ def load():
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
 		except Exception, e:
-			print "ERROR LOADING %s: %s" % (name, e)
+			print "ERROR LOADING %s: %s" % (name, e)	
 
-def parseUserInfo(inp): #@DEV Change with regex
-	global BOT
+def parseUserInfo(inp): #@DEV Replace with regex
 	varz = {}
-	m = inp.split("\\")
-	uid = m[0].split(" ")[1]
-	x = m[1]
+	inp = inp.split("\\")
+	uid = int(inp[0].split(" ")[1])
+	x = inp[1]
 	y = 1
 	while len(x) > y:
 		varz[x[y-1]] = x[y]
 		y+=2
-	BOT.Players[int(uid)] = player.Player(int(uid), varz)
+	return uid,varz
 
-def parseUserInfoChange(inp): #@DEV Change with regex
+def parseUserInfoChange(inp): #@DEV Replace with regex
 	global BOT
 	varz = {}
 	varz2 = {}
 	m = inp.split(" ")
+	uid = int(m[1])
 	x = m[2].split("\\")
 	y = 1
 	while len(x) > y:
 		varz[x[y-1]] = x[y]
 		y+=2
-	BOT.Players[int(m[1])].name = varz['n']
-	BOT.Players[int(m[1])].team = varz['t']
+	return uid,varz
 
-def parse(inp): #Change with regex?
+def parseKill(attacker,victim,method):
+	if method in [1, 3, 9, 39]:
+		BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
+	elif method in [7, 6, 10, 31, 320]:
+		BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+	else:
+		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
+		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
+
+def parse(inp):
 	global BOT
 	if inp.startswith("say:"):
-		newy = inp.split(':',2)
-		nsender = newy[1]
-		nmsg = newy[2].rstrip()
-		ncmd1 = nmsg.strip(" ")
-		ncmd = ncmd1.split(" ")[0]
-		if ncmd.lower() in BOT.Commands:
-			obj = _msg(nsender,nmsg,True)
-			BOT.Commands[ncmd][0](obj)
+		#say: 0 [WoC]*B1naryth1ef: blah blah
+		#['0', '[WoC]*B1naryth1ef', 'blah blah']
+		inp = inp.split(" ", 3)
+		inp.pop(0)
+		inp[1] = inp[1].strip(':') 
+		eventTrigger('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
+
 	elif inp.startswith('ClientConnect:'):
-		new = inp.split(":")[1].strip()
-		_conn(new)
-	elif inp.startswith('ClientUserinfo:'): 
-		ret = parseUserInfo(inp)
-		#@DEV Add UserInfo event here
-	elif inp.startswith('ClientUserinfoChanged:'): 
-		ret = parseUserInfoChange(inp)
-		#@DEV Add InfoChange event here
+		#ClientConnect: 0
+		inp = inp.split(" ")
+		inp = int(inp[1])
+		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', inp)
+
+	elif inp.startswith('ClientUserinfo:'):
+		uid, varz = parseUserInfo(inp)
+		if uid in BOT.Clients.keys(): BOT.Clients[uid] = player.Player(uid, varz)
+
+	elif inp.startswith('ClientUserinfoChanged:'):
+		uid, varz = parseUserInfoChange(inp)
+
+	elif inp.startswith('ClientDisconnect:'): pass
 	elif inp.startswith('Kill:'):
-		newy = inp.split(" ")
-		x = {}
-		x['type'] = newy[8]
-		x['victim'] = newy[6]
-		x['attacker'] = newy[4]
-		spawnEvent(x)
+		#Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
+		inp = inp.split(" ")
+		inp.pop(0)
+		attacker = int(inp[0])
+		victim = int(inp[1])
+		method = int(inp[2])
+		parseKill(attacker, victim, method)
+
+	elif inp.startswith('Hit:'): pass
+	elif inp.startswith('Item'): pass
+	elif inp.startswith('Flag:'): pass
+	else: pass
+
+	# if inp.startswith("say:"):
+	# 	newy = inp.split(':',2)
+	# 	nsender = newy[1]
+	# 	nmsg = newy[2].rstrip()
+	# 	ncmd1 = nmsg.strip(" ")
+	# 	ncmd = ncmd1.split(" ")[0]
+	# elif inp.startswith('ClientConnect:'):
+	# 	new = inp.split(":")[1].strip()
+	# 	_conn(new)
+	# elif inp.startswith('ClientUserinfo:'): 
+	# 	ret = parseUserInfo(inp)
+	# 	#@DEV Add UserInfo event here
+	# elif inp.startswith('ClientUserinfoChanged:'): 
+	# 	ret = parseUserInfoChange(inp)
+	# 	#@DEV Add InfoChange event here
+	# elif inp.startswith('Kill:'):
+	# 	newy = inp.split(" ")
+	# 	x = {}
+	# 	x['type'] = newy[8]
+	# 	x['victim'] = newy[6]
+	# 	x['attacker'] = newy[4]
+	# 	spawnEvent(x)
 		
 def loadConfig():
-	global config_prefix, config_rcon, config_rconip, config_bootcommand
-	#try:
-	if 1==1:
+	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups
+	try:
 		from config import botConfig
 		config_prefix = botConfig['prefix']
 		config_rcon = botConfig['rcon']
 		config_rconip = botConfig['rconip']
 		config_bootcommand = botConfig['servercommand']
-	#except Exception, e:
-	#	print "Error loading config! %s" % (e)
-	#	print "Exiting..."
+		config_plugins = botConfig['plugins']
+		config_groups = botConfig['groups']
+	except Exception, e:
+		print "Error loading config! %s" % (e)
+		print "Exiting..."
+
+def loadDatabase():
+	pass
 
 def loop():
 	global proc, keepLoop

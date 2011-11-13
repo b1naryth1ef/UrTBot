@@ -21,14 +21,23 @@ def cmdRestart(obj): pass
 def cmdLoadout(obj): pass
 	#format should be !loadout int, or playername (regex?)
 
+def cmdTester(obj):
+	global api
+	for client in api.B.Clients:
+		print client.uid,":",client.name,":",client.ip
+		print client.gear
+
 def init(A):
 	global api
 	api = A
-	api.rCmd('!help', cmdHelp, "List all commands")
-	api.rCmd('!list', cmdList, "List all users (with UID's)")
-	api.rCmd('!slap', cmdSlap, "Slap a player")
-	api.rCmd('!set', cmdSet, "Set a Q3 Variable")
-	api.rCmd('!map', cmdMap, "Load a map")
-	api.rCmd('!stop', cmdStop, "Stop the server/bot")
-	api.rCmd('!restart', cmdRestart, "Restart the server/bot")
-	api.rCmd('!loadout', cmdRestart, "See a players loadout")
+	api.addCmd('!help', cmdHelp, "List all commands")
+	api.addCmd('!list', cmdList, "List all users (with UID's)")
+	api.addCmd('!slap', cmdSlap, "Slap a player")
+	api.addCmd('!set', cmdSet, "Set a Q3 Variable")
+	api.addCmd('!map', cmdMap, "Load a map")
+	api.addCmd('!stop', cmdStop, "Stop the server/bot")
+	api.addCmd('!restart', cmdRestart, "Restart the server/bot")
+	api.addCmd('!loadout', cmdRestart, "See a players loadout")
+	api.addCmd('!test', cmdTester, ">:D")
+
+def die(): pass #Called when we should disable/shutdown
