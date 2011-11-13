@@ -178,7 +178,7 @@ def parse(inp):
 		inp.pop(0)
 		attacker = int(inp[0])
 		victim = int(inp[1])
-		method = int(inp[2])
+		method = int(inp[2].strip(':'))
 		parseKill(attacker, victim, method)
 
 	elif inp.startswith('Hit:'): pass
