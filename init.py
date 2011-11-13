@@ -155,8 +155,12 @@ def parse(inp):
 		#['0', '[WoC]*B1naryth1ef', 'blah blah']
 		inp = inp.split(" ", 3)
 		inp.pop(0)
-		inp[1] = inp[1].strip(':') 
-		eventTrigger('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
+		inp[1] = inp[1].strip(':')
+		if inp[2].startswith('!'):
+			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
+			if inp[2].split(' ')[0] in BOT.Commands:
+				BOT.Commands[inp[2].split(' ')[0]](0) #@TEMP 0 should become chat object
+		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0

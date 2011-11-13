@@ -13,6 +13,7 @@ class EventMessage(): pass
 def CHAT_MESSAGE(data): pass
 def TEAMCHAT_MESSAGE(data): pass
 
+def CLIENT_COMMAND(data): pass
 def CLIENT_SAY(data): pass
 def CLIENT_SAYTEAM(data): pass
 def CLIENT_TELL(data): pass
@@ -35,7 +36,8 @@ def CLIENT_CHANGELOADOUT(data): pass
 
 EVENTS = {
 	'CHAT_MESSAGE':None, #
-	'TEAMCHAT_MESSAGE':None,# 
+	'TEAMCHAT_MESSAGE':None,#
+	'CLIENT_COMMAND':None, #
 	'CLIENT_SAY':None, # 
 	'CLIENT_SAYTEAM':None, #
 	'CLIENT_TELL':None, #
