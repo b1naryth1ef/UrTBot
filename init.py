@@ -39,7 +39,11 @@ class Bot():
 
 		self.Clients = {} #AKA players
 
-	def eventFire(self, event, data): pass
+	def eventFire(self, event, data): 
+		obj = events.EVENTS[event](data)
+		for i in self.Listeners.keys():
+			if i == event: self.Listeners[i](obj)
+			break
 
 class API():
 	RED = '^1'
@@ -122,29 +126,15 @@ def load():
 		except Exception, e:
 			print "ERROR LOADING %s: %s" % (name, e)	
 
-def parseUserInfo(inp, varz={}, y=1): #@DEV Replace with regex
+def parseUserInfo(inp, varz={}, y=1):
 	inp2 = inp.split(' ', 2)
-	uid = inp2[1]
-	varz = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
-	print varz
+	uid = int(inp2[1])
+	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+	for i in var:
+		varz[i[0]] = i[1]
 	return uid,varz
 	
-	#print re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
-
-	# varz = {}
-	# if inp.startswith('\\'):
-	# 	pass
-	# else:
-	# 	m[2] = "\\"+m[2]
-	# inp = inp.split("\\")
-	# uid = int(inp[0].split(" ")[1])
-	# x = inp[1]
-	# y = 1
-	# while len(x) > y:
-	# 	varz[x[y-1]] = x[y]
-	# 	y+=2
-	# return uid,varz
-
+	
 def parseUserInfoChange(inp): #@DEV Replace with regex
 	#r is team, 
 	global BOT
@@ -164,10 +154,8 @@ def parseUserInfoChange(inp): #@DEV Replace with regex
 	return uid,varz
 
 def parseKill(attacker,victim,method):
-	if method in [1, 3, 9, 39]:
-		BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
-	elif method in [7, 6, 10, 31, 320]:
-		BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
+	elif method in [7, 6, 10, 31, 320]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
 		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
@@ -186,9 +174,6 @@ def parse(inp):
 			if inp[2].rstrip().split(' ')[0] in BOT.Commands.keys():
 				print "Natural fire"
 				BOT.Commands[inp[2].rstrip().split(' ')[0]][0](0) #@TEMP 0 should become chat object
-			else:
-				print "Unnatural fire"
-				BOT.Commands['!test'][0](0)
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
@@ -196,12 +181,14 @@ def parse(inp):
 		inp = inp.split(" ")
 		inp = int(inp[1])
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', inp)
-		BOT.Clients[inp] = None
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
 		print uid, varz
-		if uid in BOT.Clients.keys(): BOT.Clients[uid] = player.Player(uid, varz)
+		if uid in BOT.Clients.keys():
+			BOT.Clients[uid].setData(varz)
+		else:
+			BOT.Clients[uid] = player.Player(uid, varz)
 
 	elif inp.startswith('ClientUserinfoChanged:'):
 		uid, varz = parseUserInfoChange(inp)

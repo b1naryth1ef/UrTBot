@@ -1,24 +1,23 @@
 import time
 
 class Event():
-	def __init__(self, data):
+	def __init__(self, Type, data):
 		self.fireTime = time.time()
 		self.data = data
+		self.type = Type
 class EventServer(): pass
 class EventClient(): pass
 class EventOther(): pass
 class EventMessage(): pass
 
 
-def CHAT_MESSAGE(data): pass
-def TEAMCHAT_MESSAGE(data): pass
+def CHAT_MESSAGE(data): return Event('CHAT_MESSAGE', data)
+def TEAMCHAT_MESSAGE(data): return Event('TEAMCHAT_MESSAGE', data)
 
-def CLIENT_COMMAND(data): pass
-def CLIENT_SAY(data): pass
-def CLIENT_SAYTEAM(data): pass
+def CLIENT_COMMAND(data): return EventClient('CLIENT_COMMAND', data)
 def CLIENT_TELL(data): pass
 def CLIENT_JOIN(data): pass
-def CLIENT_CONNECT(data): pass
+def CLIENT_CONNECT(data): return EventClient('CLIENT_CONNECT', data)
 def CLIENT_USERINFO(data): pass
 def CLIENT_QUIT(data): pass
 def CLIENT_KICKED(data): pass
@@ -35,11 +34,9 @@ def CLIENT_CHANGENAME(data): pass
 def CLIENT_CHANGELOADOUT(data): pass
 
 EVENTS = {
-	'CHAT_MESSAGE':None, #
-	'TEAMCHAT_MESSAGE':None,#
-	'CLIENT_COMMAND':None, #
-	'CLIENT_SAY':None, # 
-	'CLIENT_SAYTEAM':None, #
+	'CHAT_MESSAGE' CHAT_MESSAGE,
+	'TEAMCHAT_MESSAGE': TEAMCHAT_MESSAGE,
+	'CLIENT_COMMAND': CLIENT_COMMAND,
 	'CLIENT_TELL':None, #
 	'CLIENT_JOIN':None, #
 	'CLIENT_CONNECT':None, #

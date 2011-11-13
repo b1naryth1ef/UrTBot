@@ -1,4 +1,4 @@
-import time, sys
+import time, sys, const
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -21,12 +21,6 @@ def cmdRestart(obj): pass
 def cmdLoadout(obj): pass
 	#format should be !loadout int, or playername (regex?)
 
-def cmdTester(obj):
-	global api
-	print api.B.Clients
-	for client in api.B.Clients.values():
-		print client.uid,":",client.name,":",client.ip
-		print client.gear
 
 def init(A):
 	global api
@@ -38,7 +32,7 @@ def init(A):
 	api.addCmd('!map', cmdMap, "Load a map")
 	api.addCmd('!stop', cmdStop, "Stop the server/bot")
 	api.addCmd('!restart', cmdRestart, "Restart the server/bot")
-	api.addCmd('!loadout', cmdRestart, "See a players loadout")
+	api.addCmd('!loadout', cmdLoadout, "See a players loadout")
 	api.addCmd('!test', cmdTester, ">:D")
 
 def die(): pass #Called when we should disable/shutdown
