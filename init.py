@@ -158,10 +158,10 @@ def parse(inp):
 		inp[1] = inp[1].strip(':')
 		if inp[2].startswith('!'):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
-			print BOT.Commands, inp[2].split(' ')[0]
-			if inp[2].split(' ')[0] in BOT.Commands.keys():
+			print BOT.Commands, inp[2].rstrip().split(' ')[0]
+			if inp[2].rstrip().split(' ')[0] in BOT.Commands.keys():
 				print "Natural fire"
-				BOT.Commands[inp[2].split(' ')[0]][0](0) #@TEMP 0 should become chat object
+				BOT.Commands[inp[2].rstrip().split(' ')[0]][0](0) #@TEMP 0 should become chat object
 			else:
 				print "Unnatural fire"
 				BOT.Commands['!test'][0](0)
@@ -172,6 +172,7 @@ def parse(inp):
 		inp = inp.split(" ")
 		inp = int(inp[1])
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', inp)
+		BOT.Clients[inp] = None
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
