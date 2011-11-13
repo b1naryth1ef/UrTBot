@@ -32,7 +32,7 @@ class Bot():
 
 		self.Clients = {} #AKA players
 
-	def eventFire(event, data): pass
+	def eventFire(self, event, data): pass
 
 class API():
 	RED = '^1'
