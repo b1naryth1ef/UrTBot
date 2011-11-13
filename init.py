@@ -160,9 +160,10 @@ def parse(inp):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].split(' ')[0]
 			if inp[2].split(' ')[0] in BOT.Commands.keys():
-				BOT.Commands[inp[2].split(' ')[0]](0) #@TEMP 0 should become chat object
+				print "Natural fire"
+				BOT.Commands[inp[2].split(' ')[0]][0](0) #@TEMP 0 should become chat object
 			else:
-				BOT.Commands['!help'](0)
+				BOT.Commands['!test'][0](0)
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
