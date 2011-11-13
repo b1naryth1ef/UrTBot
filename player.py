@@ -3,6 +3,7 @@ class Player():
 	def __init__(self, uid, data):
 		self.uid = int(uid) #@DEV Meh...
 		self.data = data
+		print data
 		try:
 			self.name = data['name']
 			self.ip = data['ip']

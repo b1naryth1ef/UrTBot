@@ -176,6 +176,7 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
+		print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid] = player.Player(uid, varz)
 
 	elif inp.startswith('ClientUserinfoChanged:'):
