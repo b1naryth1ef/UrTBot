@@ -83,11 +83,11 @@ class API():
 				return True
 		self.B.Listeners[event] = [func]
 
-	def addCmd(self, cmd, func, desc='None'):
+	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
 			print "Can't add command %s, another plugin already added it!" % (cmd)
 			return False
-		self.B.Commands[cmd] = (func,desc)
+		self.B.Commands[cmd] = (func,desc,level)
 		return True
 
 	def addTrigger(self, trigger):
