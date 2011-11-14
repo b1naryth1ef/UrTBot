@@ -42,8 +42,10 @@ class Bot():
 	def eventFire(self, event, data): 
 		obj = events.EVENTS[event](data)
 		for i in self.Listeners.keys():
-			if i == event: self.Listeners[i](obj)
-			break
+			if i == event:
+				for listener in self.Listeners[i]:
+					listener(obj)
+				break
 
 class API():
 	RED = '^1'
