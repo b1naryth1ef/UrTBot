@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import socket
 import re
+import time
 
 class Player:
 	def __init__(self, idy, name, kills, ping, address=None, bot=-1):
