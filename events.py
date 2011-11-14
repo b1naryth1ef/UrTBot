@@ -5,10 +5,10 @@ class Event():
 		self.fireTime = time.time()
 		self.data = data
 		self.type = Type
-class EventServer(): pass
-class EventClient(): pass
-class EventOther(): pass
-class EventMessage(): pass
+class EventServer(Event): pass
+class EventClient(Event): pass
+class EventOther(Event): pass
+class EventMessage(Event): pass
 
 
 def CHAT_MESSAGE(data): return Event('CHAT_MESSAGE', data)
@@ -34,7 +34,7 @@ def CLIENT_CHANGENAME(data): pass
 def CLIENT_CHANGELOADOUT(data): pass
 
 EVENTS = {
-	'CHAT_MESSAGE' CHAT_MESSAGE,
+	'CHAT_MESSAGE': CHAT_MESSAGE,
 	'TEAMCHAT_MESSAGE': TEAMCHAT_MESSAGE,
 	'CLIENT_COMMAND': CLIENT_COMMAND,
 	'CLIENT_TELL':None, #
