@@ -7,6 +7,7 @@ class Event():
 		self.type = Type
 class EventServer(Event): pass
 class EventClient(Event): pass
+class EventGame(Event): pass
 class EventOther(Event): pass
 class EventMessage(Event): pass
 
@@ -33,6 +34,15 @@ def CLIENT_PICKUPITEM(data): return EventClient('CLIENT_PICKUPITEM', data)
 def CLIENT_CHANGENAME(data): pass
 def CLIENT_CHANGELOADOUT(data): pass
 
+def GAME_FLAGPICKUP(data): return EventGame('GAME_FLAGPICKUP', data)
+def GAME_FLAGDROP(data): return EventGame('GAME_FLAGDROP', data)
+def GAME_FLAGRETURN(data): return EventGame('GAME_FLAGRETURN', data)
+def GAME_ROUND_START(data): pass
+def GAME_ROUND_END(data): pass
+def GAME_MATCH_END(data): pass
+def GAME_MATCH_START(data): pass
+
+
 EVENTS = {
 	'CHAT_MESSAGE': CHAT_MESSAGE,
 	'TEAMCHAT_MESSAGE': TEAMCHAT_MESSAGE,
@@ -54,6 +64,9 @@ EVENTS = {
 	'CLIENT_PICKUPITEM':CLIENT_PICKUPITEM,
 	'CLIENT_CHANGENAME':None,
 	'CLIENT_CHANGELOADOUT':None,
+	'GAME_FLAGPICKUP':GAME_FLAGPICKUP,
+	'GAME_FLAGDROP':GAME_FLAGDROP,
+	'GAME_FLAGRETURN':GAME_FLAGRETURN,
 	'GAME_ROUND_START':None,
 	'GAME_ROUND_END':None,
 	'GAME_MATCH_END':None,
