@@ -1,5 +1,5 @@
 #---IMPORTS---#
-import subprocess, time, os, sys, imp, player, string, re
+import subprocess, time, os, sys, imp, player, string, re, socket
 from events import *
 import events
 from pyquake3 import PyQuake3
@@ -234,7 +234,7 @@ def loop():
 	global proc, keepLoop
 	while True:
 		if keepLoop is True:
-			proc_read = proc.stdout.readline()
+			proc_read = proc.readline()
 			if proc_read:
 				print proc_read.rstrip()
 				parse(proc_read)
@@ -246,5 +246,8 @@ if __name__ == "__main__":
 	loadConfig()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
 	load()
-	proc = subprocess.Popen(config_bootcommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	#proc = subprocess.Popen(config_bootcommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	procsocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+	procsocket.connect('/tmp/quake3stdout')
+	proc = os.fdopen(procsocket.fileno())
 	loop()
