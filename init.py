@@ -74,7 +74,7 @@ class API():
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): proc.kill()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
-	def addEvent(self, event, func):
+	def addEvent(self, event, func): #Add a listener (confusing? Rename?)
 		for i in self.B.Listeners.keys():
 			if i == event and self.B.Listeners[i] != None:
 				self.B.Listeners[i].append(func)
@@ -94,17 +94,6 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
-
-def _conn(uid):
-	global BOT
-	BOT.Q.rcon_update()
-	for i in BOT.Q.players:
-		if i.uid == uid:
-			name = i.name
-			ip = i.ip
-	obj = Event('conn',(uid,name,ip))
-	Listen('conn',obj)
-	return obj
 
 def load():
 	global BOT
@@ -126,7 +115,7 @@ def load():
 		except Exception, e:
 			print "ERROR LOADING %s: %s" % (name, e)	
 
-def parseUserInfo(inp, varz={}, y=1):
+def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
 	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
@@ -134,31 +123,45 @@ def parseUserInfo(inp, varz={}, y=1):
 		varz[i[0]] = i[1]
 	return uid,varz
 	
-	
-def parseUserInfoChange(inp): #@DEV Replace with regex
-	#r is team, 
-	global BOT
-	varz = {}
-	varz2 = {}
-	m = inp.split(" ") 
-	uid = int(m[1])
-	if m[2].startswith('\\'):
-		pass
-	else:
-		m[2] = "\\"+m[2]
-	x = m[2].split("\\")
-	y = 1
-	while len(x) > y:
-		varz[x[y-1]] = x[y]
-		y+=2
-	return uid,varz
+def parseUserInfoChange(inp, varz={}, vary={}): #@DEV Replace with regex
+	#r is race, n is name, t is team
+	#ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
+	inp2 = inp.split(' ', 2)
+	uid = int(inp2[1])
+	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+	for i in var:
+		varz[i[0]] = i[1]
+	if 't' in varz.keys(): vary['team'] = varz['t']
+	if 'n' in varz.keys(): vary['name'] = varz['n']
+	return uid,vary
 
-def parseKill(attacker,victim,method):
+def parseKill(inp):
+	#Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
+	inp = inp.split(" ")
+	inp.pop(0)
+	attacker = int(inp[0])
+	victim = int(inp[1])
+	method = int(inp[2].strip(':'))
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
 	elif method in [7, 6, 10, 31, 320]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
 		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
+
+def parseHit(inp):
+	#Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
+	inp = inp.split(' ')
+	attacker = inp[1]
+	victim = inp[2]
+	hitloc = inp[3]
+	method = inp[4]
+	BOT.eventFire('CLIENT_HIT', {'atk':attacker, 'vic':victim, 'loc':hitloc, 'meth':method})
+
+def parseItem(inp):
+	inp = inp.split(' ')
+	item = inp[2]
+	client = inp[1]
+	BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':client})
 
 def parse(inp):
 	global BOT
@@ -178,60 +181,35 @@ def parse(inp):
 
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0
-		inp = inp.split(" ")
-		inp = int(inp[1])
+		inp = int(inp.split(" ")[1])
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', inp)
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
 		print uid, varz
-		if uid in BOT.Clients.keys():
-			BOT.Clients[uid].setData(varz)
-		else:
-			BOT.Clients[uid] = player.Player(uid, varz)
+		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
+		else: BOT.Clients[uid] = player.Player(uid, varz)
 
-	elif inp.startswith('ClientUserinfoChanged:'):
+	elif inp.startswith('ClientUserinfoChanged:'): 
 		uid, varz = parseUserInfoChange(inp)
 
-	elif inp.startswith('ClientDisconnect:'): pass
-	elif inp.startswith('Kill:'):
-		#Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
-		inp = inp.split(" ")
-		inp.pop(0)
-		attacker = int(inp[0])
-		victim = int(inp[1])
-		method = int(inp[2].strip(':'))
-		parseKill(attacker, victim, method)
+	elif inp.startswith('ClientDisconnect:'):
+		inp = int(inp.split(" ")[1])
+		BOT.eventFire('CLIENT_DISCONNECT', inp)
+		del BOT.Clients[inp]
 
-	elif inp.startswith('Hit:'): pass
-	elif inp.startswith('Item'): pass
+	elif inp.startswith('Kill:'): 
+		parseKill(inp)
+
+	elif inp.startswith('Hit:'): 
+		parseHit(inp)
+	elif inp.startswith('Item'):
+		parseItem(inp)
 	elif inp.startswith('Flag:'): pass
 	else: pass
-
-	# if inp.startswith("say:"):
-	# 	newy = inp.split(':',2)
-	# 	nsender = newy[1]
-	# 	nmsg = newy[2].rstrip()
-	# 	ncmd1 = nmsg.strip(" ")
-	# 	ncmd = ncmd1.split(" ")[0]
-	# elif inp.startswith('ClientConnect:'):
-	# 	new = inp.split(":")[1].strip()
-	# 	_conn(new)
-	# elif inp.startswith('ClientUserinfo:'): 
-	# 	ret = parseUserInfo(inp)
-	# 	#@DEV Add UserInfo event here
-	# elif inp.startswith('ClientUserinfoChanged:'): 
-	# 	ret = parseUserInfoChange(inp)
-	# 	#@DEV Add InfoChange event here
-	# elif inp.startswith('Kill:'):
-	# 	newy = inp.split(" ")
-	# 	x = {}
-	# 	x['type'] = newy[8]
-	# 	x['victim'] = newy[6]
-	# 	x['attacker'] = newy[4]
-	# 	spawnEvent(x)
 		
 def loadConfig():
+	"""Loads the bot config"""
 	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups
 	try:
 		from config import botConfig
@@ -246,9 +224,11 @@ def loadConfig():
 		print "Exiting..."
 
 def loadDatabase():
+	"""Should load db.py"""
 	pass
 
 def loop():
+	"""The entire loop"""
 	global proc, keepLoop
 	while True:
 		if keepLoop is True:

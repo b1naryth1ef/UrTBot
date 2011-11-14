@@ -20,6 +20,8 @@ def cmdRestart(obj): pass
 	#format should be !restart (Both bot/server)
 def cmdLoadout(obj): pass
 	#format should be !loadout int, or playername (regex?)
+def testEvent(obj):
+	api.say('TESTING 1... 2... 3...')
 
 
 def init(A):
@@ -34,5 +36,6 @@ def init(A):
 	api.addCmd('!restart', cmdRestart, "Restart the server/bot")
 	api.addCmd('!loadout', cmdLoadout, "See a players loadout")
 	api.addCmd('!test', cmdTester, ">:D")
+	api.addEvent('CLIENT_CONNECT', testEvent)
 
 def die(): pass #Called when we should disable/shutdown

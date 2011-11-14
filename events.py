@@ -18,6 +18,7 @@ def CLIENT_COMMAND(data): return EventClient('CLIENT_COMMAND', data)
 def CLIENT_TELL(data): pass
 def CLIENT_JOIN(data): pass
 def CLIENT_CONNECT(data): return EventClient('CLIENT_CONNECT', data)
+def CLIENT_DISCONNECT(data): return EventClient('CLIENT_DISCONNECT', data)
 def CLIENT_USERINFO(data): pass
 def CLIENT_QUIT(data): pass
 def CLIENT_KICKED(data): pass
@@ -27,9 +28,8 @@ def CLIENT_GENERICDEATH(data): pass
 def CLIENT_KILLTEAM(data): pass
 def CLIENT_SUICIDE(data): pass
 def CLIENT_WORLDDEATH(data): pass
-def CLIENT_INFLICTDAMAGE(data): pass
-def CLIENT_DAMAGED(data): pass
-def CLIENT_PICKUPITEM(data): pass
+def CLIENT_HIT(data): pass
+def CLIENT_PICKUPITEM(data): return EventClient('CLIENT_PICKUPITEM', data)
 def CLIENT_CHANGENAME(data): pass
 def CLIENT_CHANGELOADOUT(data): pass
 
@@ -39,7 +39,8 @@ EVENTS = {
 	'CLIENT_COMMAND': CLIENT_COMMAND,
 	'CLIENT_TELL':None, #
 	'CLIENT_JOIN':None, #
-	'CLIENT_CONNECT':None, #
+	'CLIENT_CONNECT':CLIENT_CONNECT,
+	'CLIENT_DISCONNECT':CLIENT_DISCONNECT, #
 	'CLIENT_USERINFO':None, #
 	'CLIENT_QUIT':None, #
 	'CLIENT_KICKED':None, #
@@ -49,9 +50,8 @@ EVENTS = {
 	'CLIENT_KILLTEAM':None, #
 	'CLIENT_SUICIDE':None, #
 	'CLIENT_WORLDDEATH':None,
-	'CLIENT_INFLICTDAMAGE':None,
-	'CLIENT_DAMAGED':None,
-	'CLIENT_PICKUPITEM':None,
+	'CLIENT_HIT':None,
+	'CLIENT_PICKUPITEM':CLIENT_PICKUPITEM,
 	'CLIENT_CHANGENAME':None,
 	'CLIENT_CHANGELOADOUT':None,
 	'GAME_ROUND_START':None,
