@@ -46,7 +46,7 @@ class Bot():
 				for listener in self.Listeners[i]:
 					listener(obj)
 				break
-
+		return obj
 class API():
 	RED = '^1'
 	GREEN = '^2'

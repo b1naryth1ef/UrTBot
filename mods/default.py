@@ -26,12 +26,16 @@ def testEvent(obj):
 	time.sleep(5)
 	api.say('TESTING 1... 2... 3...')
 def cmdTime(obj):
+	global time1, time2
 	if obj.data['msg'].startswith('!tstart'):
-		time = time.time()
+		time1 = time.time()
+		api.say('Timer started!')
 	elif obj.data['msg'].startswith('!tstop'):
 		time2 = time.time()
-		api.say('Timer: %s%s' % (api.BLUE, time2-time))
-		time = None
+		api.say('Timer Stopped!')
+		time.sleep(.6)
+		api.say('Timer: %s%s' % (api.BLUE, time2-time1))
+		time1 = None
 		time2 = None
 
 def testPlugin(obj):
