@@ -198,7 +198,7 @@ def parse(inp):
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
 		BOT.eventFire('CLIENT_DISCONNECT', inp)
-		del BOT.Clients[inp]
+		if inp in BOT.Clients.keys(): del BOT.Clients[inp]
 
 	elif inp.startswith('Kill:'): 
 		parseKill(inp)
