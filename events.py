@@ -26,7 +26,7 @@ def CLIENT_SWITCHTEAM(data): pass
 def CLIENT_KILL(data): pass
 def CLIENT_GENERICDEATH(data): pass
 def CLIENT_KILLTEAM(data): pass
-def CLIENT_SUICIDE(data): pass
+def CLIENT_SUICIDE(data): EventClient('CLIENT_SUICIDE', data)
 def CLIENT_WORLDDEATH(data): pass
 def CLIENT_HIT(data): pass
 def CLIENT_PICKUPITEM(data): return EventClient('CLIENT_PICKUPITEM', data)
@@ -48,7 +48,7 @@ EVENTS = {
 	'CLIENT_KILL':None, #
 	'CLIENT_GENERICDEATH':None, #
 	'CLIENT_KILLTEAM':None, #
-	'CLIENT_SUICIDE':None, #
+	'CLIENT_SUICIDE':CLIENT_SUICIDE, #
 	'CLIENT_WORLDDEATH':None,
 	'CLIENT_HIT':None,
 	'CLIENT_PICKUPITEM':CLIENT_PICKUPITEM,
