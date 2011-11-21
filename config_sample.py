@@ -21,3 +21,13 @@ dbConfig = { #Default for MySQL
 	'password': '',
 	'database': 'urtbot',
 }
+
+#Security Levels:
+#- Method 1: User must match GUID/IP/NICK to be auto-logged in
+#- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
+#- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
+#- Method 4: User must match NICK to be logged in...
+
+securityConfig = {
+	'level': 2,
+}

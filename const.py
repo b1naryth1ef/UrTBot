@@ -114,6 +114,10 @@ gearInfo = {
 }
 
 
+class UrTBotError(Exception): pass
+class ConfigError(Exception): pass
+class UrbanTerrorError(Exception): pass
+
 """
 Some content in this file has been found in the B3 source. 
 We thank the entire BigBrotherBot team for there contributions 

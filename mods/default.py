@@ -22,6 +22,7 @@ def cmdLoadout(obj): pass
 	#format should be !loadout int, or playername (regex?)
 def cmdTester(obj):
 	api.say('Testing! This is just a test! Stay clam!')
+	api.reboot()
 def testEvent(obj):
 	time.sleep(5)
 	api.say('TESTING 1... 2... 3...')

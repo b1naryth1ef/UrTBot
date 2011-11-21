@@ -47,6 +47,7 @@ class Bot():
 					listener(obj)
 				break
 		return obj
+		
 class API():
 	RED = '^1'
 	GREEN = '^2'
@@ -76,20 +77,19 @@ class API():
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): proc.kill()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
+	def reboot(self): handlr.initz('reboot')
 	def addEvent(self, event, func): #Add a listener (confusing? Rename?)
 		for i in self.B.Listeners.keys():
 			if i == event and self.B.Listeners[i] != None:
 				self.B.Listeners[i].append(func)
 				return True
 		self.B.Listeners[event] = [func]
-
 	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
 			print "Can't add command %s, another plugin already added it!" % (cmd)
 			return False
 		self.B.Commands[cmd] = (func,desc,level)
 		return True
-
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
 			print "Can't add trigger %s, another plugin already added it!" % (trigger)
@@ -97,7 +97,7 @@ class API():
 		self.B.Triggers[trigger] = []
 		return True
 
-def load():
+def loadMods():
 	global BOT
 	fn = []
 	modx = []
@@ -242,12 +242,20 @@ def loop():
 			break
 	return proc
 
-if __name__ == "__main__":
+def Start(func, nothing):
+	global BOT, proc, handlr
+	handlr = func
 	loadConfig()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
-	load()
+	loadMods()
 	#proc = subprocess.Popen(config_bootcommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	procsocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	procsocket.connect('/tmp/quake3stdout')
 	proc = os.fdopen(procsocket.fileno())
 	loop()
+
+def Exit():
+	sys.exit()
+
+if __name__ == "__main__":
+	Start()

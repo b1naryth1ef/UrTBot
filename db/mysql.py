@@ -28,7 +28,7 @@ class User(object):
 def clientAdd(): pass
 def clientDel(): pass
 def clientModify(): pass
-def clientSearch(): pass
+def clientSearch(nick=None, guid=None, ip=None): pass
 def clientSelect(): pass
 
 def aliasAdd(): pass
