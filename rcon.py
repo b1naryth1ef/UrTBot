@@ -36,20 +36,22 @@ class RCON:
 		except socket.timeout: pass
 		return data
 
-	def rcon(self, cmd):
+	def cmd(self, cmd):
 		self.last_cmd = cmd
 		retries = self.retries
 		data = None
 
 		while retries > 0 and data == None:
-			self.send('rcon "%s" %s' % (self.password, cmd))
+			self.send(cmd)
 			data = self.recv()
 			if data == None:
 				time.sleep(self.throttle_time)
 			retries -= 1
 
-		return data[4:]
+		return data[4:] if data != None else data
 
+	def rcon(self, cmd):
+		return self.cmd('rcon "%s" %s' % (self.password, cmd))
 
 if __name__ == '__main__':
 	rcon = RCON('localhost', 27960, 'password')
