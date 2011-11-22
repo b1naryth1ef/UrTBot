@@ -6,8 +6,10 @@ teams = {
 }
 
 flagtypes = {
-	'team_CTF_redflag':1,
-	'team_CTF_blueflag':2
+'team_CTF_redflag':1,
+'team_CTF_blueflag':2,
+'RED':1,
+'BLUE':2,
 }
 
 flagactions = {

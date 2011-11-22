@@ -20,6 +20,7 @@ dbConfig = { #Default for MySQL
 	'user': 'root',
 	'password': '',
 	'database': 'urtbot',
+	'prefix': '',
 }
 
 #Security Levels:
@@ -30,4 +31,5 @@ dbConfig = { #Default for MySQL
 
 securityConfig = {
 	'level': 2,
+	'multi': False,
 }

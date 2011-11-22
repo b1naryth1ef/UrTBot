@@ -6,6 +6,8 @@ import events
 from rcon import RCON
 import const
 
+__Version__ = 0.1
+
 #--SETTRZ--#
 home = os.getcwd()
 lastsent = None
@@ -178,7 +180,7 @@ def parseItem(inp):
 	inp = inp.split(' ')
 	item = inp[2].strip()
 	client = inp[1]
-	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'flagint':const.flagtypes[item]})
+	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item]})
 	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':const.getItemID(item), 'client':client})
 
 def parseFlag(inp):
@@ -186,12 +188,16 @@ def parseFlag(inp):
 	inp = inp.split(' ', 3)
 	cid = inp[1]
 	action = int(inp[2].strip(':'))
-	flag = const.flagtypes[inp[3]]
-	if action == 0: BOT.eventFire('GAME_FLAGDROP') #drop
-	elif action == 1: BOT.eventFire('GAME_FLAGRETURN') #return
-	elif action == 2: BOT.eventFire('GAME_FLAGCAPTURE') #score
+	flag = inp[3].strip()
+	flagid = const.flagtypes[flag]
+	if action == 0: BOT.eventFire('GAME_FLAGDROP', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #drop
+	elif action == 1: BOT.eventFire('GAME_FLAGRETURN', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #return
+	elif action == 2: BOT.eventFire('GAME_FLAGCAPTURE', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #score
 
-def parseFlagReturn(inp): pass
+def parseFlagReturn(inp):
+	inp = inp.split(' ', 3)
+	flag = inp[2].strip()
+	BOT.eventFire('GAME_FLAGRETURN')
 
 def parse(inp):
 	global BOT
