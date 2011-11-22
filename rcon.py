@@ -14,16 +14,20 @@ import socket
 import time
 
 class RCON:
-	def __init__(self, server='localhost', port=27960, password='password'):
+	def __init__(self, server='localhost', password='password', port=27960):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.server = server
-		self.port = port
+		if server.find(":"):
+			self.server, self.port = server.split(":")
+			self.port = int(self.port)
+		else:
+			self.server = server
+			self.port = port
 		self.password = password
 		self.last_cmd = None
 		self.retries = 3 # default number of retries
 		self.throttle_time = 0.0 # secs to wait between retries
 
-		self.socket.connect((server, port))
+		self.socket.connect((self.server, self.port))
 		self.socket.settimeout(0.5)
 
 	def send(self, data):
@@ -54,7 +58,7 @@ class RCON:
 		return self.cmd('rcon "%s" %s' % (self.password, cmd))
 
 if __name__ == '__main__':
-	rcon = RCON('localhost', 27960, 'password')
+	rcon = RCON('localhost:27960', 'password')
 	count = 100
 	start = time.time()
 	for i in range(0,count): rcon.rcon("say I am counting... %d" % i)
