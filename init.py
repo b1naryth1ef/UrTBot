@@ -113,6 +113,8 @@ def loadMods():
 			mod.init(API())
 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
 		except Exception, e:
+			if 'name' not in locals():
+				name = fname
 			print "ERROR LOADING %s: %s" % (name, e)	
 
 def parseUserInfo(inp, varz={}):
