@@ -88,6 +88,7 @@ class API():
 			if i in self.B.Listeners.keys():
 				if self.B.Listeners[i] != None: self.B.Listeners[i].append(func)
 				else: self.B.Listeners[i] = [func]
+			else: self.B.Listeners[i] = [func]
 	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
 			print "Can't add command %s, another plugin already added it!" % (cmd)
