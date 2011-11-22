@@ -255,5 +255,12 @@ def Start(func, nothing):
 def Exit():
 	sys.exit()
 
+# Just using this while the handler code is a WIP
+class DUMMY:
+	def __init__(self): pass
+	def initz(self, arg):
+		pass
+
 if __name__ == "__main__":
-	Start()
+	dummy = DUMMY()
+	Start(dummy, None)
