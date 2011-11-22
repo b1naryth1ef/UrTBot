@@ -80,9 +80,9 @@ class API():
 	def addListener(self, event, func): 
 		if event in self.B.Listeners.keys():
 			if self.B.Listeners[event] != None: self.B.Listeners[event].append(func)
-			else: self.B.Listenenrs[event] = [func]
+			else: self.B.Listeners[event] = [func]
 			return True
-		else: return False
+		else: self.B.Listeners[event] = [func]
 	def addListeners(self, events, func):
 		for i in events:
 			if i in self.B.Listeners.keys():
