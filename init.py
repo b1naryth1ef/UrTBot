@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
 from events import *

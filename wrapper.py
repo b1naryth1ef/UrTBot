@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # wrap iourtded so stdout is available on a unix socket
 from socket import *
 import subprocess
