@@ -104,6 +104,9 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
+	def getCmd(self, cmd=None):
+		if cmd == None: return self.B.Commands
+		return self.B.Commands.get(cmd)
 
 def loadMods():
 	global BOT
