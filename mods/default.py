@@ -90,6 +90,6 @@ def init(A):
 	api.addCmd('!tstart', cmdTime, "Start the timer")
 	api.addCmd('!tstop', cmdTime, "Stop the timer")
 	api.addListener('CLIENT_CONNECT', testEvent)
-	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE'], testEvent)
+	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE'], testPlugin)
 
 def die(): pass #Called when we should disable/shutdown
