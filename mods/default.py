@@ -4,8 +4,32 @@ _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
 _version = 0.1
 
-def cmdHelp(obj): pass
+def cmdHelp(obj):
 	#format should be !command : Info \n
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	# No argument, list all commands
+	if len(msg) == 1:
+		reply = ''
+		cmds = api.getCmd()
+		keys = cmds.keys()
+		keys.sort()
+		api.tell(sender, "==Commands==")
+		for k in keys:
+			if len(reply) + len(api.B.prefix) > 50:
+				api.tell(sender, reply)
+				reply = ''
+			if len(reply) > 0: reply += ", "
+			reply += k
+		api.tell(sender, reply)
+	# Argument, provide description of command
+	elif len(msg) == 2:
+		cmd = msg[1].rstrip().lstrip('!')
+		cmdobj = api.getCmd('!' + cmd)
+		if cmdobj == None:
+			api.tell(sender, "Unknown command: %s" % cmd)
+		else:
+			api.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
 def cmdList(obj): pass
 	#Format should be !command, !othercommand, !otherothercommand, etc
 def cmdSlap(obj): pass
