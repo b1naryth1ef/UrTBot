@@ -3,7 +3,7 @@
 import subprocess, time, os, sys, imp, player, string, re, socket
 from events import *
 import events
-from pyquake3 import PyQuake3
+from rcon import RCON
 import const
 
 #--SETTRZ--#
@@ -31,7 +31,7 @@ class Bot():
 		self.prefix = prefix
 		self.ip = ip
 		self.rcon = rcon
-		self.Q = PyQuake3(self.ip, rcon_password=self.rcon)
+		self.Q = RCON(self.ip, self.rcon)
 
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers
@@ -67,9 +67,6 @@ class API():
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
-	def plist(self):
-		self.Q.update()
-		return self.Q.players
 	def getPlayer(self, iid=0):
 		if len(self.B.Players) != 0: return self.B.Players[iid]
 		else: return None

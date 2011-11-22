@@ -15,8 +15,6 @@ TODOS:
 - Add basic commands, work on API [Waiting...]
 - Add lots of events [Semi-in progress]
 - Add ability to reboot bot
-- rcon is iffy (sleep(.6)) - maybe write replacement for pyquake3.py?
-	- Player data and player list should be consolidated? (not in pyquake3)
 - Authentication
 	- CONFIG:
 	- Bot Method (Four methods,)
