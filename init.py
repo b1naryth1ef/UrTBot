@@ -175,7 +175,7 @@ def parseHit(inp):
 def parseItem(inp):
 	#Item: 1 ut_weapon_ump45
 	inp = inp.split(' ')
-	item = inp[2]
+	item = inp[2].strip()
 	client = inp[1]
 	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'flagint':const.flagtypes[item]})
 	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':const.getItemID(item), 'client':client})
