@@ -14,7 +14,7 @@ def cmdSet(obj): pass
 	#Format should be !set variable value
 def cmdMap(obj): pass
 	#format should be !map map gamemode(Or none)
-def cmdStop(obj): pass
+def cmdStop(obj): api.exitProc()
 	#format should be !stop
 def cmdRestart(obj): pass
 	#format should be !restart (Both bot/server)

@@ -73,7 +73,8 @@ class API():
 	def getPlayers(self): return self.B.Players
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
-	def exitProc(self): proc.kill()
+	def exitProc(self): 
+		sys.exit()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
 	def reboot(self): handlr.initz('reboot')
 	def addEvent(self, event, func): #Add a listener (confusing? Rename?)
@@ -177,8 +178,8 @@ def parse(inp):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			if inp[2].rstrip().split(' ')[0] in BOT.Commands.keys():
-				print "Natural fire"
-				BOT.Commands[inp[2].rstrip().split(' ')[0]][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2]})) #@TEMP 0 should become chat object
+				print "Natural fire" #This should be threaded:
+				BOT.Commands[inp[2].rstrip().split(' ')[0]][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2]}))
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
