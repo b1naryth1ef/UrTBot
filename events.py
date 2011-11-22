@@ -5,71 +5,75 @@ class Event():
 		self.fireTime = time.time()
 		self.data = data
 		self.type = Type
+
 class EventServer(Event): pass
 class EventClient(Event): pass
 class EventGame(Event): pass
 class EventOther(Event): pass
 class EventMessage(Event): pass
+class EventGenric(Event): pass
 
 
-def CHAT_MESSAGE(data): return Event('CHAT_MESSAGE', data)
-def TEAMCHAT_MESSAGE(data): return Event('TEAMCHAT_MESSAGE', data)
+
+def GENERIC(data): return EventGenric(data['event'], data)
+def CHAT_MESSAGE(data): return EventServer('CHAT_MESSAGE', data)
+def TEAMCHAT_MESSAGE(data): return EventServer('TEAMCHAT_MESSAGE', data)
 
 def CLIENT_COMMAND(data): return EventClient('CLIENT_COMMAND', data)
-def CLIENT_TELL(data): pass
-def CLIENT_JOIN(data): pass
-def CLIENT_CONNECT(data): return EventClient('CLIENT_CONNECT', data)
-def CLIENT_DISCONNECT(data): return EventClient('CLIENT_DISCONNECT', data)
-def CLIENT_USERINFO(data): pass
-def CLIENT_QUIT(data): pass
-def CLIENT_KICKED(data): pass
-def CLIENT_SWITCHTEAM(data): pass
-def CLIENT_KILL(data): pass
-def CLIENT_GENERICDEATH(data): pass
-def CLIENT_KILLTEAM(data): pass
-def CLIENT_SUICIDE(data): EventClient('CLIENT_SUICIDE', data)
-def CLIENT_WORLDDEATH(data): pass
-def CLIENT_HIT(data): pass
+def CLIENT_TELL(data): return EventClient('CLIENT_TELl', data)
+def CLIENT_JOIN(data): return EventGame('CLIENT_JOIN', data)
+def CLIENT_CONNECT(data): return EventServer('CLIENT_CONNECT', data)
+def CLIENT_DISCONNECT(data): return EventServer('CLIENT_DISCONNECT', data)
+def CLIENT_USERINFO(data): return EventClient('CLIENT_USERINFO', data)
+def CLIENT_QUIT(data): return EventClient('CLIENT_QUIT', data)
+def CLIENT_KICKED(data): return EventClient('CLIENT_KICKED', data)
+def CLIENT_SWITCHTEAM(data): return EventClient('CLIENT_SWITCHTEAM', data)
+def CLIENT_KILL(data): return EventClient('CLIENT_KILL', data)
+def CLIENT_GENERICDEATH(data): return EventClient('CLIENT_GENERICDEATH', data)
+def CLIENT_KILLTEAM(data): return EventClient('CLIENT_KILLTEAM')
+def CLIENT_SUICIDE(data): return EventClient('CLIENT_SUICIDE', data)
+def CLIENT_WORLDDEATH(data): return EventClient('CLIENT_WORLDDEATH')
+def CLIENT_HIT(data): return EventClient('CLIENT_HIT')
 def CLIENT_PICKUPITEM(data): return EventClient('CLIENT_PICKUPITEM', data)
-def CLIENT_CHANGENAME(data): pass
-def CLIENT_CHANGELOADOUT(data): pass
+def CLIENT_CHANGENAME(data): return EventClient('CLIENT_CHANGENAME', data)
+def CLIENT_CHANGELOADOUT(data): return EventClient('CLIENT_CHANGELOADOUT')
 
 def GAME_FLAGPICKUP(data): return EventGame('GAME_FLAGPICKUP', data)
 def GAME_FLAGDROP(data): return EventGame('GAME_FLAGDROP', data)
 def GAME_FLAGRETURN(data): return EventGame('GAME_FLAGRETURN', data)
-def GAME_ROUND_START(data): pass
-def GAME_ROUND_END(data): pass
-def GAME_MATCH_END(data): pass
-def GAME_MATCH_START(data): pass
+def GAME_ROUND_START(data): return EventGame('GAME_ROUND_START', data)
+def GAME_ROUND_END(data): return EventGame('GAME_ROUND_END', data)
+def GAME_MATCH_END(data): return EventGame('GAME_MATCH_END', data)
+def GAME_MATCH_START(data): return EventGame('GAME_MATCH_START', data)
 
 
 EVENTS = {
 	'CHAT_MESSAGE': CHAT_MESSAGE,
 	'TEAMCHAT_MESSAGE': TEAMCHAT_MESSAGE,
 	'CLIENT_COMMAND': CLIENT_COMMAND,
-	'CLIENT_TELL':None, #
-	'CLIENT_JOIN':None, #
+	'CLIENT_TELL':CLIENT_TELL, #
+	'CLIENT_JOIN':CLIENT_JOIN, #
 	'CLIENT_CONNECT':CLIENT_CONNECT,
 	'CLIENT_DISCONNECT':CLIENT_DISCONNECT, #
-	'CLIENT_USERINFO':None, #
-	'CLIENT_QUIT':None, #
-	'CLIENT_KICKED':None, #
-	'CLIENT_SWITCHTEAM':None, #
-	'CLIENT_KILL':None, #
-	'CLIENT_GENERICDEATH':None, #
-	'CLIENT_KILLTEAM':None, #
+	'CLIENT_USERINFO':CLIENT_USERINFO, #
+	'CLIENT_QUIT':CLIENT_QUIT, #
+	'CLIENT_KICKED':CLIENT_KICKED, #
+	'CLIENT_SWITCHTEAM':CLIENT_SWITCHTEAM, #
+	'CLIENT_KILL':CLIENT_KILL, #
+	'CLIENT_GENERICDEATH':CLIENT_GENERICDEATH, #
+	'CLIENT_KILLTEAM':CLIENT_KILLTEAM, #
 	'CLIENT_SUICIDE':CLIENT_SUICIDE, #
-	'CLIENT_WORLDDEATH':None,
-	'CLIENT_HIT':None,
+	'CLIENT_WORLDDEATH':CLIENT_WORLDDEATH,
+	'CLIENT_HIT':CLIENT_HIT,
 	'CLIENT_PICKUPITEM':CLIENT_PICKUPITEM,
-	'CLIENT_CHANGENAME':None,
-	'CLIENT_CHANGELOADOUT':None,
+	'CLIENT_CHANGENAME':CLIENT_CHANGENAME,
+	'CLIENT_CHANGELOADOUT':CLIENT_CHANGENAME,
 	'GAME_FLAGPICKUP':GAME_FLAGPICKUP,
 	'GAME_FLAGDROP':GAME_FLAGDROP,
 	'GAME_FLAGRETURN':GAME_FLAGRETURN,
-	'GAME_ROUND_START':None,
-	'GAME_ROUND_END':None,
-	'GAME_MATCH_END':None,
-	'GAME_MATCH_START':None,
-	'GENERIC':None,
+	'GAME_ROUND_START':GAME_ROUND_START,
+	'GAME_ROUND_END':GAME_ROUND_END,
+	'GAME_MATCH_END':GAME_MATCH_END,
+	'GAME_MATCH_START':GAME_MATCH_START,
+	'GENERIC':GENERIC,
 }

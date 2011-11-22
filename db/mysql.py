@@ -42,3 +42,37 @@ def penaltyModify(): pass
 def penaltySearch(): pass
 def penaltySelect(): pass
 
+def defaultTableSet():
+	c.execute(""" 
+DROP TABLE IF EXISTS `penalties`;
+
+CREATE TABLE `penalties` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userid` int(11) DEFAULT NULL,
+  `adminid` int(11) DEFAULT NULL,
+  `type` varchar(265) DEFAULT '',
+  `reason` varchar(265) DEFAULT '',
+  `time` int(11) DEFAULT NULL,
+  `time_expire` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table users
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `group` int(2) DEFAULT NULL,
+  `nick` varchar(32) NOT NULL DEFAULT '',
+  `guid` varchar(32) NOT NULL DEFAULT '',
+  `password` int(6) DEFAULT NULL,
+  `data` longtext,
+  `ip` varchar(16) DEFAULT '',
+  `lastip` varchar(16) DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1; 
+""")
