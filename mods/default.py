@@ -72,8 +72,9 @@ def testPlugin(obj):
 		pass
 	elif obj.type == "GAME_FLAGRETURN":
 		pass
+	elif obj.type == "GAME_FLAGCAPTURE":
+		pass
 	
-
 def init(A):
 	global api
 	api = A
@@ -88,6 +89,6 @@ def init(A):
 	api.addCmd('!test', cmdTester, ">:D")
 	api.addCmd('!tstart', cmdTime, "Start the timer")
 	api.addCmd('!tstop', cmdTime, "Stop the timer")
-	api.addEvent('CLIENT_CONNECT', testEvent)
+	api.addListener('CLIENT_CONNECT', testEvent)
 
 def die(): pass #Called when we should disable/shutdown

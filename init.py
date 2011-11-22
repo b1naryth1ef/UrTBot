@@ -77,18 +77,27 @@ class API():
 		sys.exit()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
 	def reboot(self): handlr.initz('reboot')
-	def addEvent(self, event, func): #Add a listener (confusing? Rename?)
-		for i in self.B.Listeners.keys():
-			if i == event and self.B.Listeners[i] != None:
-				self.B.Listeners[i].append(func)
-				return True
-		self.B.Listeners[event] = [func]
+	def addListener(self, event, func): 
+		if event in self.B.Listeners.keys():
+			if self.B.Listeners[event] != None: self.B.Listeners[event].append(func)
+			else: self.B.Listenenrs[event] = [func]
+			return True
+		else: return False
+	def addListeners(self, events, func):
+		for i in events:
+			if i in self.B.Listeners.keys():
+				if self.B.Listeners[i] != None: self.B.Listeners[i].append(func)
+				else: self.B.Listeners[i] = [func]
 	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
 			print "Can't add command %s, another plugin already added it!" % (cmd)
 			return False
 		self.B.Commands[cmd] = (func,desc,level)
 		return True
+	def addCmds(self, cmds):
+		for i in cmds:
+			if i[0] in self.B.Commands.keys(): print "Can't add command %s, another plugin already added it!" % (i[0])
+			else: self.B.Commands[i[0]] = (i[1], i[2], i[3])
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
 			print "Can't add trigger %s, another plugin already added it!" % (trigger)
@@ -212,6 +221,7 @@ def parse(inp):
 	elif inp.startswith('Item'):
 		parseItem(inp)
 	elif inp.startswith('Flag:'): pass
+	elif inp.startswith('Flag Return:'): pass
 	else: pass
 		
 def loadConfig():

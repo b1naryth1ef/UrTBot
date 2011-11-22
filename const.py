@@ -5,6 +5,12 @@ teams = {
 3:'spec'
 }
 
+flagtypes = {
+0:'drop',
+1:'return',
+2:'score'	
+}
+
 gametypes = {
 0: 'ffa', #free for all
 1: None,
