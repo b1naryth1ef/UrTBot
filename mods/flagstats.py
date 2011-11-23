@@ -9,19 +9,19 @@ _version = 0.1
 
 class Timer(object):
 	def __init__(self):
-		self.start = 0
-		self.end = 0
+		self.startt = 0
+		self.endt = 0
 		self.status = 0
 	
 	def start(self): 
 		if self.status == 0:
-			self.start = time.time()
+			self.startt = time.time()
 			self.status = 1
 	def stop(self):
 		if self.status == 1: 
-			self.end = time.time()
+			self.endt = time.time()
 			self.status = 0
-	def value(self): return self.end-self.start
+	def value(self): return self.endt-self.startt
 	def reset(self):
 		self.start = 0
 		self.end = 0
