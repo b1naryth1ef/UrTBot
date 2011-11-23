@@ -286,5 +286,4 @@ def Start():
 def Exit(): sys.exit()
 
 if __name__ == "__main__":
-	dummy = DUMMY()
 	Start()
