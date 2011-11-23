@@ -1,5 +1,8 @@
-
 api = None
+
+_name = "Flag Stats"
+_author = "B1naryth1ef"
+_version = 0.1
 
 def eventListener(obj):
 	print "[][][][][][][][]"
