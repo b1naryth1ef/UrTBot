@@ -212,7 +212,7 @@ def parse(inp):
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys():
-				if BOT.getClient(int(inp[1])).group >= BOT.Commands[cmd][2]:
+				if BOT.getClient(int(inp[0])).group >= BOT.Commands[cmd][2]:
 					BOT.Commands[cmd][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2], 'cmd':cmd})) #@DEV This should be threaded
 				else: pass #@TODO tell user he cant do that
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
