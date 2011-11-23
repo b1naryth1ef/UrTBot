@@ -28,6 +28,7 @@ class Timer(object):
 def eventListener(obj):
 	global api
 	if obj == 'init':
+		print "Started"
 		redFlag = Timer()
 		blueFlag = Timer()
 
@@ -53,5 +54,6 @@ def eventListener(obj):
 def init(A):
 	global api
 	api = A
+	print 'Firing'
 	eventListener('init')
 	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
