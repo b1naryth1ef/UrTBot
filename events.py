@@ -12,6 +12,7 @@ class EventGame(Event): pass
 class EventOther(Event): pass
 class EventMessage(Event): pass
 class EventGenric(Event): pass
+class EventCustom(Event): pass
 
 
 

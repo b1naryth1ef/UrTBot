@@ -61,18 +61,6 @@ def cmdTime(obj):
 		api.say('Timer: %s%s' % (api.BLUE, time2-time1))
 		time1 = None
 		time2 = None
-
-def testPlugin(obj):
-	if obj == 'init':
-		pass #setup stuff
-	elif obj.type == "GAME_FLAGPICKUP":
-		print obj.data, obj.type
-	elif obj.type == "GAME_FLAGDROP":
-		print obj.data, obj.type
-	elif obj.type == "GAME_FLAGRETURN":
-		print obj.data, obj.type
-	elif obj.type == "GAME_FLAGCAPTURE":
-		print obj.data, obj.type
 	
 def init(A):
 	global api
@@ -89,6 +77,5 @@ def init(A):
 	api.addCmd('!tstart', cmdTime, "Start the timer")
 	api.addCmd('!tstop', cmdTime, "Stop the timer")
 	api.addListener('CLIENT_CONNECT', testEvent)
-	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE'], testPlugin)
 
 def die(): pass #Called when we should disable/shutdown
