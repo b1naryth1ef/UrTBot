@@ -68,7 +68,7 @@ class API():
 		self.Q = BOT.Q
 		self.auth = auth
 	def tester(self): print "TESTING! 1! 2! 3!"
-	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^2"+msg)
+	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
 	def getPlayer(self, iid=0):
@@ -181,7 +181,7 @@ def parseItem(inp):
 	inp = inp.split(' ')
 	item = inp[2].strip()
 	client = inp[1]
-	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item]})
+	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
 	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':const.getItemID(item), 'client':client})
 
 def parseFlag(inp):
@@ -198,7 +198,7 @@ def parseFlag(inp):
 def parseFlagReturn(inp):
 	inp = inp.split(' ', 3)
 	flag = inp[2].strip()
-	BOT.eventFire('GAME_FLAGRETURN')
+	BOT.eventFire('GAME_FLAGRESET', {'flag':flag, 'flagid':const.flagtypes[flag]})
 
 def parse(inp):
 	global BOT
@@ -260,6 +260,8 @@ def loadConfig():
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
 
+def fireTick(): pass
+
 def loadDatabase():
 	"""Should load db.py"""
 	pass
@@ -272,6 +274,7 @@ def loop():
 		if proc_read:
 			print proc_read.rstrip()
 			parse(proc_read)
+		fireTick()
 
 def Start():
 	global BOT, proc
