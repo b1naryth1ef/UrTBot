@@ -4,6 +4,7 @@ class Player():
 		self.uid = int(uid) #@DEV Meh...
 		self.data = data
 		self.group = 0
+		self.status = None
 		try:
 			self.name = None
 			self.ip = None
