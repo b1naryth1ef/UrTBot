@@ -5,7 +5,8 @@ _name = "Flag Stats"
 _author = "B1naryth1ef"
 _version = 0.1
 
-
+redFlag = None
+blueFlag = None
 
 class Timer(object):
 	def __init__(self):
@@ -74,5 +75,4 @@ def init(A):
 	global api
 	api = A
 	print 'Firing'
-	eventListener('init')
 	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
