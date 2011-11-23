@@ -23,8 +23,8 @@ class Timer(object):
 			self.status = 0
 	def value(self): return self.endt-self.startt
 	def reset(self):
-		self.start = 0
-		self.end = 0
+		self.startt = 0
+		self.endt = 0
 		self.status = 0
 
 redFlag = Timer()
@@ -36,23 +36,27 @@ def eventListener(obj):
 		print "Started"
 
 	elif obj.type == "GAME_FLAGPICKUP":
+		print "@PICKUP"
 		if obj.data['flagid'] == 1 and redFlag.status == 0: redFlag.start()
 		elif obj.data['flagid'] == 2 and blueFlag.status == 0: blueFlag.start()
 
 	elif obj.type == "GAME_FLAGRETURN":
+		print '@RETURN'
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
 	elif obj.type == "GAME_FLAGCAPTURE":
+		print '@CAPTURE'
 		if obj.data['flagid'] == 1:
 			redFlag.stop()
-			api.say('%sRed %sFlag captured in %s%s' % (api.RED, api.YELLOW, api.CYAN ,redFlag.value()))
+			api.say('%sRed %sFlag captured in %s%s' % (api.RED, api.YELLOW, api.CYAN, int(redFlag.value())))
 			redFlag.reset()
 		elif obj.data['flagid'] == 2:
 			blueFlag.stop()
-			api.say('%sBlue %sFlag captured in %s%s' % (api.BLUE, api.YELLOW, api.CYAN ,redFlag.value()))
+			api.say('%sBlue %sFlag captured in %s%s' % (api.BLUE, api.YELLOW, api.CYAN, int(redFlag.value())))
 			blueFlag.reset()
 	elif obj.type == "GAME_FLAGRESET":
+		print '@RESET'
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
