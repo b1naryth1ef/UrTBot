@@ -29,11 +29,14 @@ class Timer(object):
 		self.endt = 0
 		self.status = 0
 
-redFlag = Timer()
-blueFlag = Timer()
 
 def eventListener(obj):
 	global api
+	if redFlag == None:
+		redFlag = Timer()
+	if blueFlag == None:
+		blueFlag = Timer()
+
 	if obj == 'init':
 		print "Started"
 
