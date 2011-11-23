@@ -5,6 +5,8 @@ _name = "Flag Stats"
 _author = "B1naryth1ef"
 _version = 0.1
 
+
+
 class Timer(object):
 	def __init__(self):
 		self.start = 0
@@ -25,12 +27,13 @@ class Timer(object):
 		self.end = 0
 		self.status = 0
 
+redFlag = Timer()
+blueFlag = Timer()
+
 def eventListener(obj):
 	global api
 	if obj == 'init':
 		print "Started"
-		redFlag = Timer()
-		blueFlag = Timer()
 
 	elif obj.type == "GAME_FLAGPICKUP":
 		if obj.data['flagid'] == 1 and redFlag.status == 0: redFlag.start()
