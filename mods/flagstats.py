@@ -47,9 +47,11 @@ def eventListener(obj):
 		if obj.data['flagid'] == 1:
 			redFlag.stop()
 			api.say('%sRed %sFlag captured in %s%s' % (api.RED, api.YELLOW, api.CYAN ,redFlag.value()))
+			redFlag.reset()
 		elif obj.data['flagid'] == 2:
 			blueFlag.stop()
 			api.say('%sBlue %sFlag captured in %s%s' % (api.BLUE, api.YELLOW, api.CYAN ,redFlag.value()))
+			blueFlag.reset()
 	elif obj.type == "GAME_FLAGRESET":
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
