@@ -6,7 +6,7 @@ import events
 from rcon import RCON
 import const
 
-__Version__ = 0.1
+__Version__ = 0.2
 
 #--SETTRZ--#
 home = os.getcwd()
@@ -41,6 +41,8 @@ class Bot():
 		self.Commands = {} #Commands
 
 		self.Clients = {} #AKA players
+	
+	def getPlayer(self, uid): return self.Clients[uid]
 
 	def eventFire(self, event, data): 
 		obj = events.EVENTS[event](data)
@@ -75,8 +77,7 @@ class API():
 	def getPlayers(self): return self.B.Players
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
-	def exitProc(self): 
-		sys.exit()
+	def exitProc(self): sys.exit()
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
 	def reboot(self): handlr.initz('reboot')
 	def addListener(self, event, func): 
@@ -141,7 +142,7 @@ def parseUserInfo(inp, varz={}):
 		varz[i[0]] = i[1]
 	return uid,varz
 	
-def parseUserInfoChange(inp, varz={}, vary={}): #@DEV Replace with regex
+def parseUserInfoChange(inp, varz={}, vary={}):
 	#r is race, n is name, t is team
 	#ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
 	inp2 = inp.split(' ', 2)
@@ -203,22 +204,23 @@ def parse(inp):
 	global BOT
 	if inp.startswith("say:"):
 		#say: 0 [WoC]*B1naryth1ef: blah blah
-		#['0', '[WoC]*B1naryth1ef', 'blah blah']
 		inp = inp.split(" ", 3)
 		inp.pop(0)
 		inp[1] = inp[1].strip(':')
 		if inp[2].startswith('!'):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
-			if inp[2].rstrip().split(' ')[0] in BOT.Commands.keys():
-				print "Natural fire" #This should be threaded:
-				BOT.Commands[inp[2].rstrip().split(' ')[0]][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2]}))
+			cmd = inp[2].rstrip().split(' ')[0]
+			if cmd in BOT.Commands.keys():
+				if BOT.getClient(int(inp[1])).group >= BOT.Commands[cmd][2]:
+					BOT.Commands[cmd][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2], 'cmd':cmd})) #@DEV This should be threaded
+				else: pass #@TODO tell user he cant do that
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0
 		inp = int(inp.split(" ")[1])
-		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', inp)
+		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp}) #@DEV We should have some pointer to the fact a client is connecting
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
@@ -231,18 +233,17 @@ def parse(inp):
 
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
-		BOT.eventFire('CLIENT_DISCONNECT', inp)
+		BOT.eventFire('CLIENT_DISCONNECT', {'client':inp})
 		if inp in BOT.Clients.keys(): del BOT.Clients[inp]
 
 	elif inp.startswith('Kill:'): 
 		parseKill(inp)
-
 	elif inp.startswith('Hit:'): 
 		parseHit(inp)
 	elif inp.startswith('Item'):
 		parseItem(inp)
-	elif inp.startswith('Flag:'): pass
-	elif inp.startswith('Flag Return:'): pass
+	elif inp.startswith('Flag:'): parseFlag(inp)
+	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
 	else: pass
 		
 def loadConfig():
@@ -257,8 +258,7 @@ def loadConfig():
 		config_plugins = botConfig['plugins']
 		config_groups = botConfig['groups']
 	except Exception, e:
-		print "Error loading config! %s" % (e)
-		print "Exiting..."
+		print "Error loading config! [%s]" % (e)
 
 def loadDatabase():
 	"""Should load db.py"""
@@ -268,36 +268,23 @@ def loop():
 	"""The entire loop"""
 	global proc, keepLoop
 	while True:
-		if keepLoop is True:
-			proc_read = proc.readline()
-			if proc_read:
-				print proc_read.rstrip()
-				parse(proc_read)
-		else:
-			break
-	return proc
+		proc_read = proc.readline()
+		if proc_read:
+			print proc_read.rstrip()
+			parse(proc_read)
 
-def Start(func, nothing):
-	global BOT, proc, handlr
-	handlr = func
+def Start():
+	global BOT, proc
 	loadConfig()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
 	loadMods()
-	#proc = subprocess.Popen(config_bootcommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	procsocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	procsocket.connect('/tmp/quake3stdout')
 	proc = os.fdopen(procsocket.fileno())
 	loop()
 
-def Exit():
-	sys.exit()
-
-# Just using this while the handler code is a WIP
-class DUMMY:
-	def __init__(self): pass
-	def initz(self, arg):
-		pass
+def Exit(): sys.exit()
 
 if __name__ == "__main__":
 	dummy = DUMMY()
-	Start(dummy, None)
+	Start()

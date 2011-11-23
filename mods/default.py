@@ -67,13 +67,13 @@ def testPlugin(obj):
 	if obj == 'init':
 		pass #setup stuff
 	elif obj.type == "GAME_FLAGPICKUP":
-		print obj.data
+		print obj.data, obj.type
 	elif obj.type == "GAME_FLAGDROP":
-		pass
+		print obj.data, obj.type
 	elif obj.type == "GAME_FLAGRETURN":
-		pass
+		print obj.data, obj.type
 	elif obj.type == "GAME_FLAGCAPTURE":
-		pass
+		print obj.data, obj.type
 	
 def init(A):
 	global api

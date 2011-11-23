@@ -3,6 +3,7 @@ class Player():
 	def __init__(self, uid, data):
 		self.uid = int(uid) #@DEV Meh...
 		self.data = data
+		self.group = 0
 		try:
 			self.name = None
 			self.ip = None
@@ -37,6 +38,7 @@ class Player():
 	def setData(self, data):
 		if 'name' in data.keys(): self.name = data['name']
 		if 'ip' in data.keys(): self.ip = data['ip']
+		if 'team' in data.keys(): self.team = data['team']
 		
 		if 'model' in data.keys(): self.model = data['model']
 		if 'sex' in data.keys(): self.sex = data['sex']
