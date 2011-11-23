@@ -42,7 +42,7 @@ class Bot():
 
 		self.Clients = {} #AKA players
 	
-	def getPlayer(self, uid): return self.Clients[uid]
+	def getClient(self, uid): return self.Clients[uid]
 
 	def eventFire(self, event, data): 
 		obj = events.EVENTS[event](data)
