@@ -9,7 +9,7 @@ def eventListener(obj):
 	if obj == 'init':
 		pass #setup stuff
 	elif obj.type == "GAME_FLAGPICKUP":
-		print obj.data['item'], obj.data['team']
+		print obj.data['flag'], obj.data['team']
 	elif obj.type == "GAME_FLAGDROP":
 		print obj.data['flag'], obj.data['flagid']
 	elif obj.type == "GAME_FLAGRETURN":
