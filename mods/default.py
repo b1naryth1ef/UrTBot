@@ -58,7 +58,6 @@ def cmdTime(obj):
 	elif obj.data['msg'].startswith('!tstop'):
 		time2 = time.time()
 		api.say('Timer Stopped!')
-		time.sleep(.6)
 		api.say('Timer: %s%s' % (api.BLUE, time2-time1))
 		time1 = None
 		time2 = None
