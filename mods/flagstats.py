@@ -32,7 +32,7 @@ class Timer(object):
 
 
 def eventListener(obj):
-	global api
+	global api, redFlag, blueFlag
 	if redFlag == None:
 		redFlag = Timer()
 	if blueFlag == None:
