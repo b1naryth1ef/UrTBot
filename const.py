@@ -30,40 +30,41 @@ gametypes = {
 8: 'bm' #Bomb
 }
 
-MOD_WATER = {'id':'1'}
-MOD_LAVA ={'id':'3'}
-MOD_TELEFRAG ={'id':'5'}
-MOD_FALLING={'id':'6'}
-MOD_SUICIDE={'id':'7'}
-MOD_TRIGGER_HURT={'id':'9'}
-MOD_CHANGE_TEAM={'id':'10'}
-UT_MOD_KNIFE={'id':'12'}
-UT_MOD_KNIFE_THROWN={'id':'13'}
-UT_MOD_BERETTA={'id':'14'}
-UT_MOD_DEAGLE={'id':'15'}
-UT_MOD_SPAS={'id':'16'}
-UT_MOD_UMP45={'id':'17'}
-UT_MOD_MP5K={'id':'18'}
-UT_MOD_LR300={'id':'19'}
-UT_MOD_G36={'id':'20'}
-UT_MOD_PSG1={'id':'21'}
-UT_MOD_HK69={'id':'22'}
-UT_MOD_BLED={'id':'23'}
-UT_MOD_KICKED={'id':'24'}
-UT_MOD_HEGRENADE={'id':'25'}
-UT_MOD_FLASH={'id':None} #@DEV One of these is 26, the other 27. Dont think we need this
-UT_MOD_SMOKE={'id':None}
-UT_MOD_SR8={'id':'28'}
-UT_MOD_AK103={'id':'30'}
-UT_MOD_SPLODED={'id':'31'}
-UT_MOD_SLAPPED={'id':'32'}
-UT_MOD_BOMBED={'id':'33'}
-UT_MOD_NUKED={'id':'34'}
-UT_MOD_NEGEV={'id':'35'}
-UT_MOD_HK69_HIT={'id':'37'}
-UT_MOD_M4={'id':'38'}
-UT_MOD_FLAG={'id':'39'}
-UT_MOD_GOOMBA={'id':'40'}
+itemr = {
+'MOD_WATER': {'id':'1'},
+'MOD_LAVA': {'id':'3'},
+'MOD_TELEFRAG' : {'id':'5'},
+'MOD_FALLING': {'id':'6'},
+'MOD_SUICIDE': {'id':'7'},
+'MOD_TRIGGER_HURT': {'id':'9'},
+'MOD_CHANGE_TEAM': {'id':'10'},
+'UT_MOD_KNIFE': {'id':'12'},
+'UT_MOD_KNIFE_THROWN': {'id':'13'},
+'UT_MOD_BERETTA': {'id':'14'},
+'UT_MOD_DEAGLE': {'id':'15'},
+'UT_MOD_SPAS': {'id':'16'},
+'UT_MOD_UMP45': {'id':'17'},
+'UT_MOD_MP5K': {'id':'18'},
+'UT_MOD_LR300': {'id':'19'},
+'UT_MOD_G36': {'id':'20'},
+'UT_MOD_PSG1': {'id':'21'},
+'UT_MOD_HK69': {'id':'22'},
+'UT_MOD_BLED': {'id':'23'},
+'UT_MOD_KICKED': {'id':'24'},
+'UT_MOD_HEGRENADE': {'id':'25'},
+'UT_MOD_FLASH': {'id':None}, #@DEV One of these is 26, the other 27. Dont think we need this
+'UT_MOD_SMOKE': {'id':None},
+'UT_MOD_SR8': {'id':'28'},
+'UT_MOD_AK103': {'id':'30'},
+'UT_MOD_SPLODED': {'id':'31'},
+'UT_MOD_SLAPPED': {'id':'32'},
+'UT_MOD_BOMBED': {'id':'33'},
+'UT_MOD_NUKED': {'id':'34'},
+'UT_MOD_NEGEV': {'id':'35'},
+'UT_MOD_HK69_HIT': {'id':'37'},
+'UT_MOD_M4': {'id':'38'},
+'UT_MOD_FLAG': {'id':'39'},
+'UT_MOD_GOOMBA': {'id':'40'}}
 
 damage = {
 	'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
@@ -132,7 +133,7 @@ class ConfigError(Exception): pass
 class UrbanTerrorError(Exception): pass
 
 
-def getItemID(item): return globals()[item]['id']
+def getItemID(item): return itemr[item.upper()]['id']
 Glob = lambda: globals()
 
 """
