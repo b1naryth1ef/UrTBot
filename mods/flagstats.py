@@ -71,8 +71,8 @@ def eventListener(obj):
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
-def init(A): pass
-	# global api
-	# api = A
-	# print 'Firing'
-	# api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
+def init(A):
+	global api
+	api = A
+	print 'Firing'
+	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
