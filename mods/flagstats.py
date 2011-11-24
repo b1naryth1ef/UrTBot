@@ -24,40 +24,35 @@ class Timer(object):
 			self.status = 0
 	def value(self): 
 		x = self.endt-self.startt
-		return '{number:.{digits}f}'.format(number=x, digits=4)
+		return '{number:.{digits}f}'.format(number=x, digits=2)
 	def reset(self):
 		self.startt = 0
 		self.endt = 0
 		self.status = 0
 
-
 def eventListener(obj):
-	global api, redFlag, blueFlag
-	if redFlag == None:
-		redFlag = Timer()
-	if blueFlag == None:
-		blueFlag = Timer()
-
-	if obj == 'init':
-		print "Started"
+	"""
+	The making of this plugin was hell. 
+	Fuck the iourt team for the stupid
+	decisions in the way flag capping is
+	handled. Die in a cold, dark, horrible
+	place.
+	-B1
+	"""
+	global api
+	if redFlag == None: redFlag = Timer()
+	if blueFlag == None: blueFlag = Timer()
 
 	elif obj.type == "GAME_FLAGPICKUP":
-		print "@PICKUP",
 		print obj.data['flagid'], redFlag.status, blueFlag.status
-		if obj.data['flagid'] == 1 and redFlag.status == 0: 
-			print 'Starting'
-			redFlag.start()
-		elif obj.data['flagid'] == 2 and blueFlag.status == 0: 
-			print 'Starting'
-			blueFlag.start()
+		if obj.data['flagid'] == 1 and redFlag.status == 0: redFlag.start()
+		elif obj.data['flagid'] == 2 and blueFlag.status == 0: blueFlag.start()
 
 	elif obj.type == "GAME_FLAGRETURN":
-		print '@RETURN'
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
 	elif obj.type == "GAME_FLAGCAPTURE":
-		print '@CAPTURE'
 		if obj.data['flagid'] == 2:
 			redFlag.stop()
 			api.say('%sRed %sFlag captured in %s%s' % (api.RED, api.YELLOW, api.CYAN, redFlag.value()))
@@ -67,12 +62,10 @@ def eventListener(obj):
 			api.say('%sBlue %sFlag captured in %s%s' % (api.BLUE, api.YELLOW, api.CYAN, blueFlag.value()))
 			blueFlag.reset()
 	elif obj.type == "GAME_FLAGRESET":
-		print '@RESET'
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
 def init(A):
 	global api
 	api = A
-	print 'Firing'
 	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
