@@ -176,7 +176,7 @@ def parseHit(inp):
 	method = inp[4]
 	BOT.eventFire('CLIENT_HIT', {'atk':attacker, 'vic':victim, 'loc':hitloc, 'meth':method})
 
-def parseItem(inp): pass
+def parseItem(inp):
 	#Item: 1 ut_weapon_ump45
 	inp = inp.split(' ')
 	item = inp[2].strip()
