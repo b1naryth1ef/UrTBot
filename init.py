@@ -176,13 +176,13 @@ def parseHit(inp):
 	method = inp[4]
 	BOT.eventFire('CLIENT_HIT', {'atk':attacker, 'vic':victim, 'loc':hitloc, 'meth':method})
 
-def parseItem(inp):
+def parseItem(inp): pass
 	#Item: 1 ut_weapon_ump45
-	inp = inp.split(' ')
-	item = inp[2].strip()
-	client = inp[1]
-	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':const.getItemID(item), 'client':client})
+	# inp = inp.split(' ')
+	# item = inp[2].strip()
+	# client = inp[1]
+	# if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
+	# else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':const.getItemID(item), 'client':client})
 
 def parseFlag(inp):
 	#Flag: 0 2: team_CTF_redflag
