@@ -224,7 +224,8 @@ def parse(inp):
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0
 		inp = int(inp.split(" ")[1])
-		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp}) #@DEV We should have some pointer to the fact a client is connecting
+		if inp in BOT.Clients.keys(): raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)

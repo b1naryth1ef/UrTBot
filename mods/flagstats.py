@@ -8,7 +8,7 @@ _version = 0.1
 redFlag = None
 blueFlag = None
 
-class Timer(object):
+class Timer(object): #@CREDIT B1
 	def __init__(self):
 		self.startt = 0
 		self.endt = 0
