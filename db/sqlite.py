@@ -54,8 +54,8 @@ class DBPlugin(DBBase):
 		rows = self.c.execute(query, args).fetchall()
 		return rows
 
-	def getField(self, table, search, field): print ("WTF BAD DB BAD")
-	def setField(self, table, search, field, value): print ("WTF BAD DB BAD")
+	def getField(self, table, search, field): print ("Not implemented in SQLite yet.. oops!")
+	def setField(self, table, search, field, value): print ("Not implemented in SQLite yet.. oops!")
 
 	def addTable(self, table, values):
 		query = '''create table ''' + table + ''' ('''
