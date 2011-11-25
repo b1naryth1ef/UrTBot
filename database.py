@@ -7,6 +7,7 @@ db_plugin = sys.modules['db.' + dbConfig['database_type']]
 class DB(db_plugin.DBPlugin):
 	def __init__(self):
 		db_plugin.DBPlugin.__init__(self)
+		self.connect(dbConfig)
 
 	def clientAdd(): pass
 	def clientDel(): pass
