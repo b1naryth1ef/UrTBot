@@ -82,10 +82,12 @@ if __name__ == '__main__':
 	db.addRow('animals', ('female', 16))
 	db.addRow('animals', ('male', 11))
 	db.addRow('animals', ('unknown', 99))
+	db.commit()
 	print db.getTable('animals')
 	print db.getRow('animals', {'gender':'male'})
 	print "deleting 16 female"
 	print db.delRow('animals', {'gender':'female', 'age':12})
+	db.commit()
 	print db.getTable('animals')
 	#db.delTable('animals')
 	#print db.getTable('animals')
