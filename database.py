@@ -1,5 +1,8 @@
+import sys
 from config import dbConfig
-db_plugin = from db __import__(dbConfig['database_type'])
+
+__import__('db.' + dbConfig['database_type'])
+db_plugin = sys.modules['db.' + dbConfig['database_type']]
 
 class DB(db_plugin.DBPlugin):
 	def __init__(self):

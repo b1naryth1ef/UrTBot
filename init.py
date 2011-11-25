@@ -5,7 +5,7 @@ from events import *
 import events
 from rcon import RCON
 import const
-import db
+import database
 
 __Version__ = 0.2
 
@@ -35,7 +35,7 @@ class Bot():
 		self.ip = ip
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
-		self.db = db.DB()
+		self.db = database.DB()
 		
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers

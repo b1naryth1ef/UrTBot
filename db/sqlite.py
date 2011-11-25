@@ -3,6 +3,7 @@ import sqlite3
 
 class DBPlugin(DBBase):
 	def __init__(self):
+		print "SQLite DB loaded"
 		self.dbconn = None
 		self.c = None
 
