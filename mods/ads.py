@@ -7,3 +7,5 @@ try:
 except:
 	print "Cannot find 'adsconfig.py' in mods/config/."
 	
+
+def init(API): pass

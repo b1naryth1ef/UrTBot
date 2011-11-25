@@ -115,16 +115,16 @@ def init(A):
 	global api
 	api = A
 
-	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>"], 
-	['!list', cmdList, "List all users. Usage: !list"],
-	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>"],
-	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>"],
-	['!map', cmdMap, "Load a map. Usage: !map <map>"],
-	['!stop', cmdStop, "Stop the server/bot. Usage: !stop"],
-	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart"],
-	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>"],
-	['!test', cmdTester, ">:D"],
-	['!timer', cmdTime, "Start/stop the timer. Usage: !timer"],
+	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
+	['!list', cmdList, "List all users. Usage: !list", 0],
+	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 0],
+	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 0],
+	['!map', cmdMap, "Load a map. Usage: !map <map>", 0],
+	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 0],
+	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart", 0],
+	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>", 0],
+	['!test', cmdTester, ">:D", 0],
+	['!timer', cmdTime, "Start/stop the timer. Usage: !timer", 0],
 	])
 
 	api.addListener('CLIENT_CONNECT', welcomeEvent)
