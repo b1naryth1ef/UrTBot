@@ -4,7 +4,31 @@ _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
 _version = 0.1
 
-def cmdHelp(obj):
+TIMERZ = {}
+
+class Timer(object): #@CREDIT B1
+	def __init__(self):
+		self.startt = 0
+		self.endt = 0
+		self.status = 0
+	
+	def start(self): 
+		if self.status == 0:
+			self.startt = time.time()
+			self.status = 1
+	def stop(self):
+		if self.status == 1: 
+			self.endt = time.time()
+			self.status = 0
+	def value(self): 
+		x = self.endt-self.startt
+		return '{number:.{digits}f}'.format(number=x, digits=2)
+	def reset(self):
+		self.startt = 0
+		self.endt = 0
+		self.status = 0
+
+def cmdHelp(obj): #@CREDIT Neek
 	#format should be !command : Info \n
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -30,52 +54,79 @@ def cmdHelp(obj):
 			api.tell(sender, "Unknown command: %s" % cmd)
 		else:
 			api.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
-def cmdList(obj): pass
-	#Format should be !command, !othercommand, !otherothercommand, etc
-def cmdSlap(obj): pass
-	#Format should be !slap int or !slap name/partial name (Use regex?)
-def cmdSet(obj): pass
-	#Format should be !set variable value
-def cmdMap(obj): pass
-	#format should be !map map gamemode(Or none)
+
+def cmdList(obj):
+	sender = obj.data["sender"]
+	api.tell(sender, "==Player List==")
+	for client in api.B.Clients:
+		api.tell(sender, "[%s] %s (%s)" (client.uid, client.name, client.team))
+
+def cmdSlap(obj):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	if len(msg) == 1: api.tell(sender, "Usage: !slap <user>")
+	elif len(msg) == 2: api.rcon('slap %s' % (msg[1]))
+
+def cmdSet(obj): 
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	if len(msg) == 1: api.tell(sender, "Usage: !set <cvar> <value>")
+	elif len(msg) == 2:
+		api.rcon('set %s %s' % (msg[1], msg[2]))
+
+def cmdMap(obj):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	if len(msg) == 1: api.tell(sender, "Usage: !map <map>")
+	elif len(msg) == 2:
+		api.rcon('map %s' % (msg[1]))
+
 def cmdStop(obj): api.exitProc()
-	#format should be !stop
 def cmdRestart(obj): pass
-	#format should be !restart (Both bot/server)
 def cmdLoadout(obj): pass
-	#format should be !loadout int, or playername (regex?)
+
 def cmdTester(obj):
 	api.say('Testing! This is just a test! Stay clam!')
 	api.reboot()
-def testEvent(obj):
-	time.sleep(5)
-	api.say('TESTING 1... 2... 3...')
+
+def welcomeEvent(obj):
+	time.sleep(10)
+	try:
+		api.say('Everyone welcome %s to the server!' % api.B.Clients[obj.data['client']].name)
+	except Exception, e:
+		print "Whoops! Something went wrong:",e
+
 def cmdTime(obj):
-	global time1, time2
-	if obj.data['msg'].startswith('!tstart'):
-		time1 = time.time()
-		api.say('Timer started!')
-	elif obj.data['msg'].startswith('!tstop'):
-		time2 = time.time()
-		api.say('Timer Stopped!')
-		api.say('Timer: %s%s' % (api.BLUE, time2-time1))
-		time1 = None
-		time2 = None
+	global TIMERZ
+	sender = obj.data['sender']
+	if sender in TIMERZ:
+		if TIMERZ[sender].status == 0:
+			TIMERZ[sender].start()
+			api.tell(sender, 'Timer Started!')
+		elif TIMERZ[sender].status == 1:
+			TIMERZ[sender].stop()
+			api.tell(sender, 'Timer: %s', TIMERZ[sender].value())
+	else:
+		TIMERZ[sender] = Timer()
+		TIMERZ[sender].start()
+		api.tell(sender, 'Timer Started!')
 	
 def init(A):
 	global api
 	api = A
-	api.addCmd('!help', cmdHelp, "List all commands")
-	api.addCmd('!list', cmdList, "List all users (with UID's)")
-	api.addCmd('!slap', cmdSlap, "Slap a player")
-	api.addCmd('!set', cmdSet, "Set a Q3 Variable")
-	api.addCmd('!map', cmdMap, "Load a map")
-	api.addCmd('!stop', cmdStop, "Stop the server/bot")
-	api.addCmd('!restart', cmdRestart, "Restart the server/bot")
-	api.addCmd('!loadout', cmdLoadout, "See a players loadout")
-	api.addCmd('!test', cmdTester, ">:D")
-	api.addCmd('!tstart', cmdTime, "Start the timer")
-	api.addCmd('!tstop', cmdTime, "Stop the timer")
-	api.addListener('CLIENT_CONNECT', testEvent)
+
+	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>"], 
+	['!list', cmdList, "List all users. Usage: !list"],
+	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>"],
+	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>"],
+	['!map', cmdMap, "Load a map. Usage: !map <map>"],
+	['!stop', cmdStop, "Stop the server/bot. Usage: !stop"],
+	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart"],
+	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>"],
+	['!test', cmdTester, ">:D"],
+	['!timer', cmdTime, "Start/stop the timer. Usage: !timer"],
+	])
+
+	api.addListener('CLIENT_CONNECT', welcomeEvent)
 
 def die(): pass #Called when we should disable/shutdown

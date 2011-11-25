@@ -1,4 +1,5 @@
 import time
+from default import Timer
 api = None
 
 _name = "Flag Stats"
@@ -7,28 +8,6 @@ _version = 0.1
 
 redFlag = None
 blueFlag = None
-
-class Timer(object):
-	def __init__(self):
-		self.startt = 0
-		self.endt = 0
-		self.status = 0
-	
-	def start(self): 
-		if self.status == 0:
-			self.startt = time.time()
-			self.status = 1
-	def stop(self):
-		if self.status == 1: 
-			self.endt = time.time()
-			self.status = 0
-	def value(self): 
-		x = self.endt-self.startt
-		return '{number:.{digits}f}'.format(number=x, digits=2)
-	def reset(self):
-		self.startt = 0
-		self.endt = 0
-		self.status = 0
 
 def eventListener(obj):
 	"""
