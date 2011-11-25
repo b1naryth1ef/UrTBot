@@ -105,7 +105,7 @@ def cmdTime(obj):
 			api.tell(sender, 'Timer Started!')
 		elif TIMERZ[sender].status == 1:
 			TIMERZ[sender].stop()
-			api.tell(sender, 'Timer: %s', TIMERZ[sender].value())
+			api.tell(sender, 'Timer: %s' % (TIMERZ[sender].value()))
 	else:
 		TIMERZ[sender] = Timer()
 		TIMERZ[sender].start()
