@@ -90,11 +90,11 @@ def cmdTester(obj):
 	api.reboot()
 
 def welcomeEvent(obj):
-	time.sleep(10)
+	time.sleep(5)
 	try:
 		api.say('Everyone welcome %s to the server!' % api.B.Clients[obj.data['client']].name)
-	except Exception, e:
-		print "Whoops! Something went wrong:",e
+	except:
+		welcomeEvent(obj)
 
 def cmdTime(obj):
 	global TIMERZ
@@ -105,7 +105,7 @@ def cmdTime(obj):
 			api.tell(sender, 'Timer Started!')
 		elif TIMERZ[sender].status == 1:
 			TIMERZ[sender].stop()
-			api.tell(sender, 'Timer Stopeed: %s%s' % (api.GREEN, TIMERZ[sender].value()))
+			api.tell(sender, 'Timer Stopped: %s%s' % (api.GREEN, TIMERZ[sender].value()))
 			TIMERZ[sender].reset()
 	else:
 		TIMERZ[sender] = Timer()
