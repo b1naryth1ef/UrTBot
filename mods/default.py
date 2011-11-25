@@ -58,7 +58,7 @@ def cmdHelp(obj): #@CREDIT Neek
 def cmdList(obj):
 	sender = obj.data["sender"]
 	api.tell(sender, "==Player List==")
-	for client in api.B.Clients:
+	for client in api.B.Clients.values():
 		api.tell(sender, "[%s] %s (%s)" (client.uid, client.name, client.team))
 
 def cmdSlap(obj):
@@ -105,7 +105,8 @@ def cmdTime(obj):
 			api.tell(sender, 'Timer Started!')
 		elif TIMERZ[sender].status == 1:
 			TIMERZ[sender].stop()
-			api.tell(sender, 'Timer: %s' % (TIMERZ[sender].value()))
+			api.tell(sender, 'Timer Stopeed: %s%s' % (api.GREEN, TIMERZ[sender].value()))
+			TIMERZ[sender].reset()
 	else:
 		TIMERZ[sender] = Timer()
 		TIMERZ[sender].start()
