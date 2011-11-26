@@ -231,7 +231,9 @@ def parse(inp):
 		uid, varz = parseUserInfo(inp)
 		print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
-		else: BOT.Clients[uid] = player.Player(uid, varz)
+		else:
+			BOT.Clients[uid] = player.Player(uid, varz)
+			BOT.db.clientUpdate(BOT.Clients[uid])
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		uid, varz = parseUserInfoChange(inp)
