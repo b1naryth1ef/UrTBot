@@ -1,4 +1,3 @@
-
 class Player():
 	def __init__(self, uid, data):
 		self.uid = int(uid) #@DEV Meh...
@@ -55,7 +54,7 @@ class Player():
 
 		if 'cg_predictitems' in data.keys(): self.cg_predictitems = data['cg_predictitems']
 		if 'cg_anonymous' in data.keys(): self.cg_anonymous = data['cg_anonymous']
-		if 'cl_guid' in data.keys(): self.cl_guid = data['cl_guid']
+		if 'cl_guid' in data.keys(): self.cl_guid = data['cl_guid'].strip()
 		if 'cg_rgb' in data.keys(): self.cg_rgb = data['cg_rgb']
 		if 'cg_physics' in data.keys(): self.cg_physics = data['cg_physics']
 		
