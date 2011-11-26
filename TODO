@@ -12,6 +12,9 @@ EVENTS:
 
 TODOS:
 - Add a DB handler [In progress]
+	- database.py is incomplete: aliases, penalties
+	- DB methods shouldn't be returning data straight from db (clientSearch())
+	- SQLite plugin could be rewritten to be more pythonish (very klumsy)
 - Add basic commands, work on API [Waiting...]
 - Add lots of events [Semi-in progress]
 - Add ability to reboot bot
