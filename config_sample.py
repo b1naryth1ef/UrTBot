@@ -14,12 +14,28 @@ botConfig = {
 	}	
 }
 
-dbConfig = { #Default for MySQL
-	'database_type': "mysql",
-	'server': 'localhost',
-	'user': 'root',
+##################################
+### Database config
+###		Pick one, delete the rest
+###		'python database.py' will create 
+###		the database and setup the tables. Doit.	
+##################################
+
+#dbConfig = { #Default for MySQL [NOT IMPLEMENTED]
+#	'database_type': "mysql",
+#	'server': 'localhost',
+#	'user': 'root',
+#	'password': '',
+#	'database': 'urtbot',
+#	'prefix': '',
+#}
+
+dbConfig = { #Default for SQLite
+	'database_type': "sqlite",
+	'server': '',
+	'user': '',
 	'password': '',
-	'database': 'urtbot',
+	'database': '/tmp/urtbot.db',
 	'prefix': '',
 }
 
