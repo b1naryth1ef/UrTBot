@@ -54,8 +54,29 @@ class DBPlugin(DBBase):
 		rows = self.c.execute(query, args).fetchall()
 		return rows
 
-	def getField(self, table, search, field): print ("Not implemented in SQLite yet.. oops!")
-	def setField(self, table, search, field, value): print ("Not implemented in SQLite yet.. oops!")
+	def getField(self, table, search, field):
+		query = '''select ''' + field + ''' from ''' + table + ''' where '''
+		args = ()
+		count = 0
+		for key in search.keys():
+			args += (search[key],)
+			query += key + '=?'
+			count += 1
+			if count != len(search): query += ' and '
+		print query, args
+		return self.c.execute(query, args).fetchall()
+
+	def setField(self, table, search, field, value):
+		query = '''update ''' + table + ''' set ''' + field + '''=? where '''
+		args = (value,)
+		count = 0
+		for key in search.keys():
+			args += (search[key],)
+			query += key + '=?'
+			count += 1
+			if count != len(search): query += ' and '
+		print query, args
+		return self.c.execute(query, args).rowcount
 
 	def addTable(self, table, values):
 		query = '''create table ''' + table + ''' ('''
@@ -79,7 +100,7 @@ if __name__ == '__main__':
 	db.connect({'database':'/tmp/fuck'})
 	db.addTable('animals', {'gender':'text', 'age':'integer'})
 	db.addRow('animals', ('male', 19))
-	db.addRow('animals', ('female', 16))
+	db.addRow('animals', ('female', 19))
 	db.addRow('animals', ('male', 11))
 	db.addRow('animals', ('unknown', 99))
 	db.commit()
@@ -91,3 +112,7 @@ if __name__ == '__main__':
 	print db.getTable('animals')
 	#db.delTable('animals')
 	#print db.getTable('animals')
+	print db.getField('animals', {'age':'19'}, 'gender')
+	print db.setField('animals', {'age':'99'}, 'gender', 'dogsex')
+	db.commit()
+	print db.getTable('animals')
