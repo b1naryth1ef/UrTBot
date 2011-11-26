@@ -59,7 +59,7 @@ class DB(db_plugin.DBPlugin):
 	def penaltySelect(self): pass
 
 	def defaultTableSet(self):
-		self.addTable('clients', {'id':'integer primary key',
+		self.addTable('clients', {'id':'integer primary key autoincrement',
 		'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
 		'lastip':'text', 'joincount':'integer', 'firstjoin':'integer',
 		'lastjoin':'integer'})
