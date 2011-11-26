@@ -11,7 +11,7 @@ class DB(db_plugin.DBPlugin):
 		self.connect(dbConfig)
 
 	def clientAdd(self, client):
-		cl = self.clientSearch('guid', client.cl_guid)
+		cl = self.clientSearch({'guid':client.cl_guid})
 		if cl != []:
 			print "Tried to add player to DB: guid is already used"
 			return 0
@@ -29,11 +29,12 @@ class DB(db_plugin.DBPlugin):
 		return count
 
 	def clientModify(self, client): pass
-	def clientSearch(self, field, value):
-		return self.getRow('clients', {field:value})
+	
+	def clientSearch(self, values):
+		return self.getRow('clients', values)
 
 	def clientUpdate(self, client):
-		cl = self.clientSearch('guid', client.cl_guid)
+		cl = self.clientSearch({'guid':client.cl_guid})
 		print "got cl, ", cl
 		if cl != []:
 			# already in db, update fields
