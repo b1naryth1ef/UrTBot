@@ -5,6 +5,22 @@ from config import dbConfig
 __import__('db.' + dbConfig['database_type'])
 db_plugin = sys.modules['db.' + dbConfig['database_type']]
 
+class Client:
+	""" container class to make manipulating client db entries simpler
+		things that also exist in the running bot's Clients dict should be named
+		the same here
+	"""
+	def __init__(self):
+		self.id = 0
+		self.group = 0 # cgroup in db
+		self.name = '' # nick in db (should be changed?)
+		self.cl_guid = '' # guid in db
+		self.password = ''
+		self.ip = '' # lastip in db (should be changed..)
+		self.joincount = 0
+		self.firstjoin = 0
+		self.lastjoin = 0
+
 class DB(db_plugin.DBPlugin):
 	def __init__(self):
 		db_plugin.DBPlugin.__init__(self)
@@ -16,10 +32,9 @@ class DB(db_plugin.DBPlugin):
 			print "Tried to add player to DB: guid is already used"
 			return 0
 		else:
-			count = self.addRow('clients', {'id':None, 'cgroup':0, 'nick':client.name, 
+			count = self.addRow('clients', {'id':None, 'cgroup':client.group, 'nick':client.name, 
 			'guid':client.cl_guid, 'password':"", 'lastip':client.ip, 'joincount':1,
 			'firstjoin':int(time.time()), 'lastjoin':int(time.time())})
-			print "in clientadd", count
 			if count: self.commit()
 			return count
 
@@ -29,7 +44,7 @@ class DB(db_plugin.DBPlugin):
 		return count
 
 	def clientModify(self, client): pass
-	
+
 	def clientSearch(self, values):
 		return self.getRow('clients', values)
 
@@ -77,4 +92,19 @@ if __name__ == '__main__':
 	except Exception, e:
 		print "Ruh roh! Failed because %s." % e
 		sys.exit()
+
+	# ABSOLUTELY ONLY FOR TESTING, use security level 4 (nick only)
+	print "Adding dummy uberadmin with name 'uberadmin' for testing..."
+	client = Client()
+	client.group = 5 # cgroup in db
+	client.name = 'uberadmin' # nick in db (should be changed?)
+	client.cl_guid = 'THISISNOTAREALGUID' # guid in db
+	client.ip = '127.0.0.1'
+	try:
+		db.clientAdd(client)
+	except Exception, e:
+		print "Ate shit while adding test user, go fig."
+		sys.exit()
+	# ==================================================	
+
 	print "All done!"

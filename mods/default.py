@@ -87,14 +87,14 @@ def cmdLoadout(obj): pass
 
 def cmdTester(obj):
 	api.say('Testing! This is just a test! Stay clam!')
-	api.reboot()
+	api.reboot() # lol, so this is why !test crashes! :D
 
-def welcomeEvent(obj):
-	time.sleep(5)
-	try:
-		api.say('Everyone welcome %s to the server!' % api.B.Clients[obj.data['client']].name)
-	except:
-		welcomeEvent(obj)
+def welcomeEvent(obj): pass
+#	time.sleep(5)
+#	try:
+#		api.say('Everyone welcome %s to the server!' % api.B.Clients[obj.data['client']].name)
+#	except:
+#		welcomeEvent(obj)
 
 def cmdTime(obj):
 	global TIMERZ
@@ -118,7 +118,7 @@ def init(A):
 
 	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!list', cmdList, "List all users. Usage: !list", 0],
-	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 0],
+	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
 	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 0],
 	['!map', cmdMap, "Load a map. Usage: !map <map>", 0],
 	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 0],

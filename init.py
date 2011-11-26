@@ -6,6 +6,7 @@ import events
 from rcon import RCON
 import const
 import database
+import auth
 
 __Version__ = 0.2
 
@@ -216,9 +217,14 @@ def parse(inp):
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys():
+				uid = int(inp[0])
+				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
+				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 				if BOT.getClient(int(inp[0])).group >= BOT.Commands[cmd][2]:
 					BOT.Commands[cmd][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2], 'cmd':cmd})) #@DEV This should be threaded
-				else: pass #@TODO tell user he cant do that
+				else:
+					msg = "You lack sufficient access to use %s" % cmd
+					BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
@@ -234,6 +240,7 @@ def parse(inp):
 		else:
 			BOT.Clients[uid] = player.Player(uid, varz)
 			BOT.db.clientUpdate(BOT.Clients[uid])
+			BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		uid, varz = parseUserInfoChange(inp)
@@ -286,6 +293,7 @@ def loop():
 def Start():
 	global BOT, proc
 	loadConfig()
+	auth.load()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
 	loadMods()
 	procsocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

@@ -12,25 +12,30 @@ def load():
 	elif sec_level == 4: print "[WARNING] Security Level 4 is NOT RECOMMENDED!"
 
 
-def level1(ip, guid, nick):
+def level1(db, guid, ip, nick):
 	#- Method 1: User must match GUID/IP/NICK to be auto-logged in
-	if ip != None and guid != None and nick != None: 
-		#Maybe a match, check if they are all the same
-		pass
-	else:
-		return False
+	cl = db.clientSearch({'guid':guid,'lastip':ip,'nick':nick})
+	if cl != []:
+		print cl[0][2] # group, clientSearch will return something nicer someday..
+		return cl[0][2]
+	return 0
 
-def level2():
+def level2(db, guid, ip, nick):
 	#- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
 	pass
 
-def level3(): 
+def level3(db, guid, ip, nick): 
 	#- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
 	pass
 
-def level4():
+def level4(db, guid, ip, nick):
 	#- Method 4: User must match NICK to be logged in...
-	pass
+	cl = db.clientSearch({'nick':nick})
+	if cl != []:
+		print cl[0][2] # group, clientSearch will return something nicer someday..
+		return cl[0][2]
+	return 0
+
 
 levelz = {
 	1:level1,
@@ -40,9 +45,5 @@ levelz = {
 }
 
 def checkUserAuth(db, guid, ip, nick):
-	xip = db.clientSearch(ip=ip)
-	xguid = db.clientSearch(guid=guid)
-	xnick = db.clientSearch(nick=nick)
-
-	return levelz[sec_level](xip,xguid,xnick)
+	return levelz[sec_level](db,guid,ip,nick)
 
