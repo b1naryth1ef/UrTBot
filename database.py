@@ -98,12 +98,12 @@ if __name__ == '__main__':
 	client = Client()
 	client.group = 5 # cgroup in db
 	client.name = 'uberadmin' # nick in db (should be changed?)
-	client.cl_guid = 'THISISNOTAREALGUID' # guid in db
+	client.cl_guid = 'THISISNOTAREALGUIDOMGTHISISCOOLZ' # guid in db (should be 32 chars long)
 	client.ip = '127.0.0.1'
 	try:
 		db.clientAdd(client)
 	except Exception, e:
-		print "Ate shit while adding test user, go fig."
+		print "Ate shit while adding test user, go fig. (It's neeks fault btw)"
 		sys.exit()
 	# ==================================================	
 
