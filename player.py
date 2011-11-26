@@ -36,36 +36,7 @@ class Player():
 			print e
 
 	def setData(self, data):
-		if 'name' in data.keys(): self.name = data['name']
-		if 'ip' in data.keys(): self.ip = data['ip']
-		if 'team' in data.keys(): self.team = data['team']
-		
-		if 'model' in data.keys(): self.model = data['model']
-		if 'sex' in data.keys(): self.sex = data['sex']
-		if 'headmodel' in data.keys(): self.headmodel = data['headmodel']
-		if 'team_model' in data.keys(): self.team_model = data['team_model']
-		if 'team_headmodel' in data.keys(): self.team_headmodel = data['team_headmodel']
-		if 'funred' in data.keys(): self.funred = data['funred']
-		if 'funblue' in data.keys(): self.funblue = data['funblue']
-		if 'racered' in data.keys(): self.raceRed = data['racered']
-		if 'raceblue' in data.keys(): self.raceBlue = data['raceblue']
-		if 'color1' in data.keys(): self.color1 = data['color1']
-		if 'color2' in data.keys(): self.color2 = data['color2']
-
-		if 'cg_predictitems' in data.keys(): self.cg_predictitems = data['cg_predictitems']
-		if 'cg_anonymous' in data.keys(): self.cg_anonymous = data['cg_anonymous']
-		if 'cl_guid' in data.keys(): self.cl_guid = data['cl_guid'].strip()
-		if 'cg_rgb' in data.keys(): self.cg_rgb = data['cg_rgb']
-		if 'cg_physics' in data.keys(): self.cg_physics = data['cg_physics']
-		
-		if 'weapmodes' in data.keys(): self.weapmodes = data['weapmodes']
-		if 'gear' in data.keys(): self.gear = data['gear']
-		if 'teamtask' in data.keys(): self.teamtask = data['teamtask']
-
-		if 'handicap' in data.keys(): self.handicap = data['handicap']
-		if 'rate' in data.keys(): self.rate = data['rate']
-		if 'snaps' in data.keys(): self.snaps = data['snaps']
-		if 'ut_timenudge' in data.keys(): self.ut_timenudge = data['ut_timenudge']
+		self.__dict__.update(data) #<<< BEST FIX EVAR
 
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
