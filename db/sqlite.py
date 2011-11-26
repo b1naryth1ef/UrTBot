@@ -22,13 +22,21 @@ class DBPlugin(DBBase):
 		self.dbconn.rollback()
 
 	def addRow(self, table, values):
-		query = '''insert into ''' + table + ''' values ('''
-		for i in range(0, len(values)):
-			query += '?'
-			if (i) != len(values) - 1: query += ','
-		query += ')'
-		print query, values
-		return self.c.execute(query, values).rowcount
+		query = '''insert into ''' + table + " ("
+		args = ()
+		strargs = ''
+		count = 0
+		for key in values.keys():
+			args += (values[key],)
+			strargs += '?'
+			query += key
+			count += 1
+			if count != len(values):
+				query += ','
+				strargs += ','
+		query += ") values (" + strargs + ")"
+		print query, args
+		return self.c.execute(query, args).rowcount
 
 	def delRow(self, table, search):
 		query = '''delete from ''' + table + ''' where '''
@@ -99,10 +107,11 @@ if __name__ == '__main__':
 	db = DBPlugin()
 	db.connect({'database':'/tmp/fuck'})
 	db.addTable('animals', {'gender':'text', 'age':'integer'})
-	db.addRow('animals', ('male', 19))
-	db.addRow('animals', ('female', 19))
-	db.addRow('animals', ('male', 11))
-	db.addRow('animals', ('unknown', 99))
+	db.addRow('animals', {'gender':'male', 'age':29})
+	db.addRow('animals', {'gender':'female', 'age':13})
+	db.addRow('animals', {'gender':'male', 'age':99})
+	db.addRow('animals', {'gender':'female', 'age':59})
+	db.addRow('animals', {'gender':'male', 'age':39})
 	db.commit()
 	print db.getTable('animals')
 	print db.getRow('animals', {'gender':'male'})
