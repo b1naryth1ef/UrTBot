@@ -81,7 +81,14 @@ def cmdMap(obj):
 	sender = obj.data["sender"]
 	if len(msg) == 1: api.tell(sender, "Usage: !map <map>")
 	elif len(msg) == 2:
-		api.rcon('map %s' % (msg[1]))
+		maps = api.findMap(msg[1])
+		if len(maps) == 0:
+			api.tell(sender, "No map found matching that name")
+		elif len(maps) > 1:
+			api.tell(sender, "Found %d maps: %s" % (len(maps), maps))
+		else:
+			api.rcon('set thismap "map %s"' % maps[0])
+			api.rcon('vstr thismap')
 
 def cmdStop(obj): api.exitProc()
 def cmdRestart(obj): pass
@@ -121,8 +128,8 @@ def init(A):
 	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!list', cmdList, "List all users. Usage: !list", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
-	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 0],
-	['!map', cmdMap, "Load a map. Usage: !map <map>", 0],
+	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 5],
+	['!map', cmdMap, "Load a map. Usage: !map <map>", 2],
 	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 0],
 	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart", 0],
 	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>", 0],

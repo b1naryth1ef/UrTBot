@@ -50,3 +50,21 @@ securityConfig = {
 	'level': 2,
 	'multi': False,
 }
+
+# Urban Terror config --
+# YOU MOST LIKELY DO NOT NEED TO TOUCH THIS!
+UrTConfig = {
+    # Maps that don't have their own PK3
+    'maps' : [ 'ut4_abbey','ut4_abbeyctf','ut4_algiers','ut4_ambush',
+    'ut4_austria','ut4_casa','ut4_company','ut4_crossing','ut4_docks',
+    'ut4_dressingroom','ut4_eagle','ut4_elgin','ut4_firingrange',
+    'ut4_harbortown','ut4_herring','ut4_horror','ut4_kingdom','ut4_mandolin',
+    'ut4_maya','ut4_oildepot','ut4_prague','ut4_ramelle','ut4_ricochet',
+    'ut4_riyadh','ut4_sanc','ut4_snoppis','ut4_suburbs','ut4_subway',
+    'ut4_swim','ut4_thingley','ut4_tombs','ut4_toxic','ut4_tunis',
+    'ut4_turnpike','ut4_uptown' ],
+    # PK3s that aren't actually maps
+    'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
+                        'pak0^7', 'common-spog']
+}
+

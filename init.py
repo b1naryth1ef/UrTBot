@@ -66,12 +66,16 @@ class GameOutput:
 
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
+		from config import UrTConfig
+
 		self.prefix = prefix
 		self.ip = ip
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
 		self.db = database.DB()
 		
+		self.maplist = UrTConfig['maps']
+
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers
 		self.Triggers = {} #Possible Triggers (Events)
@@ -91,7 +95,16 @@ class Bot():
 		return obj
 
 	def Startup(self):
+		from config import UrTConfig
 		self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
+		
+		# Get the PK3s/maps the server has loaded
+		pk3s = self.Q.rcon("sv_pakNames").split('"')[3].split()
+		for ignore in UrTConfig['ignoremaps']:
+			if ignore in pk3s: pk3s.remove(ignore)
+		self.maplist += pk3s
+		print self.maplist
+
 		# We only take active client ids from status, everything else from dumpuser
 		status = self.Q.rcon("status").splitlines(False)[4:-1]
 		if status == []: return
@@ -136,6 +149,12 @@ class API():
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): sys.exit()
+	def findMap(self, mapname):
+		maplist = []
+		for name in self.B.maplist:
+			if mapname == name or ("ut4_" + mapname) == name: return [name]
+			elif mapname in name: maplist.append(name)
+		return maplist
 	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
 	def reboot(self): handlr.initz('reboot')
 	def addListener(self, event, func): 
