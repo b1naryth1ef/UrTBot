@@ -7,6 +7,7 @@ import os, sys
 import signal
 
 serverexe = None
+serversocket = None
 proc = None
 
 def sigHandler(signum, frame):
@@ -16,8 +17,9 @@ def sigHandler(signum, frame):
 
 def loadConfig():
 	from config import botConfig
-	global serverexe
+	global serverexe, serversocket
 	serverexe = botConfig['servercommand']
+	serversocket = botConfig['serversocket']
 
 def launch():
 	global proc, procfile
@@ -30,9 +32,9 @@ def launch():
 								stderr=subprocess.STDOUT)
 	procfile = os.fdopen(proc.stdout.fileno())
 	server = socket(AF_UNIX, SOCK_STREAM)
-	try: os.unlink('/tmp/quake3stdout')
+	try: os.unlink(serversocket)
 	except: pass
-	server.bind('/tmp/quake3stdout')
+	server.bind(serversocket)
 	server.listen(10)
 
 	while True:
