@@ -3,6 +3,7 @@ botConfig = {
 	'rcon': "MyPassword123",
 	'rconip': "localhost:27960",
 	'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
+	'serversocket': "/tmp/quake3_27961",
 	'plugins':[],
 	'groups':{
 		'unsub':0,
