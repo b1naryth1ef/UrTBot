@@ -50,7 +50,7 @@ class GameOutput:
 		readrdy = select.select([self.usock], [], [], 0.10)[0]
 		if readrdy != []:
 			self.buf += self.usock.recv(4096)
-			for line in self.buf.splitlines(1):
+			for line in self.buf.splitlines(True):
 				if line.endswith("\n"): self.lines.append(line.strip())
 				else: newbuf = line
 			if newbuf: self.buf = newbuf
@@ -77,7 +77,7 @@ class Bot():
 		self.Commands = {} #Commands
 
 		self.Clients = {} #AKA players
-	
+		
 	def getClient(self, uid): return self.Clients[uid]
 
 	def eventFire(self, event, data): 
@@ -88,7 +88,23 @@ class Bot():
 					listener(obj)
 				break
 		return obj
-		
+
+	def Startup(self):
+		self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
+		# We only take active client ids from status, everything else from dumpuser
+		status = self.Q.rcon("status").splitlines(False)[4:-1]
+		if status == []: return
+
+		for id in [info.split()[0] for info in status]:
+			info = self.Q.rcon("dumpuser " + id).splitlines(False)[3:]
+			if info == []: continue
+			data = {}
+			for line in info:
+				 line = line.split()
+				 data[line[0]] = line[1]
+			self.Clients[int(id)] = player.Player(id, data)
+		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+
 class API():
 	RED = '^1'
 	GREEN = '^2'
@@ -329,6 +345,7 @@ def Start():
 	loadConfig()
 	auth.load()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
+	BOT.Startup()
 	loadMods()
 	proc = GameOutput('/tmp/quake3stdout')
 	loop()
