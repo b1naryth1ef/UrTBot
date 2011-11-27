@@ -124,10 +124,10 @@ class API():
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
-	def getPlayer(self, iid=0):
-		if len(self.B.Players) != 0: return self.B.Players[iid]
+	def getClient(self, iid=0):
+		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
-	def getPlayers(self): return self.B.Players
+	def getClients(self): return self.B.Clients
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): sys.exit()
