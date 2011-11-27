@@ -59,8 +59,9 @@ def cmdHelp(obj): #@CREDIT Neek
 def cmdList(obj):
 	sender = obj.data["sender"]
 	api.tell(sender, "==Player List==")
-	for client in api.B.Clients.values():
-		api.tell(sender, "[%s] %s (%s)" (client.uid, client.name, client.team))
+	clients = api.getClients()
+	for cid in clients:
+		api.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
 def cmdSlap(obj):
 	msg = obj.data["msg"].split(" ")
@@ -118,7 +119,7 @@ def init(A):
 	api = A
 
 	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
-	['!list', cmdList, "List all users. Usage: !list", 0],
+	['!list', cmdList, "List all users. Usage: !list", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
 	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 0],
 	['!map', cmdMap, "Load a map. Usage: !map <map>", 0],
