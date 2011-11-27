@@ -35,7 +35,7 @@ def cmdHelp(obj): #@CREDIT Neek
 	# No argument, list all commands
 	if len(msg) == 1:
 		reply = ''
-		cmds = api.getCmd()
+		cmds = api.getCommands()
 		keys = cmds.keys()
 		keys.sort()
 		api.tell(sender, "==Commands==")
@@ -44,7 +44,7 @@ def cmdHelp(obj): #@CREDIT Neek
 				api.tell(sender, reply)
 				reply = ''
 			if len(reply) > 0: reply += ", "
-			reply += k
+			reply += k + "(%d)" % cmds[k][2]
 		api.tell(sender, reply)
 	# Argument, provide description of command
 	elif len(msg) == 2:
