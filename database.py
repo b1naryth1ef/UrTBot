@@ -10,16 +10,16 @@ class Client:
 		things that also exist in the running bot's Clients dict should be named
 		the same here
 	"""
-	def __init__(self):
-		self.id = 0
-		self.group = 0 # cgroup in db
-		self.name = '' # nick in db (should be changed?)
-		self.cl_guid = '' # guid in db
-		self.password = ''
-		self.ip = ''
-		self.joincount = 0
-		self.firstjoin = 0
-		self.lastjoin = 0
+	def __init__(self, info=(0,0,'','','','',0,0,0)):
+		self.id = info[0]
+		self.group = info[1] # cgroup in db
+		self.name = info[2] # nick in db (should be changed?)
+		self.cl_guid = info[3] # guid in db
+		self.password = info[4]
+		self.ip = info[5]
+		self.joincount = info[6]
+		self.firstjoin = info[7]
+		self.lastjoin = info[8]
 
 class DB(db_plugin.DBPlugin):
 	def __init__(self):
@@ -44,34 +44,36 @@ class DB(db_plugin.DBPlugin):
 		if count: self.commit()
 		return count
 
-	def clientModify(self, client): pass
+	def clientModify(self, client, fields):
+		cl = self.clientSearch({'guid':client.cl_guid})
+		if cl == []:
+			print "Tried to modify a player that doesn't exist in db!"
+			return 0
+		for key in fields:
+			self.setField('clients', {'guid':client.cl_guid}, key, fields[key])
+		return 1
 
 	def clientSearch(self, values):
-		return self.getRow('clients', values)
+		cllist = []
+		rows = self.getRow('clients', values)
+		for info in rows:
+			cllist.append(Client(info))
+		return cllist
 
 	def clientUpdate(self, client):
 		if client.ip == 'bot': return
-		
+
 		cl = self.clientSearch({'guid':client.cl_guid})
-		print "got cl, ", cl
 		if cl != []:
 			# already in db, update fields
-			self.setField('clients', {'guid':client.cl_guid}, 'ip', client.ip)
-			self.setField('clients', {'guid':client.cl_guid}, 'lastjoin', int(time.time()))
 			count = self.getField('clients', {'guid':client.cl_guid}, 'joincount')
-			print "joincount is ", count
 			count = count[0][0] + 1
-			self.setField('clients', {'guid':client.cl_guid}, 'joincount', count)
-			self.commit()
+			self.clientModify(client, {'lastjoin':int(time.time()), 'joincount':count})
 		else:
 			self.clientAdd(client)
 
-	def aliasAdd(self): pass
-	def aliasDel(self): pass
-	def aliasSearch(self): pass
-	def aliasSelect(self): pass
+	def penaltyAdd(self, client, type, length): pass
 
-	def penaltyAdd(self): pass
 	def penaltyDel(self): pass
 	def penaltyModify(self): pass
 	def penaltySearch(self): pass

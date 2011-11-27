@@ -17,8 +17,7 @@ def level1(db, guid, ip, nick):
 	ipOnly = ip.split(":")[0]
 	cl = db.clientSearch({'guid':guid,'ip':ipOnly,'nick':nick})
 	if cl != []:
-		print cl[0][2] # group, clientSearch will return something nicer someday..
-		return cl[0][2]
+		return cl[0].group
 	return 0
 
 def level2(db, guid, ip, nick):
@@ -33,8 +32,7 @@ def level4(db, guid, ip, nick):
 	#- Method 4: User must match NICK to be logged in...
 	cl = db.clientSearch({'nick':nick})
 	if cl != []:
-		print cl[0][2] # group, clientSearch will return something nicer someday..
-		return cl[0][2]
+		return cl[0].group
 	return 0
 
 
