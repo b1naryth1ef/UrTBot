@@ -309,6 +309,16 @@ def parse(inp):
 		parseItem(inp)
 	elif inp.startswith('Flag:'): parseFlag(inp)
 	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
+
+	elif inp.startswith('ShutdownGame:'):
+		BOT.eventFire('GAME_SHUTDOWN', {})
+		# We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
+		# when the mapcycle changes maps? hrmph. investigate.
+		# In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
+		for key in BOT.Clients.keys():
+			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
+			del BOT.Clients[key]
+
 	else: pass
 		
 def loadConfig():

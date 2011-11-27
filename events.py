@@ -48,7 +48,7 @@ def GAME_ROUND_START(data): return EventGame('GAME_ROUND_START', data)
 def GAME_ROUND_END(data): return EventGame('GAME_ROUND_END', data)
 def GAME_MATCH_END(data): return EventGame('GAME_MATCH_END', data)
 def GAME_MATCH_START(data): return EventGame('GAME_MATCH_START', data)
-
+def GAME_SHUTDOWN(data): return EventGame('GAME_SHUTDOWN', data)
 
 EVENTS = {
 	'CHAT_MESSAGE': CHAT_MESSAGE,
@@ -80,5 +80,6 @@ EVENTS = {
 	'GAME_ROUND_END':GAME_ROUND_END,
 	'GAME_MATCH_END':GAME_MATCH_END,
 	'GAME_MATCH_START':GAME_MATCH_START,
+	'GAME_SHUTDOWN':GAME_SHUTDOWN,
 	'GENERIC':GENERIC,
 }
