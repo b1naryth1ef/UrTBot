@@ -39,7 +39,7 @@ def eventListener(obj):
 	place.
 	-B1
 	"""
-	global api
+	global api, redFlag, blueFlag
 	if redFlag == None: redFlag = Timer()
 	if blueFlag == None: blueFlag = Timer()
 
