@@ -43,8 +43,9 @@ def cmdHelp(obj): #@CREDIT Neek
 			if len(reply) + len(api.B.prefix) > 50:
 				api.tell(sender, reply)
 				reply = ''
-			if len(reply) > 0: reply += ", "
-			reply += k + "(%d)" % cmds[k][2]
+			if cmds[k][2] <= api.getClient(sender).group:
+				if len(reply) > 0: reply += ", "
+				reply += k + "(%d)" % cmds[k][2]
 		api.tell(sender, reply)
 	# Argument, provide description of command
 	elif len(msg) == 2:
