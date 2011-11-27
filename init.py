@@ -23,6 +23,7 @@ config_rconip = None
 config_bootcommand = None
 config_groups = None
 config_plugins = None
+config_serversocket = None
 
 def canInt(i):
 	try:
@@ -311,7 +312,7 @@ def parse(inp):
 		
 def loadConfig():
 	"""Loads the bot config"""
-	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups
+	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket
 	try:
 		from config import botConfig
 		config_prefix = botConfig['prefix']
@@ -320,6 +321,7 @@ def loadConfig():
 		config_bootcommand = botConfig['servercommand']
 		config_plugins = botConfig['plugins']
 		config_groups = botConfig['groups']
+		config_serversocket = botConfig['serversocket']
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
 
@@ -347,7 +349,7 @@ def Start():
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
 	BOT.Startup()
 	loadMods()
-	proc = GameOutput('/tmp/quake3stdout')
+	proc = GameOutput(config_serversocket)
 	loop()
 
 def Exit(): sys.exit()
