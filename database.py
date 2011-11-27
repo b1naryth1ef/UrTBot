@@ -50,6 +50,8 @@ class DB(db_plugin.DBPlugin):
 		return self.getRow('clients', values)
 
 	def clientUpdate(self, client):
+		if client.ip == 'bot': return
+		
 		cl = self.clientSearch({'guid':client.cl_guid})
 		print "got cl, ", cl
 		if cl != []:
