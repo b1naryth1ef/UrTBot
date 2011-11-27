@@ -96,14 +96,19 @@ class Bot():
 		status = self.Q.rcon("status").splitlines(False)[4:-1]
 		if status == []: return
 
-		for id in [info.split()[0] for info in status]:
-			info = self.Q.rcon("dumpuser " + id).splitlines(False)[3:]
+		for uid in [info.split()[0] for info in status]:
+			uid = int(uid)
+			info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
 			if info == []: continue
 			data = {}
 			for line in info:
 				 line = line.split()
 				 data[line[0]] = line[1]
-			self.Clients[int(id)] = player.Player(id, data)
+			self.Clients[uid] = player.Player(uid, data)
+			if self.Clients[uid].ip != 'bot':
+				self.db.clientUpdate(self.Clients[uid])
+				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
+
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
 
 class API():
