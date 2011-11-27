@@ -71,7 +71,45 @@ UT_MOD_M4= {'id':'38'}
 UT_MOD_FLAG= {'id':'39'}
 UT_MOD_GOOMBA= {'id':'40'}
 
+# Hits (yes these differ from the kill ones, go fig)
+"""
+1	UT_MOD_KNIFE
+2	UT_MOD_BERETTA
+3	UT_MOD_DEAGLE
+4	UT_MOD_SPAS
+5	UT_MOD_MP5K
+6	UT_MOD_UMP45
+8	UT_MOD_LR300
+9	UT_MOD_G36
+10	UT_MOD_PSG1
+14	UT_MOD_SR8
+15	UT_MOD_AK103
+17	UT_MOD_NEGEV
+19	UT_MOD_M4
+21	UT_MOD_HEGRENADE
+"""
+
+# Hitzones
+""" verbatim:
+13:57 Hit: 2 1 5 9: chouille hit killgirl in the Legs
+Read the hit sequence as follows
+Chouille is client 1
+KillGirl is client 2
+5 is the hit area (here the legs)
+9 is the weapon ID
+
+Hit areas are:
+0: Head
+1: Helmet
+2: Torso
+3: Kevlar
+4: Arms
+5: Legs
+6: Body
+"""
+
 # Items (pickupable)
+# These don't have an integer attached to them, they just 'are'
 """
 UT_WEAPON_M4
 UT_WEAPON_GRENADE_FRAG
