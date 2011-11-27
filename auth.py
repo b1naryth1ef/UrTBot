@@ -14,7 +14,8 @@ def load():
 
 def level1(db, guid, ip, nick):
 	#- Method 1: User must match GUID/IP/NICK to be auto-logged in
-	cl = db.clientSearch({'guid':guid,'lastip':ip,'nick':nick})
+	ipOnly = ip.split(":")[0]
+	cl = db.clientSearch({'guid':guid,'ip':ipOnly,'nick':nick})
 	if cl != []:
 		print cl[0][2] # group, clientSearch will return something nicer someday..
 		return cl[0][2]

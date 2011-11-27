@@ -16,7 +16,7 @@ class Client:
 		self.name = '' # nick in db (should be changed?)
 		self.cl_guid = '' # guid in db
 		self.password = ''
-		self.ip = '' # lastip in db (should be changed..)
+		self.ip = ''
 		self.joincount = 0
 		self.firstjoin = 0
 		self.lastjoin = 0
@@ -32,8 +32,9 @@ class DB(db_plugin.DBPlugin):
 			print "Tried to add player to DB: guid is already used"
 			return 0
 		else:
+			ipOnly = client.ip.split(":")[0]
 			count = self.addRow('clients', {'id':None, 'cgroup':client.group, 'nick':client.name, 
-			'guid':client.cl_guid, 'password':"", 'lastip':client.ip, 'joincount':1,
+			'guid':client.cl_guid, 'password':"", 'ip':ipOnly, 'joincount':1,
 			'firstjoin':int(time.time()), 'lastjoin':int(time.time())})
 			if count: self.commit()
 			return count
@@ -53,7 +54,7 @@ class DB(db_plugin.DBPlugin):
 		print "got cl, ", cl
 		if cl != []:
 			# already in db, update fields
-			self.setField('clients', {'guid':client.cl_guid}, 'lastip', client.ip)
+			self.setField('clients', {'guid':client.cl_guid}, 'ip', client.ip)
 			self.setField('clients', {'guid':client.cl_guid}, 'lastjoin', int(time.time()))
 			count = self.getField('clients', {'guid':client.cl_guid}, 'joincount')
 			print "joincount is ", count
@@ -77,7 +78,7 @@ class DB(db_plugin.DBPlugin):
 	def defaultTableSet(self):
 		self.addTable('clients', {'id':'integer primary key autoincrement',
 		'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
-		'lastip':'text', 'joincount':'integer', 'firstjoin':'integer',
+		'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
 		'lastjoin':'integer'})
 
 		self.addTable('penalties', {'id':'integer primary key', 'userid':'integer',
