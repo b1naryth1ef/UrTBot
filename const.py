@@ -30,13 +30,18 @@ gametypes = {
 8: 'bm' #Bomb
 }
 
+# Method Of Death (MODs)
 MOD_WATER = {'id':'1'}
+MOD_SLIME = {'id': '2'}
 MOD_LAVA= {'id':'3'}
+MOD_CRUSH= {'id':'4'}
 MOD_TELEFRAG = {'id':'5'}
 MOD_FALLING= {'id':'6'}
-MOD_SUICIDE= {'id':'7'}
+MOD_SUICIDE= {'id':'7'} # Dupe with 11
+MOD_TARGET_LASER= {'id':'8'}
 MOD_TRIGGER_HURT= {'id':'9'}
 MOD_CHANGE_TEAM= {'id':'10'}
+#MOD_SUICIDE={'id':'11'} # Dupe
 UT_MOD_KNIFE= {'id':'12'}
 UT_MOD_KNIFE_THROWN= {'id':'13'}
 UT_MOD_BERETTA= {'id':'14'}
@@ -51,11 +56,10 @@ UT_MOD_HK69= {'id':'22'}
 UT_MOD_BLED= {'id':'23'}
 UT_MOD_KICKED= {'id':'24'}
 UT_MOD_HEGRENADE= {'id':'25'}
-UT_MOD_GRENADE_HE= {'id':'25'}
-UT_MOD_FLASH= {'id':None} #@DEV One of these is 26, the other 27. Dont think we need this
-UT_MOD_SMOKE= {'id':None}
-UT_MOD_GRENADE_SMOKE= {'id':None}
+UT_MOD_FLASHGRENADE= {'id':'26'} #@DEV It is technically possible to die from this, I guarantee it!
+UT_MOD_SMOKEGRENADE= {'id':'27'}
 UT_MOD_SR8= {'id':'28'}
+UT_MOD_SACRIFICE= {'id':'29'}
 UT_MOD_AK103= {'id':'30'}
 UT_MOD_SPLODED= {'id':'31'}
 UT_MOD_SLAPPED= {'id':'32'}
@@ -66,6 +70,39 @@ UT_MOD_HK69_HIT= {'id':'37'}
 UT_MOD_M4= {'id':'38'}
 UT_MOD_FLAG= {'id':'39'}
 UT_MOD_GOOMBA= {'id':'40'}
+
+# Items (pickupable)
+"""
+UT_WEAPON_M4
+UT_WEAPON_GRENADE_FRAG
+UT_WEAPON_NEGEV
+UT_WEAPON_BOMB
+UT_WEAPON_AK103
+UT_WEAPON_SR8
+UT_WEAPON_GRENADE_SMOKE
+UT_WEAPON_GRENADE_FLASH
+UT_WEAPON_GRENADE_HE
+UT_WEAPON_PSG1
+UT_WEAPON_G36
+UT_WEAPON_LR
+UT_WEAPON_HK69
+UT_WEAPON_UMP45
+UT_WEAPON_MP5K
+UT_WEAPON_SPAS12
+UT_WEAPON_DEAGLE
+UT_WEAPON_BERETTA
+UT_WEAPON_KNIFE
+UT_WEAPON_BOMB
+UT_ITEM_APR
+UT_ITEM_EXTRAAMMO
+UT_ITEM_HELMET
+UT_ITEM_LASER
+UT_ITEM_SILENCER
+UT_ITEM_MEDKIT
+UT_ITEM_NVG
+UT_ITEM_VEST
+UT_ITEM_BOMB
+"""
 
 damage = {
 	'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
@@ -142,6 +179,7 @@ Some content in this file has been found in the B3 source.
 We thank the entire BigBrotherBot team for there contributions 
 to the Urban Terror community, and credit much of the data/content 
 in this file to them.
-"""
 
-        
+And credit to utstatsbot for sorting most of this out and collecting it together.
+http://utstatsbot.googlecode.com/svn-history/r2/trunk/ut.log.format.txt
+"""
