@@ -46,5 +46,6 @@ levelz = {
 }
 
 def checkUserAuth(db, guid, ip, nick):
+	if ip == "bot": return 0 # skip 'em
 	return levelz[sec_level](db,guid,ip,nick)
 

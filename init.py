@@ -289,8 +289,9 @@ def parse(inp):
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 		else:
 			BOT.Clients[uid] = player.Player(uid, varz)
-			BOT.db.clientUpdate(BOT.Clients[uid])
-			BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
+			if BOT.Clients[uid].ip != 'bot':
+				BOT.db.clientUpdate(BOT.Clients[uid])
+				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		uid, varz = parseUserInfoChange(inp)
