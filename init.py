@@ -236,7 +236,6 @@ def parseItem(inp):
 	client = inp[1]
 	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
 	else: 
-		item = item.replace('weapon', 'mod') #@NOTE weapons come in as ut_weapon_XXXX but should be ut_mod_XXXX
 		BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
 
 def parseFlag(inp):
