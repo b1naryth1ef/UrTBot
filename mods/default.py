@@ -69,6 +69,12 @@ def cmdSlap(obj):
 	if len(msg) == 1: api.tell(sender, "Usage: !slap <user>")
 	elif len(msg) == 2: api.rcon('slap %s' % (msg[1]))
 
+def cmdNuke(obj):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	if len(msg) == 1: api.tell(sender, "Usage: !nuke <user>")
+	elif len(msg) == 2: api.rcon('nuke %s' % (msg[1]))
+
 def cmdSet(obj): 
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -128,6 +134,7 @@ def init(A):
 	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!list', cmdList, "List all users. Usage: !list", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
+	['!nuke', cmdNuke, "Nuke a player. Usage: !nuke <NAME/UID>", 3],
 	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 5],
 	['!map', cmdMap, "Load a map. Usage: !map <map>", 2],
 	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 0],
