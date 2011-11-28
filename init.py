@@ -142,21 +142,22 @@ class API():
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
-	def getClient(self, iid=0):
-		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
-		else: return None
 	def getClients(self): return self.B.Clients
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): sys.exit()
+	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
+	def reboot(self): handlr.initz('reboot')
+	def getCmd(self, cmd): return self.B.Commands.get(cmd)
+	def getClient(self, iid=0):
+		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
+		else: return None
 	def findMap(self, mapname):
 		maplist = []
 		for name in self.B.maplist:
 			if mapname == name or ("ut4_" + mapname) == name: return [name]
 			elif mapname in name: maplist.append(name)
 		return maplist
-	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
-	def reboot(self): handlr.initz('reboot')
 	def addListener(self, event, func): 
 		if event in self.B.Listeners.keys():
 			if self.B.Listeners[event] != None: self.B.Listeners[event].append(func)
@@ -185,8 +186,6 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
-	def getCmd(self, cmd):
-		return self.B.Commands.get(cmd)
 
 def loadMods():
 	global BOT
