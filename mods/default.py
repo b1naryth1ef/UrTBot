@@ -1,4 +1,5 @@
 import time, sys, const
+from init import canInt
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -74,6 +75,13 @@ def cmdNuke(obj):
 	sender = obj.data["sender"]
 	if len(msg) == 1: api.tell(sender, "Usage: !nuke <user>")
 	elif len(msg) == 2: api.rcon('nuke %s' % (msg[1]))
+	elif len(msg) == 3:
+		if canInt(msg[2]):
+			for i in range(int(msg[2])):
+				api.rcon('nuke %s' % (msg[1]))
+				time.sleep(.5) #@NOTE Seems like a good delay time
+
+
 
 def cmdSet(obj): 
 	msg = obj.data["msg"].split(" ")
