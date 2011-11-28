@@ -1,6 +1,6 @@
 class Player():
 	def __init__(self, uid, data):
-		self.uid = int(uid) #@DEV Meh...
+		self.uid = int(uid)
 		self.data = data
 		self.group = 0
 		self.status = None
@@ -36,7 +36,9 @@ class Player():
 			print e
 
 	def setData(self, data):
-		self.__dict__.update(data) #<<< BEST FIX EVAR
+		for i in data.keys: #Strip line endings
+			data[i] = data[i].strip()
+		self.__dict__.update(data)
 
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
