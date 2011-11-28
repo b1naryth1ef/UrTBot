@@ -63,6 +63,13 @@ def cmdList(obj):
 	for cid in clients:
 		api.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
+def cmdKick(obj):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	if len(msg) == 1: api.tell(sender, "Usage: !kick <user>")
+	elif len(msg) == 2:
+		api.rcon('kick %s' % msg[1])
+
 def cmdSlap(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -133,6 +140,7 @@ def init(A):
 
 	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!list', cmdList, "List all users. Usage: !list", 3],
+	['!kick', cmdKick, "Kick a user. Usage: !kick <NAME/UID>", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
 	['!nuke', cmdNuke, "Nuke a player. Usage: !nuke <NAME/UID>", 3],
 	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 5],
