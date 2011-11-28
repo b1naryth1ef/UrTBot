@@ -118,7 +118,7 @@ class Bot():
 				 line = line.split()
 				 data[line[0]] = line[1]
 			self.Clients[uid] = player.Player(uid, data)
-			if self.Clients[uid].ip != 'bot':
+			if self.Clients[uid].cl_guid != None:
 				self.db.clientUpdate(self.Clients[uid])
 				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
 
@@ -311,7 +311,7 @@ def parse(inp):
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 		else:
 			BOT.Clients[uid] = player.Player(uid, varz)
-			if BOT.Clients[uid].ip != 'bot':
+			if BOT.Clients[uid].cl_guid != None:
 				BOT.db.clientUpdate(BOT.Clients[uid])
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 
