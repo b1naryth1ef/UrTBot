@@ -29,7 +29,7 @@ class Timer(object): #@CREDIT B1
 		self.endt = 0
 		self.status = 0
 
-def cmdHelp(obj): #@CREDIT Neek
+def cmdHelp(obj, f): #@CREDIT Neek
 	#format should be !command : Info \n
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -57,14 +57,14 @@ def cmdHelp(obj): #@CREDIT Neek
 		else:
 			A.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
 
-def cmdList(obj):
+def cmdList(obj, f):
 	sender = obj.data["sender"]
 	A.tell(sender, "==Player List==")
 	clients = A.getClients()
 	for cid in clients:
 		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
-def cmdSlap(obj):
+def cmdSlap(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
@@ -75,7 +75,7 @@ def cmdSlap(obj):
 				A.rcon('slap %s' % (msg[1]))
 				time.sleep(.5) #@NOTE Seems like a good delay time
 
-def cmdNuke(obj):
+def cmdNuke(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !nuke <user> <count>")
@@ -86,14 +86,14 @@ def cmdNuke(obj):
 				A.rcon('nuke %s' % (msg[1]))
 				time.sleep(.5) #@NOTE Seems like a good delay time
 
-def cmdSet(obj): 
+def cmdSet(obj, f): 
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !set <cvar> <value>")
 	elif len(msg) == 2:
 		A.rcon('set %s %s' % (msg[1], msg[2]))
 
-def cmdMap(obj):
+def cmdMap(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !map <map>")
@@ -107,22 +107,22 @@ def cmdMap(obj):
 			A.rcon('set thismap "map %s"' % maps[0])
 			A.rcon('vstr thismap')
 
-def cmdStop(obj): A.exitProc()
-def cmdRestart(obj): pass
-def cmdLoadout(obj): pass
+def cmdStop(obj, f): A.exitProc()
+def cmdRestart(obj, f): pass
+def cmdLoadout(obj, f): pass
 
 def cmdTester(obj):
 	A.say('Testing! This is just a test! Stay clam!')
 	A.reboot() # lol, so this is why !test crashes! :D
 
-def welcomeEvent(obj): pass
+def welcomeEvent(obj, f): pass
 #	time.sleep(5)
 #	try:
 #		A.say('Everyone welcome %s to the server!' % A.B.Clients[obj.data['client']].name)
 #	except:
 #		welcomeEvent(obj)
 
-def cmdTime(obj):
+def cmdTime(obj, f):
 	global TIMERZ
 	sender = obj.data['sender']
 	if sender in TIMERZ:
