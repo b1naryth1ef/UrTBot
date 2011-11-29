@@ -358,7 +358,7 @@ def loadMods():
 	for i in config_plugins:
 		A.debug('Loading: %s...' % (i))
 		__import__('mods.'+i)
-		i =  sys.modules['mods.'+i]
+		i = sys.modules['mods.'+i]
 		try: thread.start_new_thread(i.init, ())
 		except Exception, e:
 			A.debug('Error in loadMods() [%s]' % (e))
