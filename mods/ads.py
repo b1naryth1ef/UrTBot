@@ -10,16 +10,16 @@ default_messages = [
 'W^100^3t! This servers on ^1fire^3!']
 default_length = 80
 
-if 1==1:
+try:
 	from config import adsconfig
 	msg = adsconfig.messages
-	leng = adsconfig.time_dela #@NOTE This should be a integer
+	leng = adsconfig.time_delay #@NOTE This should be a integer
 	A.debug('Loaded config correctly...', _name)
-# except:
-# 	A.debug('Was not able to load config... using default messages', _name)
-# 	print "Cannot find 'adsconfig.py' in mods/config/... using default messages." #<<<< This is just for users not using debug
-# 	msg = default_messages
-# 	leng = default_length
+except:
+	A.debug('Was not able to load config... using default messages', _name)
+	print "Cannot find 'adsconfig.py' in mods/config/... using default messages." #<<<< This is just for users not using debug
+	msg = default_messages
+	leng = default_length
 
 def init(x=0):
 	A.debug('ads.init() was called... looping', _name)
