@@ -26,11 +26,9 @@ except:
 def init():
 	A.debug('ads.init() was called... looping', _name)
 	x = 0
+	print A.B.status
 	while A.B.status == 1:
-		if len(msg) > x: x = 0
-		else:
-			time.sleep(leng)
-			A.say(msg[x])
-			x+=1
-
+		time.sleep(leng)
+		A.say(msg[0])
+		
 
