@@ -28,7 +28,7 @@ class Timer(object): #@CREDIT B1
 		self.endt = 0
 		self.status = 0
 
-def eventListener(obj):
+def eventListener(obj, f):
 	"""
 	The making of this plugin was hell. 
 	Fuck the iourt team for the stupid

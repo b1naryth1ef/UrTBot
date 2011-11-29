@@ -111,16 +111,12 @@ def cmdStop(obj, f): A.exitProc()
 def cmdRestart(obj, f): pass
 def cmdLoadout(obj, f): pass
 
-def cmdTester(obj):
+def cmdTester(obj, f):
 	A.say('Testing! This is just a test! Stay clam!')
 	A.reboot() # lol, so this is why !test crashes! :D
 
-def welcomeEvent(obj, f): pass
-#	time.sleep(5)
-#	try:
-#		A.say('Everyone welcome %s to the server!' % A.B.Clients[obj.data['client']].name)
-#	except:
-#		welcomeEvent(obj)
+def welcomeEvent(obj, f):
+	if obj.type == 'CLIENT_BEGIN': A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
 def cmdTime(obj, f):
 	global TIMERZ

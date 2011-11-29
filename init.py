@@ -97,7 +97,7 @@ class Bot():
 		for i in self.Listeners.keys():
 			if i == event:
 				for listener in self.Listeners[i]:
-					listener(obj)
+					thread.start_new_thread(listener, (obj, False))
 				break
 		return obj
 
@@ -255,6 +255,12 @@ def parseItem(inp):
 	else: 
 		BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
 
+def parsePlayerBegin(inp):
+	#ClientBegin: 0
+	inp = inp.split(' ')
+	client = int(inp[1])
+	BOT.eventFire('CLIENT_BEGIN', {'client':client})
+
 def parseFlag(inp):
 	#Flag: 0 2: team_CTF_redflag
 	inp = inp.split(' ', 3)
@@ -325,6 +331,7 @@ def parse(inp):
 		parseItem(inp)
 	elif inp.startswith('Flag:'): parseFlag(inp)
 	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
+	elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
 
 	elif inp.startswith('ShutdownGame:'):
 		BOT.eventFire('GAME_SHUTDOWN', {})
