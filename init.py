@@ -115,7 +115,7 @@ class Bot():
 
 		# We only take active client ids from status, everything else from dumpuser
 		status = self.Q.rcon("status").splitlines(False)[4:-1]
-		if status == []: return
+		if status == []: return #If no users are connected, we should just ignore them...
 
 		for uid in [info.split()[0] for info in status]:
 			uid = int(uid)
@@ -339,7 +339,7 @@ def parse(inp):
 		
 def loadConfig():
 	"""Loads the bot config"""
-	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket
+	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
 	try:
 		from config import botConfig
 		config_prefix = botConfig['prefix']
@@ -374,7 +374,7 @@ def loop():
 			parse(line)
 
 def Start():
-	global BOT, proc, A
+	global BOT, proc, A, config_debugmode
 	loadConfig()
 	auth.load()
 	BOT = Bot(config_prefix, config_rconip, config_rcon, debug=config_debugmode)
