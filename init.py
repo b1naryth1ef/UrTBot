@@ -203,15 +203,6 @@ class API():
 		self.B.Triggers[trigger] = []
 		return True
 
-def loadMods():
-	global BOT, A
-	for i in config_plugins:
-		print i
-		i = __import__('mods.'+i)
-		try: thread.start_new_thread(i.init())
-		except Exception, e:
-			A.debug('Error in loadMods() [%s]' % (e))
-
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
@@ -359,6 +350,15 @@ def loadConfig():
 		config_serversocket = botConfig['serversocket']
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
+
+def loadMods():
+	global BOT, A
+	for i in config_plugins:
+		print i
+		i = __import__('mods.'+i)
+		thread.start_new_thread(i.init())
+		#except Exception, e:
+		#	A.debug('Error in loadMods() [%s]' % (e))
 
 def loop():
 	"""The entire loop"""
