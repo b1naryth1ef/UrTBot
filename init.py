@@ -357,7 +357,7 @@ def loadMods():
 		print i
 		__import__('mods.'+i)
 		i =  sys.modules['mods.'+i]
-		thread.start_new_thread(i.init())
+		thread.start_new_thread(i.init(), ())
 		#except Exception, e:
 		#	A.debug('Error in loadMods() [%s]' % (e))
 
