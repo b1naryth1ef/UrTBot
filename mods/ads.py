@@ -10,7 +10,7 @@ default_messages = [
 'Type ^1!help^3 in chat for more commands!',
 'Type ^1!about^3 in chat for more information!',
 'W^100^3t! This servers on ^1fire^3!']
-default_length = 120
+default_length = 60
 
 try:
 	from config import adsconfig
@@ -24,6 +24,7 @@ except:
 	leng = default_length
 
 def init():
+	A.debug('ads.init() was called... looping', _name)
 	x = 0
 	while A.B.status == 1:
 		if len(msg) > x: x = 0
