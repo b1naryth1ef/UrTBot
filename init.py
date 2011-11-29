@@ -390,7 +390,6 @@ def loop():
 			line = proc.getLine()
 			print line
 			parse(line)
-		fireTick()
 
 def Start():
 	global BOT, proc, A
