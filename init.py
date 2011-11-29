@@ -257,6 +257,7 @@ def parseItem(inp):
 
 def parsePlayerBegin(inp):
 	#ClientBegin: 0
+	print "DID IT!"
 	inp = inp.split(' ')
 	client = int(inp[1])
 	BOT.eventFire('CLIENT_BEGIN', {'client':client})
@@ -292,6 +293,7 @@ def parse(inp):
 				uid = int(inp[0])
 				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
+				A.say('GROUP: %s' % BOT.Clients[uid].group)
 				if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), True)) 
 				else:
