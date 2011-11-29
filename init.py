@@ -355,7 +355,8 @@ def loadMods():
 	global BOT, A
 	for i in config_plugins:
 		print i
-		i = __import__('mods.'+i)
+		__import__('mods.'+i)
+		i =  sys.modules['mods.'+i]
 		thread.start_new_thread(i.init())
 		#except Exception, e:
 		#	A.debug('Error in loadMods() [%s]' % (e))
