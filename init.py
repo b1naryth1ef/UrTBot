@@ -402,7 +402,7 @@ def Start():
 	loadMods()
 	proc = GameOutput(config_serversocket)
 	x = os.uname() #@DEV Is this windows friendly?
-	A.say('UrTBot V%s loaded on %s (%s/)' % (__Version__, sys.platform, x[2], x[4])) 
+	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
 def Exit(): sys.exit()
