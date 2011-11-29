@@ -14,6 +14,7 @@ import thread
 __Version__ = 0.2
 
 #--SETTRZ--#
+A = None
 home = os.getcwd()
 lastsent = None
 keepLoop = True
