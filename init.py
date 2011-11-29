@@ -193,7 +193,7 @@ def loadMods():
 	global BOT
 	for i in config_plugins:
 		print i
-		__import__(i)
+		__import__('mods.'+i)
 
 # def loadMods():
 # 	global BOT
