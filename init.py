@@ -287,7 +287,7 @@ def parse(inp):
 				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 				#if BOT.getClient(int(inp[0])).group >= BOT.Commands[cmd][2]:
-				thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), None)) 
+				thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}))) 
 				#else:
 				#	msg = "You lack sufficient access to use %s" % cmd
 				#	BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
@@ -356,7 +356,7 @@ def loadConfig():
 def loadMods():
 	global BOT, A
 	for i in config_plugins:
-		print i
+		A.debug('Loading: %s...' % (i))
 		__import__('mods.'+i)
 		i =  sys.modules['mods.'+i]
 		try: thread.start_new_thread(i.init, ())
