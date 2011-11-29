@@ -207,31 +207,8 @@ def loadMods():
 	for i in config_plugins:
 		print i
 		i = __import__('mods.'+i)
-		try: i.init()
+		try: thread.start_new_thread(i.init())
 		except: pass
-
-
-# def loadMods():
-# 	global BOT
-# 	fn = []
-# 	modx = []
-# 	county = 0
-# 	for i in os.listdir(os.path.join(home, 'mods')):
-# 		if i.endswith('.py') and not i.startswith("_"):
-# 			fn.append(os.path.join(home, 'mods', i))
-# 	for f in fn:
-# 		fname = os.path.basename(f)[:-3]
-# 		try:
-# 			mod = imp.load_source(fname, f)
-# 			name = getattr(mod, "_name")
-# 			author = getattr(mod, "_author")
-# 			version = getattr(mod, "_version")
-# 			mod.init(API())
-# 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-# 		except Exception, e:
-# 			if 'name' not in locals():
-# 				name = fname
-# 			print "ERROR LOADING %s: %s" % (name, e)	
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
