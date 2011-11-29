@@ -11,13 +11,15 @@ import select
 import thread
 
 
-__Version__ = 0.2
+__Version__ = 0.3
 
 #--SETTRZ--#
 A = None
 home = os.getcwd()
 lastsent = None
 keepLoop = True
+botDEBUGS = []
+pluginDEBUGS = []
 
 #--GLOB--#
 config_prefix = None
@@ -76,6 +78,7 @@ class Bot():
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
 		self.db = database.DB()
+		self.status = 1 #1 is on, 0 is off
 		
 		self.maplist = UrTConfig['maps']
 
@@ -143,6 +146,13 @@ class API():
 		self.B = BOT
 		self.Q = BOT.Q
 		self.auth = auth
+	def debug(self, msg, plugin=None): 
+		if self.B.debug is True and plugin is None: 
+			print '[DEBUG]', msg
+			botDEBUGS.append((time.time(), msg))
+		else:
+			print '[PDEBUG|%s] %s' % (plugin, msg)
+			pluginDEBUGS.append((time.time(), plugin, msg))
 	def tester(self): print "TESTING! 1! 2! 3!"
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
@@ -196,7 +206,10 @@ def loadMods():
 	global BOT
 	for i in config_plugins:
 		print i
-		__import__('mods.'+i)
+		i = __import__('mods.'+i)
+		try: i.init()
+		except: pass
+
 
 # def loadMods():
 # 	global BOT
@@ -368,12 +381,6 @@ def loadConfig():
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
 
-def fireTick(): pass
-
-def loadDatabase():
-	"""Should load db.py"""
-	pass
-
 def loop():
 	"""The entire loop"""
 	global proc, keepLoop
@@ -394,6 +401,8 @@ def Start():
 	BOT.Startup()
 	loadMods()
 	proc = GameOutput(config_serversocket)
+	x = os.uname() #@DEV Is this windows friendly?
+	A.say('UrTBot V%s loaded on %s (%s/)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
 def Exit(): sys.exit()

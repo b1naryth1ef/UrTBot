@@ -6,3 +6,4 @@ def testr(obj, n0):
 
 A.addCmd('!t', testr, ':D', 0)
 
+def init(): pass
