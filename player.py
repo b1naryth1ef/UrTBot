@@ -36,7 +36,7 @@ class Player():
 			print e
 
 	def setData(self, data):
-		for i in data.keys: #Strip line endings
+		for i in data.keys(): #Strip line endings
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
 
