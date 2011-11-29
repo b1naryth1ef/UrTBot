@@ -141,11 +141,11 @@ def init():
 	['!nuke', cmdNuke, "Nuke a player. Usage: !nuke <NAME/UID>", 3],
 	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 5],
 	['!map', cmdMap, "Load a map. Usage: !map <map>", 2],
-	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 0],
-	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart", 0],
-	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>", 0],
+	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 3],
+	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart", 3],
+	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>", 2],
 	['!test', cmdTester, ">:D", 0],
-	['!timer', cmdTime, "Start/stop the timer. Usage: !timer", 0],
+	['!timer', cmdTime, "Start/stop the timer. Usage: !timer", 1],
 	])
 
 	A.addListener('CLIENT_CONNECT', welcomeEvent)
