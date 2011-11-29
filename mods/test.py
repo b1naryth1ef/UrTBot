@@ -1,6 +1,6 @@
 from init import A
 
-def testr(obj):
+def testr(obj, n0):
 	A.say('TESTING 1... 2... 3...')
 	print "Testing!"
 
