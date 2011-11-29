@@ -70,7 +70,7 @@ class GameOutput():
 		return self.lines.pop(0)
 
 class Bot():
-	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
+	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
 		from config import UrTConfig
 
 		self.prefix = prefix
@@ -79,7 +79,7 @@ class Bot():
 		self.Q = RCON(self.ip, self.rcon)
 		self.db = database.DB()
 		self.status = 1 #1 is on, 0 is off
-		self.debug = False #False will hide messages, True will print them and log them to vars
+		self.debug = debug #False will hide messages, True will print them and log them to vars
 		
 		self.maplist = UrTConfig['maps']
 
@@ -148,13 +148,14 @@ class API():
 		self.Q = BOT.Q
 		self.auth = auth
 	def debug(self, msg, plugin=None): 
-		if self.B.debug is True and plugin is None: 
-			print '[DEBUG]', msg
-			botDEBUGS.append((time.time(), msg))
-		else:
-			print '[PDEBUG|%s] %s' % (plugin, msg)
-			pluginDEBUGS.append((time.time(), plugin, msg))
-	def tester(self): print "TESTING! 1! 2! 3!"
+		if self.B.debug is True: 
+			if plugin is None:
+				print '[DEBUG]', msg
+				botDEBUGS.append((time.time(), msg))
+			else:
+				print '[PDEBUG|%s] %s' % (plugin, msg)
+				pluginDEBUGS.append((time.time(), plugin, msg))
+	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
@@ -188,17 +189,17 @@ class API():
 			else: self.B.Listeners[i] = [func]
 	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
-			print "Can't add command %s, another plugin already added it!" % (cmd)
+			self.debug("Can't add command %s, another plugin already added it!" % (cmd))
 			return False
 		self.B.Commands[cmd] = (func,desc,level)
 		return True
 	def addCmds(self, cmds):
 		for i in cmds:
-			if i[0] in self.B.Commands.keys(): print "Can't add command %s, another plugin already added it!" % (i[0])
+			if i[0] in self.B.Commands.keys(): self.debug("Can't add command %s, another plugin already added it!" % (i[0]))
 			else: self.B.Commands[i[0]] = (i[1], i[2], i[3])
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
-			print "Can't add trigger %s, another plugin already added it!" % (trigger)
+			self.debug("Can't add trigger %s, another plugin already added it!" % (trigger))
 			return False
 		self.B.Triggers[trigger] = []
 		return True
@@ -348,6 +349,7 @@ def loadConfig():
 		config_plugins = botConfig['plugins']
 		config_groups = botConfig['groups']
 		config_serversocket = botConfig['serversocket']
+		config_debugmode = botConfig['debug_mode']
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
 
@@ -357,9 +359,9 @@ def loadMods():
 		print i
 		__import__('mods.'+i)
 		i =  sys.modules['mods.'+i]
-		thread.start_new_thread(i.init, ())
-		#except Exception, e:
-		#	A.debug('Error in loadMods() [%s]' % (e))
+		try: thread.start_new_thread(i.init, ())
+		except Exception, e:
+			A.debug('Error in loadMods() [%s]' % (e))
 
 def loop():
 	"""The entire loop"""
@@ -375,7 +377,7 @@ def Start():
 	global BOT, proc, A
 	loadConfig()
 	auth.load()
-	BOT = Bot(config_prefix, config_rconip, config_rcon)
+	BOT = Bot(config_prefix, config_rconip, config_rcon, debug=config_debugmode)
 	A = API()
 	BOT.Startup()
 	loadMods()
