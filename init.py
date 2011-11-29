@@ -191,25 +191,30 @@ class API():
 
 def loadMods():
 	global BOT
-	fn = []
-	modx = []
-	county = 0
-	for i in os.listdir(os.path.join(home, 'mods')):
-		if i.endswith('.py') and not i.startswith("_"):
-			fn.append(os.path.join(home, 'mods', i))
-	for f in fn:
-		fname = os.path.basename(f)[:-3]
-		try:
-			mod = imp.load_source(fname, f)
-			name = getattr(mod, "_name")
-			author = getattr(mod, "_author")
-			version = getattr(mod, "_version")
-			mod.init(API())
-			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-		except Exception, e:
-			if 'name' not in locals():
-				name = fname
-			print "ERROR LOADING %s: %s" % (name, e)	
+	for i in config_plugins:
+		__import__(i)
+
+# def loadMods():
+# 	global BOT
+# 	fn = []
+# 	modx = []
+# 	county = 0
+# 	for i in os.listdir(os.path.join(home, 'mods')):
+# 		if i.endswith('.py') and not i.startswith("_"):
+# 			fn.append(os.path.join(home, 'mods', i))
+# 	for f in fn:
+# 		fname = os.path.basename(f)[:-3]
+# 		try:
+# 			mod = imp.load_source(fname, f)
+# 			name = getattr(mod, "_name")
+# 			author = getattr(mod, "_author")
+# 			version = getattr(mod, "_version")
+# 			mod.init(API())
+# 			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
+# 		except Exception, e:
+# 			if 'name' not in locals():
+# 				name = fname
+# 			print "ERROR LOADING %s: %s" % (name, e)	
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
@@ -377,10 +382,11 @@ def loop():
 		fireTick()
 
 def Start():
-	global BOT, proc
+	global BOT, proc, A
 	loadConfig()
 	auth.load()
 	BOT = Bot(config_prefix, config_rconip, config_rcon)
+	A = API()
 	BOT.Startup()
 	loadMods()
 	proc = GameOutput(config_serversocket)
