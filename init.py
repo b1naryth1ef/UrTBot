@@ -98,6 +98,7 @@ class Bot():
 		return obj
 
 	def Startup(self):
+		print 'CALLED STARTUP'
 		from config import UrTConfig
 		self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
 		
@@ -126,6 +127,7 @@ class Bot():
 				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+		print 'STARTUP DONE'
 
 class API():
 	RED = '^1'
