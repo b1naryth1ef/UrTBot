@@ -28,6 +28,7 @@ TODOS:
 	- Min Required Level (Anyone on or above must use !login to authenticate)
 	
 STUPID URT THINGS:
+- Figure out all the weapon hits/etc
 - hotpotato (flags go boom) does not print a flag return msg.
 	the flag gets dropped and goes BOOM without any further notification.
 	this screws up the flagstats code. solutions are all hacky. :|

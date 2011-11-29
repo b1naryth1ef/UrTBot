@@ -8,6 +8,8 @@ import const
 import database
 import auth
 import select
+import thread
+
 
 __Version__ = 0.2
 
@@ -32,7 +34,7 @@ def canInt(i):
 	except:
 		return False
 
-class GameOutput:
+class GameOutput():
 	def __init__(self, usockname=None):
 		self.usockname = usockname
 		self.usock = None
@@ -142,21 +144,22 @@ class API():
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
-	def getClient(self, iid=0):
-		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
-		else: return None
 	def getClients(self): return self.B.Clients
 	def getCommands(self): return self.B.Commands
 	def whatTeam(self, num): return const.teams[num]
 	def exitProc(self): sys.exit()
+	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
+	def reboot(self): handlr.initz('reboot')
+	def getCmd(self, cmd): return self.B.Commands.get(cmd)
+	def getClient(self, iid=0):
+		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
+		else: return None
 	def findMap(self, mapname):
 		maplist = []
 		for name in self.B.maplist:
 			if mapname == name or ("ut4_" + mapname) == name: return [name]
 			elif mapname in name: maplist.append(name)
 		return maplist
-	def bootProc(self): keepLoop = False #@DEV Need a way of rebooting el boto
-	def reboot(self): handlr.initz('reboot')
 	def addListener(self, event, func): 
 		if event in self.B.Listeners.keys():
 			if self.B.Listeners[event] != None: self.B.Listeners[event].append(func)
@@ -185,8 +188,6 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
-	def getCmd(self, cmd):
-		return self.B.Commands.get(cmd)
 
 def loadMods():
 	global BOT
@@ -293,7 +294,7 @@ def parse(inp):
 				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 				if BOT.getClient(int(inp[0])).group >= BOT.Commands[cmd][2]:
-					BOT.Commands[cmd][0](BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'msg':inp[2], 'cmd':cmd})) #@DEV This should be threaded
+					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), None)) 
 				else:
 					msg = "You lack sufficient access to use %s" % cmd
 					BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
