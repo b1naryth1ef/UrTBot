@@ -79,6 +79,7 @@ class Bot():
 		self.Q = RCON(self.ip, self.rcon)
 		self.db = database.DB()
 		self.status = 1 #1 is on, 0 is off
+		self.debug = False #False will hide messages, True will print them and log them to vars
 		
 		self.maplist = UrTConfig['maps']
 
@@ -203,12 +204,13 @@ class API():
 		return True
 
 def loadMods():
-	global BOT
+	global BOT, A
 	for i in config_plugins:
 		print i
 		i = __import__('mods.'+i)
 		try: thread.start_new_thread(i.init())
-		except: pass
+		except Exception, e:
+			A.debug('Error in loadMods() [%s]' % (e))
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
