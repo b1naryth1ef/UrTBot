@@ -1,5 +1,5 @@
 import time, sys, const
-from init import canInt
+from init import canInt, A
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -36,89 +36,89 @@ def cmdHelp(obj): #@CREDIT Neek
 	# No argument, list all commands
 	if len(msg) == 1:
 		reply = ''
-		cmds = api.getCommands()
+		cmds = A.getCommands()
 		keys = cmds.keys()
 		keys.sort()
-		api.tell(sender, "==Commands==")
+		A.tell(sender, "==Commands==")
 		for k in keys:
-			if len(reply) + len(api.B.prefix) > 50:
-				api.tell(sender, reply)
+			if len(reply) + len(A.B.prefix) > 50:
+				A.tell(sender, reply)
 				reply = ''
-			if cmds[k][2] <= api.getClient(sender).group:
+			if cmds[k][2] <= A.getClient(sender).group:
 				if len(reply) > 0: reply += ", "
 				reply += k + "(%d)" % cmds[k][2]
-		api.tell(sender, reply)
+		A.tell(sender, reply)
 	# Argument, provide description of command
 	elif len(msg) == 2:
 		cmd = msg[1].rstrip().lstrip('!')
-		cmdobj = api.getCmd('!' + cmd)
+		cmdobj = A.getCmd('!' + cmd)
 		if cmdobj == None:
-			api.tell(sender, "Unknown command: %s" % cmd)
+			A.tell(sender, "Unknown command: %s" % cmd)
 		else:
-			api.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
+			A.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
 
 def cmdList(obj):
 	sender = obj.data["sender"]
-	api.tell(sender, "==Player List==")
-	clients = api.getClients()
+	A.tell(sender, "==Player List==")
+	clients = A.getClients()
 	for cid in clients:
-		api.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
+		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
 def cmdSlap(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
-	if len(msg) == 1: api.tell(sender, "Usage: !slap <user> <count>")
-	elif len(msg) == 2: api.rcon('slap %s' % (msg[1]))
+	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
+	elif len(msg) == 2: A.rcon('slap %s' % (msg[1]))
 	elif len(msg) == 3:
 		if canInt(msg[2]):
 			for i in range(int(msg[2])):
-				api.rcon('slap %s' % (msg[1]))
+				A.rcon('slap %s' % (msg[1]))
 				time.sleep(.5) #@NOTE Seems like a good delay time
 
 def cmdNuke(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
-	if len(msg) == 1: api.tell(sender, "Usage: !nuke <user> <count>")
-	elif len(msg) == 2: api.rcon('nuke %s' % (msg[1]))
+	if len(msg) == 1: A.tell(sender, "Usage: !nuke <user> <count>")
+	elif len(msg) == 2: A.rcon('nuke %s' % (msg[1]))
 	elif len(msg) == 3:
 		if canInt(msg[2]):
 			for i in range(int(msg[2])):
-				api.rcon('nuke %s' % (msg[1]))
+				A.rcon('nuke %s' % (msg[1]))
 				time.sleep(.5) #@NOTE Seems like a good delay time
 
 def cmdSet(obj): 
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
-	if len(msg) == 1: api.tell(sender, "Usage: !set <cvar> <value>")
+	if len(msg) == 1: A.tell(sender, "Usage: !set <cvar> <value>")
 	elif len(msg) == 2:
-		api.rcon('set %s %s' % (msg[1], msg[2]))
+		A.rcon('set %s %s' % (msg[1], msg[2]))
 
 def cmdMap(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
-	if len(msg) == 1: api.tell(sender, "Usage: !map <map>")
+	if len(msg) == 1: A.tell(sender, "Usage: !map <map>")
 	elif len(msg) == 2:
-		maps = api.findMap(msg[1])
+		maps = A.findMap(msg[1])
 		if len(maps) == 0:
-			api.tell(sender, "No map found matching that name")
+			A.tell(sender, "No map found matching that name")
 		elif len(maps) > 1:
-			api.tell(sender, "Found %d maps: %s" % (len(maps), maps))
+			A.tell(sender, "Found %d maps: %s" % (len(maps), maps))
 		else:
-			api.rcon('set thismap "map %s"' % maps[0])
-			api.rcon('vstr thismap')
+			A.rcon('set thismap "map %s"' % maps[0])
+			A.rcon('vstr thismap')
 
-def cmdStop(obj): api.exitProc()
+def cmdStop(obj): A.exitProc()
 def cmdRestart(obj): pass
 def cmdLoadout(obj): pass
 
 def cmdTester(obj):
-	api.say('Testing! This is just a test! Stay clam!')
-	api.reboot() # lol, so this is why !test crashes! :D
+	A.say('Testing! This is just a test! Stay clam!')
+	A.reboot() # lol, so this is why !test crashes! :D
 
 def welcomeEvent(obj): pass
 #	time.sleep(5)
 #	try:
-#		api.say('Everyone welcome %s to the server!' % api.B.Clients[obj.data['client']].name)
+#		A.say('Everyone welcome %s to the server!' % A.B.Clients[obj.data['client']].name)
 #	except:
 #		welcomeEvent(obj)
 
@@ -128,21 +128,18 @@ def cmdTime(obj):
 	if sender in TIMERZ:
 		if TIMERZ[sender].status == 0:
 			TIMERZ[sender].start()
-			api.tell(sender, 'Timer Started!')
+			A.tell(sender, 'Timer Started!')
 		elif TIMERZ[sender].status == 1:
 			TIMERZ[sender].stop()
-			api.tell(sender, 'Timer Stopped: %s%s' % (api.GREEN, TIMERZ[sender].value()))
+			A.tell(sender, 'Timer Stopped: %s%s' % (A.GREEN, TIMERZ[sender].value()))
 			TIMERZ[sender].reset()
 	else:
 		TIMERZ[sender] = Timer()
 		TIMERZ[sender].start()
-		api.tell(sender, 'Timer Started!')
+		A.tell(sender, 'Timer Started!')
 	
-def init(A):
-	global api
-	api = A
-
-	api.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
+def init():
+	A.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!list', cmdList, "List all users. Usage: !list", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
 	['!nuke', cmdNuke, "Nuke a player. Usage: !nuke <NAME/UID>", 3],
@@ -155,6 +152,6 @@ def init(A):
 	['!timer', cmdTime, "Start/stop the timer. Usage: !timer", 0],
 	])
 
-	api.addListener('CLIENT_CONNECT', welcomeEvent)
+	A.addListener('CLIENT_CONNECT', welcomeEvent)
 
 def die(): pass #Called when we should disable/shutdown

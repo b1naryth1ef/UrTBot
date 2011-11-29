@@ -1,9 +1,7 @@
 from init import A
 import time
 
-_name = "Advert Plugin"
-_author = "B1naryth1ef"
-_version = 0.1
+_name = "Adverts"
 
 default_messages = [
 'Checkout the UrTBot, an open source project, on github!',
@@ -14,8 +12,8 @@ default_length = 80
 
 try:
 	from config import adsconfig
-	msg = adsconfig['messages']
-	leng = adsconfig['time_delay'] #@NOTE This should be a integer
+	msg = adsconfig.messages
+	leng = adsconfig.time_delay #@NOTE This should be a integer
 	A.debug('Loaded config correctly...', _name)
 except:
 	A.debug('Was not able to load config... using default messages', _name)
@@ -23,13 +21,11 @@ except:
 	msg = default_messages
 	leng = default_length
 
-def init():
+def init(x=0):
 	A.debug('ads.init() was called... looping', _name)
-	x = 0
-	print A.B.status
 	while True:
 		time.sleep(leng)
-		A.say(msg[0])
+		A.say(msg[x])
 		x+=1
 		if x > len(msg): x = 0
 		

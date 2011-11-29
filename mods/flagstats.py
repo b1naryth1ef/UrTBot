@@ -1,9 +1,7 @@
 import time
-api = None
+from init import A
 
-_name = "Flag Stats"
-_author = "B1naryth1ef"
-_version = 0.1
+_name = "Flagstats"
 
 redFlag = None
 blueFlag = None
@@ -39,7 +37,7 @@ def eventListener(obj):
 	place.
 	-B1
 	"""
-	global api, redFlag, blueFlag
+	global A, redFlag, blueFlag
 	if redFlag == None: redFlag = Timer()
 	if blueFlag == None: blueFlag = Timer()
 
@@ -55,17 +53,14 @@ def eventListener(obj):
 	elif obj.type == "GAME_FLAGCAPTURE":
 		if obj.data['flagid'] == 2:
 			redFlag.stop()
-			api.say('%sRed %sFlag captured in %s%s seconds' % (api.RED, api.YELLOW, api.CYAN, redFlag.value()))
+			A.say('%sRed %sFlag captured in %s%s seconds' % (A.RED, A.YELLOW, A.CYAN, redFlag.value()))
 			redFlag.reset()
 		elif obj.data['flagid'] == 1:
 			blueFlag.stop()
-			api.say('%sBlue %sFlag captured in %s%s seconds' % (api.BLUE, api.YELLOW, api.CYAN, blueFlag.value()))
+			A.say('%sBlue %sFlag captured in %s%s seconds' % (A.BLUE, A.YELLOW, A.CYAN, blueFlag.value()))
 			blueFlag.reset()
 	elif obj.type == "GAME_FLAGRESET":
 		if obj.data['flagid'] == 1: redFlag.reset()
 		elif obj.data['flagid'] == 2: blueFlag.reset()
 
-def init(A):
-	global api
-	api = A
-	api.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
+def init(): A.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
