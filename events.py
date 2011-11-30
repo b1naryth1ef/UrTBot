@@ -24,6 +24,7 @@ def CLIENT_COMMAND(data): return EventClient('CLIENT_COMMAND', data)
 def CLIENT_TELL(data): return EventClient('CLIENT_TELl', data)
 def CLIENT_JOIN(data): return EventGame('CLIENT_JOIN', data)
 def CLIENT_CONNECT(data): return EventServer('CLIENT_CONNECT', data)
+def CLIENT_BEGIN(data): return EventClient('CLIENT_BEGIN', data)
 def CLIENT_DISCONNECT(data): return EventServer('CLIENT_DISCONNECT', data)
 def CLIENT_USERINFO(data): return EventClient('CLIENT_USERINFO', data)
 def CLIENT_QUIT(data): return EventClient('CLIENT_QUIT', data)
@@ -57,6 +58,7 @@ EVENTS = {
 	'CLIENT_TELL':CLIENT_TELL, #
 	'CLIENT_JOIN':CLIENT_JOIN, #
 	'CLIENT_CONNECT':CLIENT_CONNECT,
+	'CLIENT_BEGIN':CLIENT_BEGIN,
 	'CLIENT_DISCONNECT':CLIENT_DISCONNECT, #
 	'CLIENT_USERINFO':CLIENT_USERINFO, #
 	'CLIENT_QUIT':CLIENT_QUIT, #

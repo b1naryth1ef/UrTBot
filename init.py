@@ -11,12 +11,15 @@ import select
 import thread
 
 
-__Version__ = 0.2
+__Version__ = 0.3
 
 #--SETTRZ--#
+A = None
 home = os.getcwd()
 lastsent = None
 keepLoop = True
+botDEBUGS = []
+pluginDEBUGS = []
 
 #--GLOB--#
 config_prefix = None
@@ -67,7 +70,7 @@ class GameOutput():
 		return self.lines.pop(0)
 
 class Bot():
-	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon=""):
+	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
 		from config import UrTConfig
 
 		self.prefix = prefix
@@ -75,6 +78,8 @@ class Bot():
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
 		self.db = database.DB()
+		self.status = 1 #1 is on, 0 is off
+		self.debug = debug #False will hide messages, True will print them and log them to vars
 		
 		self.maplist = UrTConfig['maps']
 
@@ -92,11 +97,12 @@ class Bot():
 		for i in self.Listeners.keys():
 			if i == event:
 				for listener in self.Listeners[i]:
-					listener(obj)
+					thread.start_new_thread(listener, (obj, False))
 				break
 		return obj
 
 	def Startup(self):
+		print 'CALLED STARTUP'
 		from config import UrTConfig
 		self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
 		
@@ -109,7 +115,7 @@ class Bot():
 
 		# We only take active client ids from status, everything else from dumpuser
 		status = self.Q.rcon("status").splitlines(False)[4:-1]
-		if status == []: return
+		if status == []: return #If no users are connected, we should just ignore them...
 
 		for uid in [info.split()[0] for info in status]:
 			uid = int(uid)
@@ -125,6 +131,7 @@ class Bot():
 				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+		print 'STARTUP DONE'
 
 class API():
 	RED = '^1'
@@ -140,7 +147,15 @@ class API():
 		self.B = BOT
 		self.Q = BOT.Q
 		self.auth = auth
-	def tester(self): print "TESTING! 1! 2! 3!"
+	def debug(self, msg, plugin=None): 
+		if self.B.debug is True: 
+			if plugin is None:
+				print '[DEBUG]', msg
+				botDEBUGS.append((time.time(), msg))
+			else:
+				print '[DEBUG|%s] %s' % (plugin, msg)
+				pluginDEBUGS.append((time.time(), plugin, msg))
+	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
 	def rcon(self,cmd): return self.Q.rcon(cmd)
@@ -174,42 +189,20 @@ class API():
 			else: self.B.Listeners[i] = [func]
 	def addCmd(self, cmd, func, desc='None', level=0):
 		if cmd in self.B.Commands.keys():
-			print "Can't add command %s, another plugin already added it!" % (cmd)
+			self.debug("Can't add command %s, another plugin already added it!" % (cmd))
 			return False
 		self.B.Commands[cmd] = (func,desc,level)
 		return True
 	def addCmds(self, cmds):
 		for i in cmds:
-			if i[0] in self.B.Commands.keys(): print "Can't add command %s, another plugin already added it!" % (i[0])
+			if i[0] in self.B.Commands.keys(): self.debug("Can't add command %s, another plugin already added it!" % (i[0]))
 			else: self.B.Commands[i[0]] = (i[1], i[2], i[3])
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
-			print "Can't add trigger %s, another plugin already added it!" % (trigger)
+			self.debug("Can't add trigger %s, another plugin already added it!" % (trigger))
 			return False
 		self.B.Triggers[trigger] = []
 		return True
-
-def loadMods():
-	global BOT
-	fn = []
-	modx = []
-	county = 0
-	for i in os.listdir(os.path.join(home, 'mods')):
-		if i.endswith('.py') and not i.startswith("_"):
-			fn.append(os.path.join(home, 'mods', i))
-	for f in fn:
-		fname = os.path.basename(f)[:-3]
-		try:
-			mod = imp.load_source(fname, f)
-			name = getattr(mod, "_name")
-			author = getattr(mod, "_author")
-			version = getattr(mod, "_version")
-			mod.init(API())
-			print "Loaded: %s (Version: %s) by %s" % (name, version, author)
-		except Exception, e:
-			if 'name' not in locals():
-				name = fname
-			print "ERROR LOADING %s: %s" % (name, e)	
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
@@ -262,6 +255,13 @@ def parseItem(inp):
 	else: 
 		BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
 
+def parsePlayerBegin(inp):
+	#ClientBegin: 0
+	print "DID IT!"
+	inp = inp.split(' ')
+	client = int(inp[1])
+	BOT.eventFire('CLIENT_BEGIN', {'client':client})
+
 def parseFlag(inp):
 	#Flag: 0 2: team_CTF_redflag
 	inp = inp.split(' ', 3)
@@ -293,10 +293,11 @@ def parse(inp):
 				uid = int(inp[0])
 				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
-				if BOT.getClient(int(inp[0])).group >= BOT.Commands[cmd][2]:
-					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), None)) 
+				A.say('GROUP: %s' % BOT.Clients[uid].group)
+				if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
+					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), True)) 
 				else:
-					msg = "You lack sufficient access to use %s" % cmd
+					msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
 					BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
@@ -332,6 +333,7 @@ def parse(inp):
 		parseItem(inp)
 	elif inp.startswith('Flag:'): parseFlag(inp)
 	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
+	elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
 
 	elif inp.startswith('ShutdownGame:'):
 		BOT.eventFire('GAME_SHUTDOWN', {})
@@ -346,7 +348,7 @@ def parse(inp):
 		
 def loadConfig():
 	"""Loads the bot config"""
-	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket
+	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
 	try:
 		from config import botConfig
 		config_prefix = botConfig['prefix']
@@ -356,14 +358,19 @@ def loadConfig():
 		config_plugins = botConfig['plugins']
 		config_groups = botConfig['groups']
 		config_serversocket = botConfig['serversocket']
+		config_debugmode = botConfig['debug_mode']
 	except Exception, e:
 		print "Error loading config! [%s]" % (e)
 
-def fireTick(): pass
-
-def loadDatabase():
-	"""Should load db.py"""
-	pass
+def loadMods():
+	global BOT, A
+	for i in config_plugins:
+		A.debug('Loading: %s...' % (i))
+		__import__('mods.'+i)
+		i = sys.modules['mods.'+i]
+		try: thread.start_new_thread(i.init, ())
+		except Exception, e:
+			A.debug('Error in loadMods() [%s]' % (e))
 
 def loop():
 	"""The entire loop"""
@@ -374,16 +381,18 @@ def loop():
 			line = proc.getLine()
 			print line
 			parse(line)
-		fireTick()
 
 def Start():
-	global BOT, proc
+	global BOT, proc, A, config_debugmode
 	loadConfig()
 	auth.load()
-	BOT = Bot(config_prefix, config_rconip, config_rcon)
+	BOT = Bot(config_prefix, config_rconip, config_rcon, debug=config_debugmode)
+	A = API()
 	BOT.Startup()
 	loadMods()
 	proc = GameOutput(config_serversocket)
+	x = os.uname() #@DEV Is this windows friendly?
+	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
 def Exit(): sys.exit()

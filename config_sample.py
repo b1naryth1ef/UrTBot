@@ -12,7 +12,8 @@ botConfig = {
 		'mod':3,
 		'admin':4,
 		'uberadmin':5
-	}	
+	},
+	'debug_mode':True
 }
 
 ##################################
