@@ -79,6 +79,9 @@ class DB(db_plugin.DBPlugin):
 	def penaltySearch(self): pass
 	def penaltySelect(self): pass
 
+	def tableCreate(self, table, info):
+		self.addTable(table, info)
+		
 	def defaultTableSet(self):
 		self.addTable('clients', {'id':'integer primary key autoincrement',
 		'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
