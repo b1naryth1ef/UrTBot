@@ -9,11 +9,10 @@ def cmdTeams(obj, f):
 	bluePlayers = []
 	toTeam = 0
 	fromTeam = None
-
+	
 	# sort players into two lists, redPlayers & bluePlayers
 	clients = A.getClients()
 	for client in clients:
-		A.tell(sender, clients[client])
 		if clients[client].team != None:
 			if clients[client].team == 'red': redPlayers.append(client)
 			elif clients[client].team == 'blue': bluePlayers.append(client)
