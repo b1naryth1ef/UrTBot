@@ -141,7 +141,7 @@ class Bot():
 		2: Masha BLUE k:0 d:0 ping:0
 		3: NickiBrand SPECTATOR k:0 d:0 ping:0
 		"""
-		reply = self.Q.rcon("players")
+		reply = self.Q.rcon("players").splitlines()[4:]
 		for line in reply:
 			inp = line.split(':', 1)
 			uid = int(inp[0])
