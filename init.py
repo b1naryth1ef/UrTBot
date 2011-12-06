@@ -113,7 +113,7 @@ class Bot():
 		self.maplist += pk3s
 		print self.maplist
 
-		# We only take active client ids from status, everything else from dumpuser (and teams from 'players')
+		# We only take active client ids from status, everything else from dumpuser
 		status = self.Q.rcon("status").splitlines(False)[4:-1]
 		if status == []: return #If no users are connected, we should just ignore them...
 
@@ -129,28 +129,6 @@ class Bot():
 			if self.Clients[uid].cl_guid != None:
 				self.db.clientUpdate(self.Clients[uid])
 				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
-		
-		# Fixup teams via 'players' command (why isn't team in dumpuser?! RRAAWRRR) (it is for bots! ?!?!)
-		# 'players' seems buggy... b3 links to a broken UrT forum post :|
-		"""
-		Map: ut4_algiers
-		Players: 4
-		Scores: R:0 B:0
-		0: neek BLUE k:0 d:0 ping:135 99.29.57.207:27960
-		1: neek_1 RED k:0 d:0 ping:132 99.29.57.207:55213
-		2: Masha BLUE k:0 d:0 ping:0
-		3: NickiBrand SPECTATOR k:0 d:0 ping:0
-		"""
-		reply = self.Q.rcon("players").splitlines()[4:]
-		for line in reply:
-			inp = line.split(':', 1)
-			uid = int(inp[0])
-			info = inp[1].strip().split(" ")
-			team = info[1].lower()
-			if team == 'spectator': team = 'spec'
-			if info[4] != 'ping:0': self.Clients[uid].team = team # don't bother with bots
-
-
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
 		print 'STARTUP DONE'
@@ -225,6 +203,15 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
+	def retrieveTeam(team):
+		reply = A.rcon("g_" + team + "TeamList").splitlines()[1:][0]
+		players = reply.split('\"')[3].split("^")[0]
+		ids = []
+		for char in players:
+			cid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".find(char)
+			if cid != -1: ids.append(cid)
+		return ids
+
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
