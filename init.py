@@ -378,7 +378,8 @@ def loop():
 		proc.checkAndRead()
 		while proc.hasLine():
 			line = proc.getLine()
-			print line
+			if line != '^1Error: weapon number out of range':
+				print line
 			parse(line)
 
 def Start():
