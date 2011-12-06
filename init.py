@@ -220,7 +220,8 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
 	for i in var:
 		varz[i[0]] = i[1]
-	if 't' in varz.keys(): vary['team'] = teams.get(int(varz['t']))
+	print varz
+	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
 	if 'n' in varz.keys(): vary['name'] = varz['n']
 	# probably should figure out what those other fields are?
 	return uid,vary
