@@ -217,7 +217,7 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	#ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
-	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+	var = re.findall(r'([^\\]+)\\([^\\]+)', inp[2])
 	for i in var:
 		varz[i[0]] = i[1]
 	print varz
@@ -320,7 +320,7 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
-		uid, varz = parseUserInfoChange(inp)
+		uid, varz = parseUserInfoChange(inp, {}, {})
 		print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 
