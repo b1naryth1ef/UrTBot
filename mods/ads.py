@@ -27,6 +27,6 @@ def init(x=0):
 		time.sleep(leng)
 		A.say(msg[x])
 		x+=1
-		if x > len(msg): x = 0
+		if x >= len(msg): x = 0
 		
 
