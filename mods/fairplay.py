@@ -13,7 +13,7 @@ def cmdTeams(obj, f):
 	A.tell(sender, "red: %d, blue %d" % (len(redPlayers),len(bluePlayers)))
 	difference = abs(len(redPlayers) - len(bluePlayers))
 	if difference <= 1:
-		A.tell(sender, "Teams are not uneven.")
+		A.tell(sender, "Teams are already balanced.")
 		return
 
 	if len(bluePlayers) > len(redPlayers):
