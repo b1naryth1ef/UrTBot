@@ -26,6 +26,7 @@ def cmdTeams(obj, f):
 	while difference > 1:
 		# pick a cid from fromTeam
 		cid = random.choice(fromTeam)
+		fromTeam.remove(cid)
 		A.rcon("forceteam %s %s" % (cid, toTeam))
 		difference -= 1
 	
