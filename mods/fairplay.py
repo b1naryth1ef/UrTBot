@@ -15,8 +15,8 @@ def cmdTeams(obj, f):
 	for client in clients:
 		A.tell(sender, clients[client])
 		if clients[client].team != None:
-			if clients[client].team == 1: redPlayers.append(client)
-			elif clients[client].team == 2: bluePlayers.append(client)
+			if clients[client].team == 'red': redPlayers.append(client)
+			elif clients[client].team == 'blue': bluePlayers.append(client)
 
 	A.tell(sender, "red: %d, blue %d" % (len(redPlayers),len(bluePlayers)))
 	difference = abs(len(redPlayers) - len(bluePlayers))
