@@ -1,7 +1,7 @@
 from init import A
 import random
 
-def cmdTeams(obj):
+def cmdTeams(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 
