@@ -314,7 +314,11 @@ def parse(inp):
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0
 		inp = int(inp.split(" ")[1])
-		if inp in BOT.Clients.keys(): raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+		if inp in BOT.Clients.keys():
+			#'til we find ways to work around the missing ClientDisconnect messages... this won't be fatal. 
+			#raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+			print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
+			del BOT.Clients[inp]
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
 
 	elif inp.startswith('ClientUserinfo:'):
