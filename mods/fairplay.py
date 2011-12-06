@@ -5,18 +5,11 @@ def cmdTeams(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 
-	redPlayers = []
-	bluePlayers = []
+	redPlayers = A.retrieveTeam('red')
+	bluePlayers = A.retrieveTeam('blue')
 	toTeam = 0
 	fromTeam = None
 	
-	# sort players into two lists, redPlayers & bluePlayers
-	clients = A.getClients()
-	for client in clients:
-		if clients[client].team != None:
-			if clients[client].team == 'red': redPlayers.append(client)
-			elif clients[client].team == 'blue': bluePlayers.append(client)
-
 	A.tell(sender, "red: %d, blue %d" % (len(redPlayers),len(bluePlayers)))
 	difference = abs(len(redPlayers) - len(bluePlayers))
 	if difference <= 1:
