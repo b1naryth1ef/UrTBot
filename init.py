@@ -220,8 +220,9 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
 	for i in var:
 		varz[i[0]] = i[1]
-	if 't' in varz.keys(): vary['team'] = varz['t']
+	if 't' in varz.keys(): vary['team'] = teams.get(int(varz['t']))
 	if 'n' in varz.keys(): vary['name'] = varz['n']
+	# probably should figure out what those other fields are?
 	return uid,vary
 
 def parseKill(inp):
@@ -317,7 +318,10 @@ def parse(inp):
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
+		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
 		uid, varz = parseUserInfoChange(inp)
+		print uid, varz
+		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
