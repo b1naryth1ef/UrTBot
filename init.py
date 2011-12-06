@@ -203,7 +203,7 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
-	def retrieveTeam(team):
+	def retrieveTeam(self, team):
 		reply = A.rcon("g_" + team + "TeamList").splitlines()[1:][0]
 		players = reply.split('\"')[3].split("^")[0]
 		ids = []
