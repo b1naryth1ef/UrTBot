@@ -203,6 +203,15 @@ class API():
 			return False
 		self.B.Triggers[trigger] = []
 		return True
+	def retrieveTeam(self, team):
+		reply = A.rcon("g_" + team + "TeamList").splitlines()[1:][0]
+		players = reply.split('\"')[3].split("^")[0]
+		ids = []
+		for char in players:
+			cid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".find(char)
+			if cid != -1: ids.append(cid)
+		return ids
+
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
@@ -217,11 +226,13 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	#ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
-	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
+	var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
 	for i in var:
 		varz[i[0]] = i[1]
-	if 't' in varz.keys(): vary['team'] = varz['t']
+	print varz
+	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
 	if 'n' in varz.keys(): vary['name'] = varz['n']
+	# probably should figure out what those other fields are?
 	return uid,vary
 
 def parseKill(inp):
@@ -303,7 +314,11 @@ def parse(inp):
 	elif inp.startswith('ClientConnect:'):
 		#ClientConnect: 0
 		inp = int(inp.split(" ")[1])
-		if inp in BOT.Clients.keys(): raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+		if inp in BOT.Clients.keys():
+			#'til we find ways to work around the missing ClientDisconnect messages... this won't be fatal. 
+			#raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+			print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
+			del BOT.Clients[inp]
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
 
 	elif inp.startswith('ClientUserinfo:'):
@@ -317,7 +332,10 @@ def parse(inp):
 				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
-		uid, varz = parseUserInfoChange(inp)
+		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
+		uid, varz = parseUserInfoChange(inp, {}, {})
+		print uid, varz
+		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
@@ -378,7 +396,8 @@ def loop():
 		proc.checkAndRead()
 		while proc.hasLine():
 			line = proc.getLine()
-			print line
+			if line != '^1Error: weapon number out of range':
+				print line
 			parse(line)
 
 def Start():

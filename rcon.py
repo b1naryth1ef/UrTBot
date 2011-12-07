@@ -28,7 +28,7 @@ class RCON:
 		self.throttle_time = 0.0 # secs to wait between retries
 
 		self.socket.connect((self.server, self.port))
-		self.socket.settimeout(0.5)
+		self.socket.settimeout(0.75)
 
 	def send(self, data):
 		self.socket.send('\xFF\xFF\xFF\xFF' + data)

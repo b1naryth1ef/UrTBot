@@ -35,7 +35,6 @@ class DBPlugin(DBBase):
 				query += ','
 				strargs += ','
 		query += ") values (" + strargs + ")"
-		print query, args
 		return self.c.execute(query, args).rowcount
 
 	def delRow(self, table, search):
@@ -58,7 +57,6 @@ class DBPlugin(DBBase):
 			query += key + '=?'
 			count += 1
 			if count != len(search): query += ' and '
-		print query, args
 		rows = self.c.execute(query, args).fetchall()
 		return rows
 
@@ -71,7 +69,6 @@ class DBPlugin(DBBase):
 			query += key + '=?'
 			count += 1
 			if count != len(search): query += ' and '
-		print query, args
 		return self.c.execute(query, args).fetchall()
 
 	def setField(self, table, search, field, value):
@@ -83,7 +80,6 @@ class DBPlugin(DBBase):
 			query += key + '=?'
 			count += 1
 			if count != len(search): query += ' and '
-		print query, args
 		return self.c.execute(query, args).rowcount
 
 	def addTable(self, table, values):
