@@ -52,7 +52,11 @@ def launch():
 			client, _ = server.accept()
 			clients.append(client)
 
-if __name__ == '__main__':
+def init():
 	signal.signal(signal.SIGINT, sigHandler)
 	loadConfig()
 	launch()
+
+if __name__ == '__main__': 
+	init()
+	
