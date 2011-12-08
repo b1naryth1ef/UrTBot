@@ -57,12 +57,17 @@ def cmdHelp(obj, f): #@CREDIT Neek
 		else:
 			A.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
 
+def cmdAbout(obj, f):
+	sender = obj.data["sender"]
+	A.tell(sender, "UrTBot: b1n likes dancing in the moonlight.")
+
 def cmdList(obj, f):
 	sender = obj.data["sender"]
 	A.tell(sender, "==Player List==")
 	clients = A.getClients()
 	for cid in clients:
 		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
+
 def cmdKick(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -142,6 +147,7 @@ def cmdTime(obj, f):
 	
 def init():
 	A.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
+	['!about', cmdAbout, "About UrTBot", 1],
 	['!list', cmdList, "List all users. Usage: !list", 3],
 	['!kick', cmdKick, "Kick a user. Usage: !kick <NAME/UID>", 3],
 	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
