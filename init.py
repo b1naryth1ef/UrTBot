@@ -297,6 +297,7 @@ def parse(inp):
 		inp.pop(0)
 		inp[1] = inp[1].strip(':')
 		if inp[2].startswith('!'):
+			inp[2] = inp[2].lower()
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
