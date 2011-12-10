@@ -69,14 +69,20 @@ def cmdList(obj, f):
 	for cid in clients:
 		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
-def cmdKick(obj):
+def cmdKick(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
-	if len(msg) == 1: api.tell(sender, "Usage: !kick <user>")
+	if len(msg) == 1: A.tell(sender, "Usage: !kick <user>")
 	elif len(msg) == 2:
-		api.rcon('kick %s' % msg[1])
+		cid = A.findClients(msg[1])
+		if len(cid) == 0:
+			A.tell(sender, "No player/clientID matching '%s'." % msg[1])
+		elif len(cid) > 1:
+			A.tell(sender, "Please be more specific.")
+		else:
+			A.rcon('clientkick %d' % cid[0])
 
-def cmdSlap(obj):
+def cmdSlap(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
