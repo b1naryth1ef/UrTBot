@@ -167,6 +167,10 @@ class API():
 	def getClient(self, iid=0):
 		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
+	def findClients(self, name):
+		clients = self.getClients()
+		return [client for client in clients if name in clients[client].name]
+
 	def findMap(self, mapname):
 		maplist = []
 		for name in self.B.maplist:
