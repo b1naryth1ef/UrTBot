@@ -332,9 +332,10 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
-		print uid, varz
+		#print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 		else:
+			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz)
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
