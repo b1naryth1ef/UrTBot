@@ -29,7 +29,8 @@ class DB(db_plugin.DBPlugin):
 		cols = self.getColumns(table)
 		value = None
 		for field in cols:
-			if field[2] == 'text': value = ""
+			if field[1] == 'id': pass # leave as none for autoid
+			elif field[2] == 'text': value = ""
 			elif field[2] == 'integer': value = 0
 			else: print "[WARNING] sqlite column of neither integer nor text. Not yet supported!"
 			self.cols[field[1]] = value
@@ -43,6 +44,9 @@ class DB(db_plugin.DBPlugin):
 			rowDict[column] = row[i]
 			i += 1 # Not very pythonish :D Alternatives?!
 		return rowDict
+
+	def rowCreate(self, row):
+		return self.addRow(self.table, row)
 
 	def rowFind(self, search):
 		result = self.getRow(self.table, {self.tablekey:search})
@@ -71,13 +75,6 @@ class DB(db_plugin.DBPlugin):
 		return self.cols.copy()
 
 	def defaultTableSet(self):
-		if self.tableExists("clients") == True: print "Table 'clients' already exists."
-		else:
-			self.tableCreate('clients', {'id':'integer primary key autoincrement',
-			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
-			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
-			'lastjoin':'integer'})
-
 		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
 		else:
 			self.tableCreate('penalties', {'id':'integer primary key', 'userid':'integer',

@@ -1,3 +1,5 @@
+import database
+
 class Player():
 	def __init__(self, uid, data):
 		self.uid = int(uid)
@@ -39,6 +41,35 @@ class Player():
 		for i in data.keys(): #Strip line endings
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
+
+class PlayerDatabase():
+	def __init__(self):
+		self.db = database.DB()
+		if self.db.tableExists("clients") == False:
+			self.db.tableCreate('clients', {'id':'integer primary key autoincrement',
+			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
+			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
+			'lastjoin':'integer'})
+			self.db.commit()
+		self.db.tableSelect("clients", "guid")
+
+	def playerCreate(self, player):
+		newplayer = self.db.rowBlank()
+		for key in newplayer:
+			if key == "cgroup":
+				newplayer[key] = player["group"]
+			else: newplayer[key] = player[key] 			
+		self.db.rowCreate(newplayer)
+		return self.db.commit()
+
+	def playerUpdate(self, player):
+		# Ignore bots (what works best for this?)
+		if player.cl_guid == None or player.cl_guid == "": return
+		# If the player is in the db already, set player data from db
+		entry = self.db.rowFind(player.cl_guid)
+		if entry != None:
+			player.group = entry["cgroup"]
+		else: self.playerCreate(player)
 
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
