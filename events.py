@@ -1,10 +1,14 @@
 import time
 
 class Event():
+	def updateData(self, data=self.data): self.__dict__.update(data)
+
 	def __init__(self, Type, data):
 		self.fireTime = time.time()
 		self.data = data
 		self.type = Type
+
+		self.updateData()
 
 class EventServer(Event): pass
 class EventClient(Event): pass
@@ -14,8 +18,6 @@ class EventMessage(Event): pass
 class EventGenric(Event): pass
 class EventCustom(Event): pass
 
-
-
 def GENERIC(data): return EventGenric(data['event'], data)
 def CHAT_MESSAGE(data): return EventServer('CHAT_MESSAGE', data)
 def TEAMCHAT_MESSAGE(data): return EventServer('TEAMCHAT_MESSAGE', data)
@@ -24,6 +26,7 @@ def CLIENT_COMMAND(data): return EventClient('CLIENT_COMMAND', data)
 def CLIENT_TELL(data): return EventClient('CLIENT_TELl', data)
 def CLIENT_JOIN(data): return EventGame('CLIENT_JOIN', data)
 def CLIENT_CONNECT(data): return EventServer('CLIENT_CONNECT', data)
+def CLIENT_CONNECTED(data): return EventClient('CLIENT_CONNECTED', data)
 def CLIENT_BEGIN(data): return EventClient('CLIENT_BEGIN', data)
 def CLIENT_DISCONNECT(data): return EventServer('CLIENT_DISCONNECT', data)
 def CLIENT_USERINFO(data): return EventClient('CLIENT_USERINFO', data)
@@ -58,6 +61,7 @@ EVENTS = {
 	'CLIENT_TELL':CLIENT_TELL, #
 	'CLIENT_JOIN':CLIENT_JOIN, #
 	'CLIENT_CONNECT':CLIENT_CONNECT,
+	'CLIENT_CONNECTED':CLIENT_CONNECTED,
 	'CLIENT_BEGIN':CLIENT_BEGIN,
 	'CLIENT_DISCONNECT':CLIENT_DISCONNECT, #
 	'CLIENT_USERINFO':CLIENT_USERINFO, #
