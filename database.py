@@ -81,19 +81,27 @@ class DB(db_plugin.DBPlugin):
 
 	def tableCreate(self, table, info):
 		self.addTable(table, info)
+
+	def tableExists(self, table):
+		return self.checkTable(table);
+
 		
 	def defaultTableSet(self):
-		self.addTable('clients', {'id':'integer primary key autoincrement',
-		'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
-		'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
-		'lastjoin':'integer'})
-
-		self.addTable('penalties', {'id':'integer primary key', 'userid':'integer',
-		'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer'})
+		if self.tableExists("clients") == True: print "Table 'clients' already exists."
+		else:
+			self.addTable('clients', {'id':'integer primary key autoincrement',
+			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
+			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
+			'lastjoin':'integer'})
+			
+		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
+		else:
+			self.addTable('penalties', {'id':'integer primary key', 'userid':'integer',
+			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer'})
 		self.commit()
 
 if __name__ == '__main__':
-	db = DB()
+	db = DB()		
 	print "Making default tables..."
 	try:
 		db.defaultTableSet()
