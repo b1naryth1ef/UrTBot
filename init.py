@@ -195,6 +195,12 @@ class API():
 		for i in cmds:
 			if i[0] in self.B.Commands.keys(): self.debug("Can't add command %s, another plugin already added it!" % (i[0]))
 			else: self.B.Commands[i[0]] = (i[1], i[2], i[3])
+	def delCmd(self, cmd):
+		if cmd in self.B.Commands.keys():
+			del self.B.Commands[cmd]
+			return True
+		return False
+
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
 			self.debug("Can't add trigger %s, another plugin already added it!" % (trigger))
