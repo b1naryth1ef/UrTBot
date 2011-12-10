@@ -77,7 +77,7 @@ class Bot():
 		self.ip = ip
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
-		self.db = database.DB()
+		self.pdb = player.PlayerDatabase()
 		self.status = 1 #1 is on, 0 is off
 		self.debug = debug #False will hide messages, True will print them and log them to vars
 		
@@ -127,8 +127,7 @@ class Bot():
 				 data[line[0]] = line[1]
 			self.Clients[uid] = player.Player(uid, data)
 			if self.Clients[uid].cl_guid != None:
-				self.db.clientUpdate(self.Clients[uid])
-				self.Clients[uid].group = auth.checkUserAuth(self.db, self.Clients[uid].cl_guid, self.Clients[uid].ip, self.Clients[uid].name)
+				self.pdb.playerUpdate(self.Clients[uid])
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
 		print 'STARTUP DONE'
@@ -146,7 +145,6 @@ class API():
 	def __init__(self, auth=None):
 		self.B = BOT
 		self.Q = BOT.Q
-		self.auth = auth
 	def debug(self, msg, plugin=None): 
 		if self.B.debug is True: 
 			if plugin is None:
@@ -304,7 +302,8 @@ def parse(inp):
 			if cmd in BOT.Commands.keys():
 				uid = int(inp[0])
 				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
+				BOT.pdb.playerUpdate(BOT.Clients[uid])
+				print "shit", BOT.Clients[uid].group
 				if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), True)) 
 				else:
@@ -329,8 +328,7 @@ def parse(inp):
 		else:
 			BOT.Clients[uid] = player.Player(uid, varz)
 			if BOT.Clients[uid].cl_guid != None:
-				BOT.db.clientUpdate(BOT.Clients[uid])
-				BOT.Clients[uid].group = auth.checkUserAuth(BOT.db, BOT.Clients[uid].cl_guid, BOT.Clients[uid].ip, BOT.Clients[uid].name)
+				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update

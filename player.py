@@ -1,4 +1,6 @@
 import database
+import auth
+import time 
 
 class Player():
 	def __init__(self, uid, data):
@@ -55,22 +57,38 @@ class PlayerDatabase():
 
 	def playerCreate(self, player):
 		newplayer = self.db.rowBlank()
-		for key in newplayer:
-			if key == "cgroup":
-				newplayer[key] = player["group"]
-			else: newplayer[key] = player[key] 			
+		newplayer["id"] = None
+		newplayer["cgroup"] = 0
+		newplayer["nick"] = player.name
+		newplayer["guid"] = player.cl_guid
+		newplayer["password"] = ""
+		newplayer["ip"] = player.ip
+		newplayer["joincount"] = 1
+		newplayer["firstjoin"] = int(time.time())
+		newplayer["lastjoin"] = newplayer["firstjoin"]
+		try:
+			newplayer["ip"] = player.ip.split(":")[0]
+		except: print "[WARNING] Mal-formed IP address... that's all. :D"
 		self.db.rowCreate(newplayer)
 		return self.db.commit()
 
-	def playerUpdate(self, player):
+	def playerUpdate(self, player, join=False):
 		# Ignore bots (what works best for this?)
 		if player.cl_guid == None or player.cl_guid == "": return
 		# If the player is in the db already, set player data from db
 		entry = self.db.rowFind(player.cl_guid)
 		if entry != None:
-			player.group = entry["cgroup"]
-		else: self.playerCreate(player)
+			player.group = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
+			if join != False:
+				entry["joincount"] += 1
+				self.db.rowUpdate(entry)
+				self.db.commit()
+		else:
+			self.playerCreate(player)
+			player.group = 0
 
+	def playerJoin(self, player):
+		entry = self.db.findRow(player.cl_guid)
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
 # 'headmodel': 'sarge', 'team_model': 'james', 

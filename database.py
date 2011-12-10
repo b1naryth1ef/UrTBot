@@ -48,14 +48,16 @@ class DB(db_plugin.DBPlugin):
 	def rowCreate(self, row):
 		return self.addRow(self.table, row)
 
-	def rowFind(self, search):
-		result = self.getRow(self.table, {self.tablekey:search})
+	def rowFind(self, search, key=None):
+		if key == None: key = self.tablekey
+		result = self.getRow(self.table, {key:search})
 		if len(result) == 0: return None
 		return self.rowToDict(result[0])
 
-	def rowFindAll(self, search=None):
+	def rowFindAll(self, search=None, key=None):
+		if key == None: key = self.tablekey
 		if search == None: result = self.getTable(self.table)
-		else: result = self.getRow(self.table, {self.tablekey:search})
+		else: result = self.getRow(self.table, {key:search})
 		if len(result) == 0: return None
 		rows = []
 		for row in result:
