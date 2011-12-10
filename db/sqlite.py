@@ -99,6 +99,12 @@ class DBPlugin(DBBase):
 	def getTable(self, table):
 		return self.c.execute("select * from " + table).fetchall()
 
+	def checkTable(self, table):
+		reply = self.c.execute('SELECT CASE WHEN tbl_name = ? THEN 1 ELSE 0 END FROM sqlite_master WHERE tbl_name = "name" AND type = "table"', (table,)).fetchall()
+		for value in reply:
+			if value == (1,): return True
+		return False
+
 if __name__ == '__main__':
 	db = DBPlugin()
 	db.connect({'database':'/tmp/fuck'})

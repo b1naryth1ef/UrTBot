@@ -20,3 +20,4 @@ class DBBase:
         def addTable(self, table, values): print "WTF BAD DB BAD"
         def delTable(self, table): print "WTF BAD DB BAD"
         def getTable(self, table): print "WTF BAD DB BAD"
+        def checkTable(self, table): print "WTF BAD DB BAD"
