@@ -51,6 +51,7 @@ class DB(db_plugin.DBPlugin):
 			return 0
 		for key in fields:
 			self.setField('clients', {'guid':client.cl_guid}, key, fields[key])
+		self.commit()
 		return 1
 
 	def clientSearch(self, values):
@@ -93,7 +94,7 @@ class DB(db_plugin.DBPlugin):
 			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
 			'lastjoin':'integer'})
-			
+
 		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
 		else:
 			self.addTable('penalties', {'id':'integer primary key', 'userid':'integer',
