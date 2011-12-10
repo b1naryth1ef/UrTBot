@@ -10,7 +10,7 @@ def cmdTeams(obj, f):
 	toTeam = 0
 	fromTeam = None
 	
-	A.tell(sender, "red: %d, blue %d" % (len(redPlayers),len(bluePlayers)))
+	A.rcon('bigtext "AUTO-BALANCING TEAMS')	
 	difference = abs(len(redPlayers) - len(bluePlayers))
 	if difference <= 1:
 		A.tell(sender, "Teams are already balanced.")
