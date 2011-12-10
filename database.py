@@ -76,14 +76,14 @@ class DB(db_plugin.DBPlugin):
 	def defaultTableSet(self):
 		if self.tableExists("clients") == True: print "Table 'clients' already exists."
 		else:
-			self.addTable('clients', {'id':'integer primary key autoincrement',
+			self.tableCreate('clients', {'id':'integer primary key autoincrement',
 			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
 			'lastjoin':'integer'})
 
 		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
 		else:
-			self.addTable('penalties', {'id':'integer primary key', 'userid':'integer',
+			self.tableCreate('penalties', {'id':'integer primary key', 'userid':'integer',
 			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer'})
 		self.commit()
 
