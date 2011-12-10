@@ -168,6 +168,10 @@ class API():
 		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
 	def findClients(self, name):
+		if name.isdigit() and len(name) <= 2:
+			client = self.getClients().get(int(name))
+			if client != None: return [int(name)]
+			return []
 		clients = self.getClients()
 		return [client for client in clients if name in clients[client].name]
 
