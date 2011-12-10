@@ -1,5 +1,6 @@
 import time, sys, const
 from init import canInt, A
+import database
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -144,8 +145,30 @@ def cmdTime(obj, f):
 		TIMERZ[sender] = Timer()
 		TIMERZ[sender].start()
 		A.tell(sender, 'Timer Started!')
-	
+
+def cmdIDDQD(obj, f):
+	sender = obj.data['sender']
+	client = A.getClient(sender)
+
+	db = database.DB()
+	db.tableSelect("clients", "guid")
+	entry = db.rowFind(client.cl_guid)
+	entry["cgroup"] = 5
+	db.rowUpdate(entry)
+	db.commit()
+	db.disconnect()
+
+	A.rcon('bigtext "Congratuations! You have exquisite taste.')
+	A.delCmd("!iddqd")
+
 def init():
+	db = database.DB()
+	db.tableSelect("clients", "cgroup")
+	uberadmin = db.rowFind(5)
+	if uberadmin == None:
+		A.addCmd('!iddqd', cmdIDDQD, "Set yourself as uberadmin. Usage: !iddqd", 0)
+	db.disconnect()
+
 	A.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
 	['!about', cmdAbout, "About UrTBot", 1],
 	['!list', cmdList, "List all users. Usage: !list", 3],
