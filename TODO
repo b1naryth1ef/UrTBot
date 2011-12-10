@@ -2,33 +2,46 @@ EVENTS:
 	api.registerEve('event', function)
 	Should pull events from const (deaths) and allow for dynamic ones, so modules can do, api.registerHook('hook', **args) and then api.fireHook('hook')
 
-- Kick/Banning
-- Slapping/Nuking
-- Team Killing
+- Kick/Banning -- kick is trivial, banning (!ban etc): see note about penalty plugin
+- Team Killing -- part of fairplay?
 - Match Managment
-- Database
 - Threading
+	- so far so good, gj man
 
 
 TODOS:
 - Add a DB handler [In progress]
-	- database.py is incomplete: aliases, penalties
-	- DB methods shouldn't be returning data straight from db (clientSearch())
 	- SQLite plugin could be rewritten to be more pythonish (very klumsy)
-- Add basic commands, work on API [Waiting...]
-- Add lots of events [Semi-in progress]
+	- Good example plugin should be written
+- Add basic commands, work on API [In progress]
+- Add lots of events [Semi-in progress] -- I'd say this is done? We can always add more
 - Add ability to reboot bot
+	- I'm ignorant, what's the status on this?
 - Authentication
 	- CONFIG:
 	- Bot Method (Four methods,)
-		- Method 1: User must match GUID/IP/NICK to be auto-logged in
-		- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
-		- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
-		- Method 4: User must match NICK to be logged in...
+DONE		- Method 1: User must match GUID/IP/NICK to be auto-logged in
+DONE		- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
+		- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in -- LAZZZYY me, I'll check this off soon.
+DONE		- Method 4: User must match NICK to be logged in...
+				- Maybe this should be GUID instead of NICK? NICK offers... nothing for security. Nada! Good for testing tho.
 	- Min Required Level (Anyone on or above must use !login to authenticate)
-	
+- Figure out what is causing the double-rcon commands. (random doubling)
+- Add name completion method to API (for !kick, etc.)
+- Add a stats plugin [In progress]
+	- held up by the db but it should be good to go now
+- Add a penalty plugin
+	- ban, mute management, etc. I'd like this in a plugin and not in core. Thoughts?
+- Fairplay plugin:
+	- !teams could be smarter
+	- !force team w/ 'lock'/'unlock' should be added
+
 STUPID URT THINGS:
 - Figure out all the weapon hits/etc
 - hotpotato (flags go boom) does not print a flag return msg.
 	the flag gets dropped and goes BOOM without any further notification.
 	this screws up the flagstats code. solutions are all hacky. :|
+- track down all the things that can happen without notifying us on stdout (this'll just happen over time)
+
+THINGS THAT ARE GOING VERY WELL:
+The plugin system is seckzy; Looking forward to having fun with it when the core is more settled.
