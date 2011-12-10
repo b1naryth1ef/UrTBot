@@ -21,3 +21,4 @@ class DBBase:
         def delTable(self, table): print "WTF BAD DB BAD"
         def getTable(self, table): print "WTF BAD DB BAD"
         def checkTable(self, table): print "WTF BAD DB BAD"
+        def getColumns(self, table): print "WTF BAD DB BAD"

@@ -105,6 +105,9 @@ class DBPlugin(DBBase):
 			if value == (1,): return True
 		return False
 
+	def getColumns(self, table):
+		return self.c.execute("pragma table_info (%s)" % table).fetchall()
+		
 if __name__ == '__main__':
 	db = DBPlugin()
 	db.connect({'database':'/tmp/fuck'})
