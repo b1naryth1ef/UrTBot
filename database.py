@@ -27,16 +27,13 @@ class DB(db_plugin.DBPlugin):
 		self.colsOrder = []
 
 		cols = self.getColumns(table)
-		cdict = {}
 		value = None
 		for field in cols:
 			if field[2] == 'text': value = ""
 			elif field[2] == 'integer': value = 0
 			else: print "[WARNING] sqlite column of neither integer nor text. Not yet supported!"
-			cdict[field[1]] = value
+			self.cols[field[1]] = value
 			self.colsOrder.append(field[1])
-		self.cols = cdict
-		print self.colsOrder
 
 	def rowToDict(self, row):
 		""" Helper function for the class """
