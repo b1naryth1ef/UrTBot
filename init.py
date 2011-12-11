@@ -402,8 +402,10 @@ def parse(inp):
 		for key in BOT.Clients.keys():
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
-	elif inp.startswith('InitGame:'): pass
-	elif inp.startswith('SurvivorWinner:'): pass
+	elif inp.startswith('InitGame:'):
+		BOT.eventFire('GAME_ROUND_START', {})
+	elif inp.startswith('SurvivorWinner:'): 
+		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 	elif inp.startswith('InitRound:'): pass
 
 		

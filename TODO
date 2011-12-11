@@ -12,11 +12,11 @@ EVENTS:
 TODOS:
 - Add a DB handler [In progress]
 	- SQLite plugin could be rewritten to be more pythonish (very klumsy)
-	- Good example plugin should be written
+	- Good example plugin should be written [Stats?]
 - Add basic commands, work on API [In progress]
-- Add lots of events [Semi-in progress] -- I'd say this is done? We can always add more
+DONE - Add lots of events [Semi-in progress] -- I'd say this is done? We can always add more
 - Add ability to reboot bot
-	- I'm ignorant, what's the status on this?
+	- I'm ignorant, what's the status on this? [No fucking clue what ima do...]
 - Authentication
 	- CONFIG:
 	- Bot Method (Four methods,)
@@ -26,15 +26,15 @@ DONE		- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
 DONE		- Method 4: User must match NICK to be logged in...
 				- Maybe this should be GUID instead of NICK? NICK offers... nothing for security. Nada! Good for testing tho.
 	- Min Required Level (Anyone on or above must use !login to authenticate)
-- Figure out what is causing the double-rcon commands. (random doubling)
-- Add name completion method to API (for !kick, etc.)
+- Figure out what is causing the double-rcon commands. (random doubling) [Havent observed this, make this an issue yea?]
+DONE - Add name completion method to API (for !kick, etc.)
 - Add a stats plugin [In progress]
 	- held up by the db but it should be good to go now
 - Add a penalty plugin
-	- ban, mute management, etc. I'd like this in a plugin and not in core. Thoughts?
+	- ban, mute management, etc. I'd like this in a plugin and not in core. Thoughts? [Prolly in default yes? or seperate?]
 - Fairplay plugin:
 	- !teams could be smarter
-	- !force team w/ 'lock'/'unlock' should be added
+	DONE - !force team w/ 'lock'/'unlock' should be added
 
 STUPID URT THINGS:
 - Figure out all the weapon hits/etc
