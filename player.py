@@ -5,6 +5,7 @@ import time
 class Player():
 	def __init__(self, uid, data):
 		self.uid = int(uid)
+		self.cid = None #<<< get from the db
 		self.data = data
 		self.group = 0
 		self.status = None

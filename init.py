@@ -262,10 +262,13 @@ def parseKill(inp):
 	inp = inp.split(" ")
 	inp.pop(0)
 	attacker = int(inp[0])
+	atkobj = BOT.Clients[attacker]
 	victim = int(inp[1])
+	vicobj = BOT.Clients[victim]
 	method = int(inp[2].strip(':'))
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
 	elif method in [7, 6, 10, 31, 320]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+	elif atkobj.team == vicobj.team: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
 		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
@@ -347,9 +350,10 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
-		print uid, varz
+		#print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
 		else:
+			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz)
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
