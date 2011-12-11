@@ -1,5 +1,5 @@
 from init import A
-import random
+import random, const
 
 def cmdTeams(obj, f):
 	msg = obj.data["msg"].split(" ")
@@ -31,7 +31,38 @@ def cmdTeams(obj, f):
 		A.rcon("forceteam %s %s" % (cid, toTeam))
 		difference -= 1
 	
-	A.say("Balanced teams.")
+	A.say("Balanced teams.") #<<< should be told to the user?
+
+def eveLock(obj): pass
+
+def cmdLock(obj, f): pass
+
+def cmdForce(obj, f):
+	msg = obj.data['msgsplit'])
+	sender = obj.data['sender'] #The sender id
+	team = msg[2] #Team to switch player to
+	play = A.findClient(msg[1]) #Player name/id to autocomplete
+	if play: playobj = A.getClient(nameToCID(play)) #Player obj
+
+	if A.canInt(team): team = const.teams[int(team)] #Is the team an integer representation of a team? if so use the team name
+	if team not in const.teams.values() and team != 'spectator': #we are a bad team!
+		A.tell(sender, 'Unknown team %s (spec/spectator/red/blue)' % team)
+		return None
+	if team == 'spec': team == 'spectator' #urt likes spectator
+
+	if len(msg) == 3 and playobj.team != team: #!force player team
+		A.rcon('forceteam %s %s' % (playobj.uid, team))
+		A.tell(sender, '%s was forced to %s.' % (playobj.name, team))
+
+	elif len(msg) == 4 and msg[3] == 'lock': #!force player team lock
+		A.rcon('forceteam %s %s' % (playobj.uid, team))
+		playobj.fairplay_locked = True
+		A.tell(sender, '%s was forced and locked to %s. Type !unlock %s to unlock player.' % (playobj.name, team, playobj.name))
+	else:
+		A.tell(sender, "Usage: !force <client> <team> <lock>")
+
 
 def init():
 	A.addCmd('!teams', cmdTeams, "Attempt to balance uneven teams", 1)
+	A.addCmd('!force', cmdForce, "Force a player, and lock him if need be!", 3)
+	A.addListener('CLIENT_SWITCHTEAM', eveLock)

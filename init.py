@@ -30,12 +30,7 @@ config_groups = None
 config_plugins = None
 config_serversocket = None
 
-def canInt(i):
-	try:
-		int(i)
-		return True
-	except:
-		return False
+def canInt(i): return i.isdigit()
 
 class GameOutput():
 	def __init__(self, usockname=None):
@@ -87,6 +82,7 @@ class Bot():
 		self.Listeners = {} #Plugins waiting for Triggers
 		self.Triggers = {} #Possible Triggers (Events)
 		self.Commands = {} #Commands
+		self.Aliases = {} #aliases BIATCH
 
 		self.Clients = {} #AKA players
 		
@@ -153,6 +149,7 @@ class API():
 			else:
 				print '[DEBUG|%s] %s' % (plugin, msg)
 				pluginDEBUGS.append((time.time(), plugin, msg))
+	def canInt(self, i): return canInt(i)
 	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
@@ -167,10 +164,15 @@ class API():
 	def getClient(self, iid=0):
 		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
+	def findClient(self, name):
+		x = findClients(name)
+		if len(x) == 1: return x
+		else: return False
 	def findClients(self, name):
 		if name.isdigit() and len(name) <= 2:
 			client = self.getClients().get(int(name))
-			if client != None: return [int(name)]
+			#if client != None: return [int(name)] #Should return obj ouis?
+			if client != None: return [client]
 			return []
 		clients = self.getClients()
 		return [client for client in clients if name in clients[client].name]
@@ -203,22 +205,30 @@ class API():
 				if self.B.Listeners[i] != None: self.B.Listeners[i].append(func)
 				else: self.B.Listeners[i] = [func]
 			else: self.B.Listeners[i] = [func]
-	def addCmd(self, cmd, func, desc='None', level=0):
+	def addCmd(self, cmd, func, desc='None', level=0, alias=[]):
 		if cmd in self.B.Commands.keys():
 			self.debug("Can't add command %s, another plugin already added it!" % (cmd))
 			return False
 		self.B.Commands[cmd] = (func,desc,level)
+		for i in alias:
+			self.B.Aliases[i] = (func,desc,level,cmd)
 		return True
 	def addCmds(self, cmds):
 		for i in cmds:
 			if i[0] in self.B.Commands.keys(): self.debug("Can't add command %s, another plugin already added it!" % (i[0]))
+			if len(i) == 5:
+				for x in i[5]:
+					self.B.Aliases[x] = (i[1], i[2], i[3], i[0])
 			else: self.B.Commands[i[0]] = (i[1], i[2], i[3])
 	def delCmd(self, cmd):
 		if cmd in self.B.Commands.keys():
 			del self.B.Commands[cmd]
+			for i in self.B.Aliases:
+				if i[3] == cmd:
+					del i
 			return True
 		return False
-
+	
 	def addTrigger(self, trigger):
 		if trigger in self.B.Triggers.keys():
 			self.debug("Can't add trigger %s, another plugin already added it!" % (trigger))
@@ -233,7 +243,6 @@ class API():
 			cid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".find(char)
 			if cid != -1: ids.append(cid)
 		return ids
-
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
@@ -288,7 +297,7 @@ def parseItem(inp):
 	item = inp[2].strip()
 	client = inp[1]
 	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
+	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':client})
 
 def parsePlayerBegin(inp):
 	#ClientBegin: 0
@@ -312,6 +321,16 @@ def parseFlagReturn(inp):
 	flag = inp[2].strip()
 	BOT.eventFire('GAME_FLAGRESET', {'flag':flag, 'flagid':const.flagtypes[flag]})
 
+def parseCommand(inp):
+	uid = int(inp[0])
+	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
+	print "shit", BOT.Clients[uid].group
+	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
+		thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd}), True)) 
+	else:
+		msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
+		BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
+
 def parse(inp):
 	global BOT
 	if inp.startswith("say:"):
@@ -324,15 +343,8 @@ def parse(inp):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
-			if cmd in BOT.Commands.keys():
-				uid = int(inp[0])
-				BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-				print "shit", BOT.Clients[uid].group
-				if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
-					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), True)) 
-				else:
-					msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
-					BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
+			if cmd in BOT.Commands.keys(): parseCommand(inp)
+			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
 	elif inp.startswith('ClientConnect:'):
@@ -384,6 +396,9 @@ def parse(inp):
 		for key in BOT.Clients.keys():
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
+	elif inp.startswith('InitGame:'): pass
+	elif inp.startswith('SurvivorWinner:'): pass
+	elif inp.startswith('InitRound:'): pass
 
 		
 def loadConfig():
