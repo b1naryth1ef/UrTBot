@@ -1,7 +1,9 @@
 import time
 
 class Event():
-	def updateData(self, data=self.data): self.__dict__.update(data)
+	def updateData(self, data=None):
+		if data == None: data = self.data
+		self.__dict__.update(data)
 
 	def __init__(self, Type, data):
 		self.fireTime = time.time()
