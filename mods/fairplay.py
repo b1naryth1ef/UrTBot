@@ -33,9 +33,32 @@ def cmdTeams(obj, f):
 	
 	A.say("Balanced teams.") #<<< should be told to the user?
 
-def eveLock(obj): pass
+def eveLock(obj):
+	cobj = A.getClient(obj.client)
+	if 'fairplay_locked' in cobj.__dict__.keys():
+		if cobj.fairplay_locked is True:
+			A.rcon('forceteam %s %s' % (cobj.uid, obj.fromteam))
 
-def cmdLock(obj, f): pass
+def cmdLock(obj, f):
+	#![un]lock user
+
+	if len(obj.msgsplit) != 2: return A.tell(obj.sender, "Usage: %s <client>" % obj.cmd) #Sneaky bastard that I am
+
+	play = A.findClient(obj.msgsplit[1])
+	if play: playobj = A.getClient(nameToCID(play))
+	else: return None
+
+	if 'fairplay_locked' not in playobj.__dict__.keys(): playobj.fairplay_locked = False
+
+	if obj.cmd == '!lock':
+		if playobj.fairplay_locked is True: return A.tell(obj.sender, "%s is already locked! Unlock with !unlock %s" % (playobj.name, playobj.uid))
+		else: playobj.fairplay_locked = True
+		A.tell(obj.sender, 'Success! %s was locked to %s' % (playobj.name, playobj.team))
+
+	elif obj.cmd == '!unlock':
+		if playobj.fairplay_locked is True: playobj.fairplay_locked = False:
+		else: return A.tell(obj.sender, '%s is already unlocked!' % playobj.name)
+		A.tell(obj.sender, 'Success! %s was unlocked!' % (playobj.name))
 
 def cmdForce(obj, f):
 	msg = obj.data['msgsplit'])
@@ -43,11 +66,11 @@ def cmdForce(obj, f):
 	team = msg[2] #Team to switch player to
 	play = A.findClient(msg[1]) #Player name/id to autocomplete
 	if play: playobj = A.getClient(nameToCID(play)) #Player obj
+	else: return None
 
 	if A.canInt(team): team = const.teams[int(team)] #Is the team an integer representation of a team? if so use the team name
-	if team not in const.teams.values() and team != 'spectator': #we are a bad team!
-		A.tell(sender, 'Unknown team %s (spec/spectator/red/blue)' % team)
-		return None
+	if team not in const.teams.values() and team != 'spectator': #we are a bad team! 
+		return A.tell(sender, 'Unknown team %s (spec/spectator/red/blue)' % team)
 	if team == 'spec': team == 'spectator' #urt likes spectator
 
 	if len(msg) == 3 and playobj.team != team: #!force player team
