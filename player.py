@@ -48,7 +48,7 @@ class Player():
 class PlayerDatabase():
 	def __init__(self):
 		self.db = database.DB()
-		if self.db.tableExists("clients") == False:
+		if not self.db.tableExists("clients"): #PYTHON BABEH! NO HAS == FOR TRUE/FALSE!
 			self.db.tableCreate('clients', {'id':'integer primary key autoincrement',
 			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',

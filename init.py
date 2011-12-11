@@ -267,8 +267,8 @@ def parseKill(inp):
 	vicobj = BOT.Clients[victim]
 	method = int(inp[2].strip(':'))
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
-	elif method in [7, 6, 10, 31, 320]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
-	elif atkobj.team == vicobj.team and atkobj.uid != vicobj.uid: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
+	elif method in [7, 6, 10, 31, 32]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+	elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
 		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
@@ -288,12 +288,10 @@ def parseItem(inp):
 	item = inp[2].strip()
 	client = inp[1]
 	if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-	else: 
-		BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
+	else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'itemint':0, 'client':client})
 
 def parsePlayerBegin(inp):
 	#ClientBegin: 0
-	print "DID IT!"
 	inp = inp.split(' ')
 	client = int(inp[1])
 	BOT.eventFire('CLIENT_BEGIN', {'client':client})
@@ -328,8 +326,7 @@ def parse(inp):
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys():
 				uid = int(inp[0])
-				#@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-				BOT.pdb.playerUpdate(BOT.Clients[uid])
+				BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 				print "shit", BOT.Clients[uid].group
 				if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 					thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'cmd':cmd}), True)) 
@@ -363,12 +360,10 @@ def parse(inp):
 		uid, varz = parseUserInfoChange(inp, {}, {})
 		print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
-
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
 		BOT.eventFire('CLIENT_DISCONNECT', {'client':inp})
 		if inp in BOT.Clients.keys(): del BOT.Clients[inp]
-
 	elif inp.startswith('Kill:'): 
 		parseKill(inp)
 	elif inp.startswith('Hit:'): 
@@ -378,17 +373,18 @@ def parse(inp):
 	elif inp.startswith('Flag:'): parseFlag(inp)
 	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
 	elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
-
 	elif inp.startswith('ShutdownGame:'):
 		BOT.eventFire('GAME_SHUTDOWN', {})
 		# We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
 		# when the mapcycle changes maps? hrmph. investigate.
 		# In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
+		# rcon from 127.0.0.1:
+		# map
+		# That should work ye?
 		for key in BOT.Clients.keys():
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
 
-	else: pass
 		
 def loadConfig():
 	"""Loads the bot config"""
@@ -404,7 +400,7 @@ def loadConfig():
 		config_serversocket = botConfig['serversocket']
 		config_debugmode = botConfig['debug_mode']
 	except Exception, e:
-		print "Error loading config! [%s]" % (e)
+		A.debug("Error loading config! [%s]" % (e))
 
 def loadMods():
 	global BOT, A
@@ -417,13 +413,13 @@ def loadMods():
 			A.debug('Error in loadMods() [%s]' % (e))
 
 def loop():
-	"""The entire loop"""
+	"""Round and round in circles we go!"""
 	global proc, keepLoop
 	while True:
 		proc.checkAndRead()
 		while proc.hasLine():
 			line = proc.getLine()
-			if line != '^1Error: weapon number out of range':
+			if line != '^1Error: weapon number out of range': #<<<< HUH?
 				print line
 			parse(line)
 
@@ -436,11 +432,11 @@ def Start():
 	BOT.Startup()
 	loadMods()
 	proc = GameOutput(config_serversocket)
-	x = os.uname() #@DEV Is this windows friendly?
+	x = os.uname()
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
 def Exit(): sys.exit()
 
 if __name__ == "__main__":
-	Start()
+	print "Use start.py to start everything or we'll trololololol, and die!"
