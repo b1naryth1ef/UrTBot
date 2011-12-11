@@ -360,12 +360,18 @@ def parse(inp):
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
 		#print uid, varz
-		if uid in BOT.Clients.keys(): BOT.Clients[uid].setData(varz)
+		if uid in BOT.Clients.keys():
+			if 'team' in varz:
+				if BOT.Clients[uid].team != varz['team']:
+					BOT.eventFire('CLIENT_SWITCHTEAM', {'client':uid, 'toteam':varz['team'], 'fromteam':BOT.Clients[uid].team})
+
+			BOT.Clients[uid].setData(varz)
 		else:
 			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz)
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
+		
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
