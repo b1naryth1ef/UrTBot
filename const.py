@@ -1,5 +1,4 @@
 teams = {
-0:'zombie',
 1:'red',
 2:'blue',
 3:'spec'
