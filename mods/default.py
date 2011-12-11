@@ -74,35 +74,40 @@ def cmdKick(obj, f):
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !kick <user>")
 	elif len(msg) == 2:
-		cid = A.findClients(msg[1])
-		if len(cid) == 0:
-			A.tell(sender, "No player/clientID matching '%s'." % msg[1])
-		elif len(cid) > 1:
-			A.tell(sender, "Please be more specific.")
-		else:
-			A.rcon('clientkick %d' % cid[0])
+		cid = A.nameToCID(msg[1], sender)
+		if cid == None:
+			return
+		A.rcon('clientkick %d' % cid)
 
 def cmdSlap(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
-	elif len(msg) == 2: A.rcon('slap %s' % (msg[1]))
-	elif len(msg) == 3:
-		if canInt(msg[2]):
-			for i in range(int(msg[2])):
-				A.rcon('slap %s' % (msg[1]))
-				time.sleep(.5) #@NOTE Seems like a good delay time
+	else:
+		cid = A.nameToCID(msg[1], sender)
+		if cid == None:
+			return
+		count = 1
+		if len(msg) == 3:
+			if canInt(msg[2]): count = int(msg[2])
+		for i in range(count):
+			A.rcon('slap %d' % cid)
+			time.sleep(.5) #@NOTE Seems like a good delay time
 
 def cmdNuke(obj, f):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !nuke <user> <count>")
-	elif len(msg) == 2: A.rcon('nuke %s' % (msg[1]))
-	elif len(msg) == 3:
-		if canInt(msg[2]):
-			for i in range(int(msg[2])):
-				A.rcon('nuke %s' % (msg[1]))
-				time.sleep(.5) #@NOTE Seems like a good delay time
+	else:
+		cid = A.nameToCID(msg[1], sender)
+		if cid == None:
+			return
+		count = 1
+		if len(msg) == 3:
+			if canInt(msg[2]): count = int(msg[2])
+		for i in range(count):
+			A.rcon('nuke %d' % cid)
+			time.sleep(.5) #@NOTE Seems like a good delay time
 
 def cmdSet(obj, f): 
 	msg = obj.data["msg"].split(" ")
