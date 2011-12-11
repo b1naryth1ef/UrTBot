@@ -174,6 +174,16 @@ class API():
 			return []
 		clients = self.getClients()
 		return [client for client in clients if name in clients[client].name]
+	def nameToCID(self, name, notify=None):
+		cid = self.findClients(name)
+		if len(cid) == 1:
+			return cid[0]
+		elif notify:
+			if len(cid) == 0:
+				self.tell(notify, "No player/clientID matching '%s'." % name)
+			else:
+				self.tell(notify, "Please be more specific.")
+		return None
 
 	def findMap(self, mapname):
 		maplist = []
