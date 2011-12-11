@@ -268,7 +268,7 @@ def parseKill(inp):
 	method = int(inp[2].strip(':'))
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
 	elif method in [7, 6, 10, 31, 320]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
-	elif atkobj.team == vicobj.team: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
+	elif atkobj.team == vicobj.team and atkobj.uid != vicobj.uid: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
 		BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
