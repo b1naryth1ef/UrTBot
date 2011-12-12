@@ -263,9 +263,9 @@ class API():
 
 def parseInitGame(inp, varz={}):
 	options = re.findall(r'\\([^\\]+)\\([^\\]+)', data)
-    for o in options:
-    	varz[o[0]] = o[1]
-    return varz
+	for o in options:
+		varz[o[0]] = o[1]
+	return varz
       
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
