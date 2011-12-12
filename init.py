@@ -77,6 +77,8 @@ class Bot():
 		self.debug = debug #False will hide messages, True will print them and log them to vars
 		
 		self.maplist = UrTConfig['maps']
+		self.currentMap = None
+		self.gameData = {}
 
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers
@@ -87,6 +89,18 @@ class Bot():
 		self.Clients = {} #AKA players
 		
 	def getClient(self, uid): return self.Clients[uid]
+	def getGameType(self):
+		r = self.Q.rcon('g_gametype')
+		r = re.findall(const.rconGameType, r)
+		self.gameData['g_gametype'] = r[0][0]
+		return r[0][0]
+		 
+	def getCurrentMap(self):
+		r = self.Q.rcon('mapname')
+		r = const.rconCurrentMap.search(r)
+		self.currentMap = r.group(1)
+		self.gameData['mapname'] = r.group(1)
+		return r.group(1)
 
 	def eventFire(self, event, data): 
 		obj = events.EVENTS[event](data)
@@ -124,6 +138,9 @@ class Bot():
 			self.Clients[uid] = player.Player(uid, data)
 			if self.Clients[uid].cl_guid != None:
 				self.pdb.playerUpdate(self.Clients[uid])
+
+		self.getGameType()
+		self.getCurrentMap()
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
 		print 'STARTUP DONE'
@@ -244,6 +261,12 @@ class API():
 			if cid != -1: ids.append(cid)
 		return ids
 
+def parseInitGame(inp, varz={}):
+	options = re.findall(r'\\([^\\]+)\\([^\\]+)', data)
+    for o in options:
+    	varz[o[0]] = o[1]
+    return varz
+      
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
@@ -403,7 +426,7 @@ def parse(inp):
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
 	elif inp.startswith('InitGame:'):
-		BOT.eventFire('GAME_ROUND_START', {})
+		BOT.gameData.update(parseInitGame(inp))
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 	elif inp.startswith('InitRound:'): pass

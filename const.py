@@ -1,3 +1,5 @@
+import re
+
 teams = {
 1:'red',
 2:'blue',
@@ -210,6 +212,9 @@ class UrbanTerrorError(Exception): pass
 
 def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
+
+rconGameType = '.*?(\\d+).*?\\d+.*?(\\d+)'
+rconCurrentMap = re.compile('.*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?((?:[a-z][a-z0-9_]*))', re.IGNORECASE|re.DOTALL)
 
 """
 Some content in this file has been found in the B3 source. 
