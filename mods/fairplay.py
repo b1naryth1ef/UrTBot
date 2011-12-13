@@ -56,12 +56,12 @@ def cmdLock(obj, f):
 		A.tell(obj.sender, 'Success! %s was locked to %s' % (playobj.name, playobj.team))
 
 	elif obj.cmd == '!unlock':
-		if playobj.fairplay_locked is True: playobj.fairplay_locked = False:
+		if playobj.fairplay_locked is True: playobj.fairplay_locked = False
 		else: return A.tell(obj.sender, '%s is already unlocked!' % playobj.name)
 		A.tell(obj.sender, 'Success! %s was unlocked!' % (playobj.name))
 
 def cmdForce(obj, f):
-	msg = obj.data['msgsplit'])
+	msg = obj.data['msgsplit']
 	sender = obj.data['sender'] #The sender id
 	team = msg[2] #Team to switch player to
 	play = A.findClient(msg[1]) #Player name/id to autocomplete
