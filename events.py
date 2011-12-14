@@ -4,13 +4,19 @@ class Event():
 	def updateData(self, data=None):
 		if not data: data = self.data
 		self.__dict__.update(data)
+	
+	def genHash(self): return hash(self.type+str(self.fireTime))
 
 	def __init__(self, Type, data):
 		self.fireTime = time.time()
 		self.data = data
 		self.type = Type
-
+		self.hash = self.genHash()
 		self.updateData()
+
+	def __cmp__(self, other):
+		if self.hash == other.hash: return 0
+		else: return -1 #Will technically allow self < other, but idk how else to do this without screwing things up...
 
 class EventServer(Event): pass
 class EventClient(Event): pass

@@ -24,7 +24,7 @@ import database
 	  rowFindAll() returns a list of all rows that match
 """
 
-def parseKill(obj): pass
+def parseKill(obj, f): pass
 	#A.B.Clients[obj.atk]
 	atk = A.getClient(obj.atk)
 	atkClient = db.rowFind(atk.cid) #<<< see player.py for note on what cid should be
@@ -32,17 +32,17 @@ def parseKill(obj): pass
 	db.rowUpdate(atkClient)
 	db.commit()
 
-def parseDeath(obj):
+def parseDeath(obj, f):
 	vic = A.getClient[obj.vic]
 	vicClient = db.rowFind(vic.cid)
 	vicClient["deaths"] += 1
 	db.rowUpdate(vicClient)
 	db.commit()
 
-def parseSuicide(obj): pass
-def parseTeamKill(obj): pass
+def parseSuicide(obj, f): pass
+def parseTeamKill(obj, f): pass
 
-def eventHandler(obj):
+def eventHandler(obj, f):
 	if obj.type == 'CLIENT_KILL': parseKill(obj)
 	elif obj.type == 'CLIENT_SUICIDE': parseSuicide(obj)
 	elif obj.type == 'CLIENT_GENERICDEATH': parseDeath(obj)

@@ -33,7 +33,7 @@ def cmdTeams(obj, f):
 	
 	A.say("Balanced teams.") #<<< should be told to the user?
 
-def eveLock(obj):
+def eveLock(obj, f):
 	cobj = A.getClient(obj.client)
 	if 'fairplay_locked' in cobj.__dict__.keys():
 		if cobj.fairplay_locked is True:
