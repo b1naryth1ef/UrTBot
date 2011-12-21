@@ -1,5 +1,5 @@
 import time, sys, const
-from init import canInt, A, command
+from init import canInt, A, command, listener, __Version__
 import database
 
 _name = "Default/Built-in Plugin"
@@ -31,10 +31,11 @@ class Timer(object): #@CREDIT B1
 		self.status = 0
 
 @command('!tt', 'Test Plugin', 0)
-def tester(obj, f):
+def tester(obj):
 	print 'Test!'
 
-def cmdHelp(obj, f): #@CREDIT Neek
+@command('!help', 'List all commands, or info on a specific command. Usage: !help <cmd>', 0)
+def cmdHelp(obj): #@CREDIT Neek
 	#format should be !command : Info \n
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -62,18 +63,21 @@ def cmdHelp(obj, f): #@CREDIT Neek
 		else:
 			A.tell(sender, "%s: %s" % (cmd, cmdobj[1]))
 
-def cmdAbout(obj, f):
+@command('!about', 'About UrTBot', 0)
+def cmdAbout(obj):
 	sender = obj.data["sender"]
-	A.tell(sender, "UrTBot: b1n likes dancing in the moonlight.")
+	A.tell(sender, "UrTBot: V%s by Neek and B1naryth1ef" % __Version__)
 
-def cmdList(obj, f):
+@command('!list', 'List all users. Usage: !list', 3)
+def cmdList(obj):
 	sender = obj.data["sender"]
 	A.tell(sender, "==Player List==")
 	clients = A.getClients()
 	for cid in clients:
 		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
 
-def cmdKick(obj, f):
+@command('!kick', 'Kick a user. Usage: !kick <NAME/UID>', 3)
+def cmdKick(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !kick <user>")
@@ -83,7 +87,8 @@ def cmdKick(obj, f):
 			return
 		A.rcon('clientkick %d' % cid)
 
-def cmdSlap(obj, f):
+@command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
+def cmdSlap(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
@@ -98,7 +103,8 @@ def cmdSlap(obj, f):
 			A.rcon('slap %d' % cid)
 			time.sleep(.5) #@NOTE Seems like a good delay time
 
-def cmdNuke(obj, f):
+@command('!nuke', 'Nuke a player. Usage: !nuke <NAME/UID>', 3)
+def cmdNuke(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !nuke <user> <count>")
@@ -113,14 +119,16 @@ def cmdNuke(obj, f):
 			A.rcon('nuke %d' % cid)
 			time.sleep(.5) #@NOTE Seems like a good delay time
 
-def cmdSet(obj, f): 
+@command('!set', 'Set a Q3 Variable. Usage: !set <cvar> <value>', 5)
+def cmdSet(obj): 
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !set <cvar> <value>")
 	elif len(msg) == 2:
 		A.rcon('set %s %s' % (msg[1], msg[2]))
 
-def cmdMap(obj, f):
+@command('!map', 'Load a map. Usage: !map <map>', 2)
+def cmdMap(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !map <map>")
@@ -134,18 +142,12 @@ def cmdMap(obj, f):
 			A.rcon('set thismap "map %s"' % maps[0])
 			A.rcon('vstr thismap')
 
-def cmdStop(obj, f): A.exitProc()
-def cmdRestart(obj, f): pass
-def cmdLoadout(obj, f): pass
-
-def cmdTester(obj, f):
-	A.say('Testing! This is just a test! Stay clam!')
-	A.reboot() # lol, so this is why !test crashes! :D
-
-def welcomeEvent(obj, f):
+@listener('CLIENT_BEGIN')
+def welcomeEvent(obj):
 	if obj.type == 'CLIENT_BEGIN': A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
-def cmdTime(obj, f):
+@command('!timer', 'Start/stop the timer. Usage: !timer', 1)
+def cmdTime(obj):
 	global TIMERZ
 	sender = obj.data['sender']
 	if sender in TIMERZ:
@@ -161,7 +163,7 @@ def cmdTime(obj, f):
 		TIMERZ[sender].start()
 		A.tell(sender, 'Timer Started!')
 
-def cmdIDDQD(obj, f):
+def cmdIDDQD(obj):
 	sender = obj.data['sender']
 	client = A.getClient(sender)
 
@@ -183,22 +185,5 @@ def init():
 	if uberadmin == None:
 		A.addCmd('!iddqd', cmdIDDQD, "Set yourself as uberadmin. Usage: !iddqd", 0)
 	db.disconnect()
-
-	A.addCmds([['!help', cmdHelp, "List all commands, or info on a specific command. Usage: !help <cmd>", 0], 
-	['!about', cmdAbout, "About UrTBot", 1],
-	['!list', cmdList, "List all users. Usage: !list", 3],
-	['!kick', cmdKick, "Kick a user. Usage: !kick <NAME/UID>", 3],
-	['!slap', cmdSlap, "Slap a player. Usage: !slap <NAME/UID>", 3],
-	['!nuke', cmdNuke, "Nuke a player. Usage: !nuke <NAME/UID>", 3],
-	['!set', cmdSet, "Set a Q3 Variable. Usage: !set <cvar> <value>", 5],
-	['!map', cmdMap, "Load a map. Usage: !map <map>", 2],
-	['!stop', cmdStop, "Stop the server/bot. Usage: !stop", 3],
-	['!restart', cmdRestart, "Restart the server/bot. Usage: !restart", 3],
-	['!loadout', cmdLoadout, "See a players loadout. Usage: !loadout <NAME/UID>", 2],
-	['!test', cmdTester, ">:D", 0],
-	['!timer', cmdTime, "Start/stop the timer. Usage: !timer", 1],
-	])
-
-	A.addListener('CLIENT_CONNECT', welcomeEvent)
 
 def die(): pass #Called when we should disable/shutdown

@@ -76,7 +76,7 @@ class Bot():
 		for i in self.Listeners.keys():
 			if i == event:
 				for listener in self.Listeners[i]:
-					thread.start_new_thread(listener, (obj, False))
+					thread.start_new_thread(listener, (obj))
 				break
 		return obj
 

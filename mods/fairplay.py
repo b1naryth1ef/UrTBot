@@ -1,7 +1,8 @@
-from init import A
+from init import A, command, listener
 import random, const
 
-def cmdTeams(obj, f):
+@command('!teams', "Attempt to balance uneven teams", 1)
+def cmdTeams(obj):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 
@@ -33,13 +34,16 @@ def cmdTeams(obj, f):
 	
 	A.say("Balanced teams.") #<<< should be told to the user?
 
-def eveLock(obj, f):
+@listener('CLIENT_SWITCHTEAM')
+def eveLock(obj):
 	cobj = A.getClient(obj.client)
 	if 'fairplay_locked' in cobj.__dict__.keys():
 		if cobj.fairplay_locked is True:
 			A.rcon('forceteam %s %s' % (cobj.uid, obj.fromteam))
 
-def cmdLock(obj, f):
+@command('!lock', 'Lock a player to the team they are on. Usage: !lock <player>', 3)
+@command('!unlock', 'Unlock a locked player. Usage: !unlock <player>', 3)
+def cmdLock(obj):
 	#![un]lock user
 
 	if len(obj.msgsplit) != 2: return A.tell(obj.sender, "Usage: %s <client>" % obj.cmd) #Sneaky bastard that I am
@@ -60,7 +64,8 @@ def cmdLock(obj, f):
 		else: return A.tell(obj.sender, '%s is already unlocked!' % playobj.name)
 		A.tell(obj.sender, 'Success! %s was unlocked!' % (playobj.name))
 
-def cmdForce(obj, f):
+@command('!force', 'Force a player, and lock him if need be! Usage: !force <player> <team> [lock]')
+def cmdForce(obj):
 	msg = obj.data['msgsplit']
 	sender = obj.data['sender'] #The sender id
 	team = msg[2] #Team to switch player to
@@ -82,10 +87,7 @@ def cmdForce(obj, f):
 		playobj.fairplay_locked = True
 		A.tell(sender, '%s was forced and locked to %s. Type !unlock %s to unlock player.' % (playobj.name, team, playobj.name))
 	else:
-		A.tell(sender, "Usage: !force <client> <team> <lock>")
+		A.tell(sender, "Usage: !force <client> <team> [lock]")
 
-
-def init():
-	A.addCmd('!teams', cmdTeams, "Attempt to balance uneven teams", 1)
-	A.addCmd('!force', cmdForce, "Force a player, and lock him if need be!", 3)
-	A.addListener('CLIENT_SWITCHTEAM', eveLock)
+def init(): pass
+def die(): pass
