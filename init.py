@@ -33,6 +33,7 @@ def command(cmd, desc='None', level=0, alias=[]): #WOOT! DECORATERS ARE THE SHIZ
 		for i in alias:
 			BOT.Aliases[i] = (target,desc,level,cmd)
 		return target
+	return decorator
 
 def listener(event): #WOOT! DECORATERS ARE THE SHIZ
 	def decorator(target):
@@ -42,6 +43,7 @@ def listener(event): #WOOT! DECORATERS ARE THE SHIZ
 				return target
 			BOT.Listeners[event] = [target]
 			return target
+	return decorator
 
 def parseInitGame(inp, varz={}):
 	options = re.findall(r'\\([^\\]+)\\([^\\]+)', data)
