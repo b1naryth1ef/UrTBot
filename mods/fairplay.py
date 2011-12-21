@@ -2,7 +2,7 @@ from init import A, command, listener
 import random, const
 
 @command('!teams', "Attempt to balance uneven teams", 1)
-def cmdTeams(obj):
+def cmdTeams(obj, t):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 
@@ -35,7 +35,7 @@ def cmdTeams(obj):
 	A.say("Balanced teams.") #<<< should be told to the user?
 
 @listener('CLIENT_SWITCHTEAM')
-def eveLock(obj):
+def eveLock(obj, t):
 	cobj = A.getClient(obj.client)
 	if 'fairplay_locked' in cobj.__dict__.keys():
 		if cobj.fairplay_locked is True:
@@ -43,7 +43,7 @@ def eveLock(obj):
 
 @command('!lock', 'Lock a player to the team they are on. Usage: !lock <player>', 3)
 @command('!unlock', 'Unlock a locked player. Usage: !unlock <player>', 3)
-def cmdLock(obj):
+def cmdLock(obj, t):
 	#![un]lock user
 
 	if len(obj.msgsplit) != 2: return A.tell(obj.sender, "Usage: %s <client>" % obj.cmd) #Sneaky bastard that I am
@@ -65,7 +65,7 @@ def cmdLock(obj):
 		A.tell(obj.sender, 'Success! %s was unlocked!' % (playobj.name))
 
 @command('!force', 'Force a player, and lock him if need be! Usage: !force <player> <team> [lock]')
-def cmdForce(obj):
+def cmdForce(obj, t):
 	msg = obj.data['msgsplit']
 	sender = obj.data['sender'] #The sender id
 	team = msg[2] #Team to switch player to
