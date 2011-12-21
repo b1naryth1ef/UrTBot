@@ -1,5 +1,5 @@
 import time, sys, const
-from init import canInt, A
+from init import canInt, A, command
 import database
 
 _name = "Default/Built-in Plugin"
@@ -29,6 +29,10 @@ class Timer(object): #@CREDIT B1
 		self.startt = 0
 		self.endt = 0
 		self.status = 0
+
+@command('!tt', 'Test Plugin', 0)
+def tester(obj, f):
+	print 'Test!'
 
 def cmdHelp(obj, f): #@CREDIT Neek
 	#format should be !command : Info \n
