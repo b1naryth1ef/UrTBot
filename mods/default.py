@@ -85,7 +85,7 @@ def cmdKick(obj, t):
 		cid = A.nameToCID(msg[1], sender)
 		if cid == None:
 			return
-		A.rcon('clientkick %d' % cid)
+		A.rcon('clientkick %d' % int(cid))
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
 def cmdSlap(obj, t):
