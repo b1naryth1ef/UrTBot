@@ -131,10 +131,10 @@ class API():
 		if self.B.debug is True: 
 			if plugin is None:
 				print '[DEBUG]', msg
-				botDEBUGS.append((time.time(), msg))
+				init.botDEBUGS.append((time.time(), msg))
 			else:
 				print '[DEBUG|%s] %s' % (plugin, msg)
-				pluginDEBUGS.append((time.time(), plugin, msg))
+				init.pluginDEBUGS.append((time.time(), plugin, msg))
 	def canInt(self, i): return canInt(i)
 	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
