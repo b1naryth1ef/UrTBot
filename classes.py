@@ -1,5 +1,5 @@
 from rcon import RCON
-import init, socket, select
+import init, socket, select, time
 
 class GameOutput():
 	def __init__(self, usockname=None):
