@@ -133,7 +133,8 @@ def parseCommand(inp, cmd):
 	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 	print "shit", BOT.Clients[uid].group
 	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
-		thread.start_new_thread(BOT.Commands[cmd][0], (BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd}))) 
+		obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
+		thread.start_new_thread(BOT.Commands[cmd][0], (obj)) 
 	else:
 		msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
 		BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
