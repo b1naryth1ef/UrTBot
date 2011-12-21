@@ -128,7 +128,7 @@ def parseFlagReturn(inp):
 	flag = inp[2].strip()
 	BOT.eventFire('GAME_FLAGRESET', {'flag':flag, 'flagid':const.flagtypes[flag]})
 
-def parseCommand(inp):
+def parseCommand(inp, cmd):
 	uid = int(inp[0])
 	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 	print "shit", BOT.Clients[uid].group
@@ -150,7 +150,7 @@ def parse(inp):
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
 			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
-			if cmd in BOT.Commands.keys(): parseCommand(inp)
+			if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
 			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
 		BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
 
