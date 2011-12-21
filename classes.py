@@ -72,7 +72,7 @@ class Bot():
 		return r.group(1)
 
 	def eventFire(self, event, data): 
-		obj = events.EVENTS[event](data)
+		obj = init.events.EVENTS[event](data)
 		for i in self.Listeners.keys():
 			if i == event:
 				for listener in self.Listeners[i]:
