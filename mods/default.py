@@ -31,7 +31,7 @@ class Timer(object): #@CREDIT B1
 		self.status = 0
 
 @command('!tt', 'Test Plugin', 0)
-def tester(obj):
+def tester(obj, **args):
 	print 'Test!'
 
 @command('!help', 'List all commands, or info on a specific command. Usage: !help <cmd>', 0)
