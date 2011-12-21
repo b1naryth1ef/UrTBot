@@ -151,7 +151,7 @@ class API():
 		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
 	def findClient(self, name):
-		x = findClients(name)
+		x = init.findClients(name)
 		if len(x) == 1: return x
 		else: return False
 	def findClients(self, name):
