@@ -85,13 +85,15 @@ def cmdKick(obj, t):
 		if msg[1].isdigit():
 			kick = int(msg[1]) #@DEV This needs a check to see if players name is 0 or something annoying like that
 		else:
-			cid = A.nameToCID(msg[1], sender)
-			if cid == None:
-				cli = A.newFindClient(msg[1])
-				if cli != None:
-					kick = cli.uid
-			else:
-				kick = int(cid)
+			#cid = A.nameToCID(msg[1], sender)
+			#if cid == None:
+			cli = A.newFindClient(msg[1])
+			print cli
+			if cli != None:
+				print 'Ye!'
+				kick = cli.uid
+			#else:
+			#	kick = int(cid)
 		A.rcon('clientkick %d' % kick)
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
