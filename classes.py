@@ -152,7 +152,7 @@ class API():
 		else: return None
 	def findClient(self, name):
 		x = self.findClients(name)
-		if len(x) == 1: return x
+		if len(x) == 1: return x[0]
 		else: return False
 	def findClients(self, name):
 		if name.isdigit() and len(name) <= 2:

@@ -43,6 +43,7 @@ STUPID URT THINGS:
 	the flag gets dropped and goes BOOM without any further notification.
 	this screws up the flagstats code. solutions are all hacky. :|
 - track down all the things that can happen without notifying us on stdout (this'll just happen over time)
+- make sure we fire CLIENT_CHANGETEAM even when we get the changeteam from clientUserInfo[change]
 
 THINGS THAT ARE GOING VERY WELL:
 The plugin system is seckzy; Looking forward to having fun with it when the core is more settled.

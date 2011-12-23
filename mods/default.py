@@ -82,10 +82,17 @@ def cmdKick(obj, t):
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !kick <user>")
 	elif len(msg) == 2:
-		cid = A.nameToCID(msg[1], sender)
-		if cid == None:
-			return
-		A.rcon('clientkick %d' % int(cid))
+		if msg[1].isdigit():
+			kick = int(msg[1])
+		else:
+			cid = A.nameToCID(msg[1], sender)
+			if cid == None:
+				cli = A.findClient(msg[1])
+				if cli != None:
+					kick = cli.uid
+			else:
+				kick = int(cid)
+		A.rcon('clientkick %d' % kick)
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
 def cmdSlap(obj, t):
@@ -100,7 +107,7 @@ def cmdSlap(obj, t):
 		if len(msg) == 3:
 			if canInt(msg[2]): count = int(msg[2])
 		for i in range(count):
-			A.rcon('slap %d' % cid)
+			A.rcon('slap %d' % int(cid))
 			time.sleep(.5) #@NOTE Seems like a good delay time
 
 @command('!nuke', 'Nuke a player. Usage: !nuke <NAME/UID>', 3)
