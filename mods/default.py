@@ -73,7 +73,7 @@ def cmdList(obj, t):
 	sender = obj.data["sender"]
 	A.tell(sender, "==Player List==")
 	for c in A.getClients().values():
-		A.tell(sender, "[%s] %s (%s)" % (c.uid, c.name, c..ip))
+		A.tell(sender, "[%s] %s (%s)" % (c.uid, c.name, c.ip))
 
 @command('!kick', 'Kick a user. Usage: !kick <NAME/UID>', 3)
 def cmdKick(obj, t):
