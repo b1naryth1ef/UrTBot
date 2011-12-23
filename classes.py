@@ -159,8 +159,8 @@ class API():
 		ret = []
 		for i in cli.values():
 			print name, i.name
-			if name in i.name:
-				ret.append(name)
+			if name in i.name.lower():
+				ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
 		elif len(ret) >= 2: return False
