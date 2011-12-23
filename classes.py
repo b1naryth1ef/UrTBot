@@ -158,6 +158,7 @@ class API():
 		cli = self.getClients()
 		ret = []
 		for i in cli.values():
+			print name, i.name
 			if name in i.name:
 				ret.append(name)
 		if len(ret) == 1: return ret[0]
