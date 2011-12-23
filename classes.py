@@ -154,6 +154,15 @@ class API():
 		x = self.findClients(name)
 		if len(x) == 1: return x[0]
 		else: return False
+	def newFindClient(self, name):
+		cli = self.getClients()
+		ret = []
+		for i in cli:
+			if name in cli.name:
+				ret.append(name)
+		if len(ret) == 1: return ret[0]
+		elif len(ret) == 0: return None
+		elif len(ret) >= 2: return False
 	def findClients(self, name):
 		if name.isdigit() and len(name) <= 2:
 			client = self.getClients().get(int(name))

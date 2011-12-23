@@ -83,11 +83,11 @@ def cmdKick(obj, t):
 	if len(msg) == 1: A.tell(sender, "Usage: !kick <user>")
 	elif len(msg) == 2:
 		if msg[1].isdigit():
-			kick = int(msg[1])
+			kick = int(msg[1]) #@DEV This needs a check to see if players name is 0 or something annoying like that
 		else:
 			cid = A.nameToCID(msg[1], sender)
 			if cid == None:
-				cli = A.findClient(msg[1])
+				cli = A.newFindClient(msg[1])
 				if cli != None:
 					kick = cli.uid
 			else:
