@@ -30,7 +30,7 @@ class Timer(object): #@CREDIT B1
 		self.endt = 0
 		self.status = 0
 
-@command('!tt', 'Test Plugin', 0)
+@command('!test', 'Test Command', 0)
 def tester(obj, t):
 	print 'Test!'
 
@@ -72,9 +72,8 @@ def cmdAbout(obj, t):
 def cmdList(obj, t):
 	sender = obj.data["sender"]
 	A.tell(sender, "==Player List==")
-	clients = A.getClients()
-	for cid in clients:
-		A.tell(sender, "[%2d] %s (%s)" % (cid, clients[cid].name, clients[cid].ip))
+	for c in A.getClients().values():
+		A.tell(sender, "[%s] %s (%s)" % (c.uid, c.name, c..ip))
 
 @command('!kick', 'Kick a user. Usage: !kick <NAME/UID>', 3)
 def cmdKick(obj, t):
@@ -85,15 +84,9 @@ def cmdKick(obj, t):
 		if msg[1].isdigit():
 			kick = int(msg[1]) #@DEV This needs a check to see if players name is 0 or something annoying like that
 		else:
-			#cid = A.nameToCID(msg[1], sender)
-			#if cid == None:
-			cli = A.newFindClient(msg[1])
-			print cli
+			cli = A.findClient(msg[1])
 			if cli != None:
-				print 'Ye!'
 				kick = cli.uid
-			#else:
-			#	kick = int(cid)
 		A.rcon('clientkick %d' % kick)
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
@@ -102,15 +95,18 @@ def cmdSlap(obj, t):
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !slap <user> <count>")
 	else:
-		cid = A.nameToCID(msg[1], sender)
-		if cid == None:
-			return
+		if msg[1].isdigit():
+			slap = int(msg[1])
+		else:
+			cli = A.findClient(msg[1])
+			if cli != None:
+				slap = cli.uid
 		count = 1
 		if len(msg) == 3:
 			if canInt(msg[2]): count = int(msg[2])
 		for i in range(count):
-			A.rcon('slap %d' % int(cid))
-			time.sleep(.5) #@NOTE Seems like a good delay time
+			A.rcon('slap %d' % slap)
+			time.sleep(.8)
 
 @command('!nuke', 'Nuke a player. Usage: !nuke <NAME/UID>', 3)
 def cmdNuke(obj, t):
@@ -118,15 +114,18 @@ def cmdNuke(obj, t):
 	sender = obj.data["sender"]
 	if len(msg) == 1: A.tell(sender, "Usage: !nuke <user> <count>")
 	else:
-		cid = A.nameToCID(msg[1], sender)
-		if cid == None:
-			return
+		if msg[1].isdigit():
+			nuke = int(msg[1])
+		else:
+			cli = A.findClient(msg[1])
+			if cli != None:
+				nuke = cli.uid
 		count = 1
 		if len(msg) == 3:
 			if canInt(msg[2]): count = int(msg[2])
 		for i in range(count):
-			A.rcon('nuke %d' % cid)
-			time.sleep(.5) #@NOTE Seems like a good delay time
+			A.rcon('nuke %d' % nuke)
+			time.sleep(.8)
 
 @command('!set', 'Set a Q3 Variable. Usage: !set <cvar> <value>', 5)
 def cmdSet(obj, t): 
@@ -153,7 +152,7 @@ def cmdMap(obj, t):
 
 @listener('CLIENT_BEGIN')
 def welcomeEvent(obj, t):
-	if obj.type == 'CLIENT_BEGIN': A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
+	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
 @command('!timer', 'Start/stop the timer. Usage: !timer', 1)
 def cmdTime(obj, t):

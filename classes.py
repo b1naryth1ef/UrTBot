@@ -150,16 +150,13 @@ class API():
 	def getClient(self, iid=0):
 		if len(self.B.Clients) != 0: return self.B.Clients.get(int(iid))
 		else: return None
-	def findClient(self, name):
+	def oldfindClient(self, name):
 		x = self.findClients(name)
 		if len(x) == 1: return x[0]
 		else: return False
-	def newFindClient(self, name):
-		cli = self.getClients()
-		ret = []
-		for i in cli.values():
-			print name, i.name
-			if name in i.name.lower():
+	def findClient(self, name, ret=[]):
+		for i in self.getClients().values():
+			if name in i.name.lower() or name == i.name.lower():
 				ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None

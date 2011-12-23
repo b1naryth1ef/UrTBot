@@ -41,8 +41,8 @@ def listener(event): #WOOT! DECORATERS ARE THE SHIZ
 			if BOT.Listeners[event] != None: 
 				BOT.Listeners[event].append(target)
 				return target
-			BOT.Listeners[event] = [target]
-			return target
+		BOT.Listeners[event] = [target]
+		return target
 	return decorator
 
 def parseInitGame(inp, varz={}):
