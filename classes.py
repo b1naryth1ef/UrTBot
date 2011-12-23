@@ -157,7 +157,7 @@ class API():
 	def newFindClient(self, name):
 		cli = self.getClients()
 		ret = []
-		for i in cli:
+		for i in cli.values():
 			if name in cli.name:
 				ret.append(name)
 		if len(ret) == 1: return ret[0]
