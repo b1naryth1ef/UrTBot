@@ -24,7 +24,7 @@ config_groups = None
 config_plugins = None
 config_serversocket = None
 
-def canInt(i): return i.isdigit() #@DEV Just a depricated function... Replace for beta
+def canInt(i): return str(i).isdigit() #@DEV Just a depricated function... Replace for beta
 
 def command(cmd, desc='None', level=0, alias=[]): #WOOT! DECORATERS ARE THE SHIZ
 	def decorator(target):

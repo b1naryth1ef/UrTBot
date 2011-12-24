@@ -36,6 +36,7 @@ def cmdTeams(obj, t):
 
 @listener('CLIENT_SWITCHTEAM')
 def eveLock(obj, t):
+	print 'EveLocker fired!'
 	cobj = A.getClient(obj.client)
 	if 'fairplay_locked' in cobj.__dict__.keys():
 		if cobj.fairplay_locked is True:

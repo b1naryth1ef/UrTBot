@@ -135,7 +135,7 @@ class API():
 			else:
 				print '[DEBUG|%s] %s' % (plugin, msg)
 				init.pluginDEBUGS.append((time.time(), plugin, msg))
-	def canInt(self, i): return canInt(i)
+	def canInt(self, i): return str(i).isdigit()
 	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
