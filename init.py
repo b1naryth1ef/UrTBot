@@ -83,7 +83,11 @@ def parseKill(inp):
 	vicobj = BOT.Clients[victim]
 	method = int(inp[2][:-1])
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
-	elif method in [7, 6, 10, 31, 32]: BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+	elif method in [7, 6, 10, 31, 32]: 
+		BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+		if method == 10:
+			BOT.eventFire('CLIENT_SWITCHTEAM', {'client':attacker, 'fromteam':atkobj.team, 'toteam':None})
+			atkobj.team = const.switchTeam(atkobj.team)
 	elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})

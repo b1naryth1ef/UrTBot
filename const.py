@@ -209,7 +209,9 @@ class UrTBotError(Exception): pass
 class ConfigError(Exception): pass
 class UrbanTerrorError(Exception): pass
 
-
+def switchTeam(team):
+	x = {1:2, 2:1}
+	return x[team]
 def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
 
