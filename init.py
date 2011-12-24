@@ -78,8 +78,8 @@ def parseKill(inp):
 	inp = inp.split(" ")
 	inp.pop(0)
 	attacker = int(inp[0])
-	if attacker == 1022: #We're world
-		atkobj = None #Find a better method?
+	if attacker == 1022: atkobj = None #We're world. Setting this None might break shit (but hopefully not)
+	else: atkobj = BOT.Clients[attacker] #We're a player
 	victim = int(inp[1])
 	vicobj = BOT.Clients[victim]
 	method = int(inp[2][:-1])
