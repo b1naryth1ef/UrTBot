@@ -104,7 +104,7 @@ class Bot():
 			for line in info:
 				 line = line.split()
 				 data[line[0]] = line[1]
-			self.Clients[uid] = player.Player(uid, data)
+			self.Clients[uid] = player.Player(uid, data, init.A)
 			if self.Clients[uid].cl_guid != None:
 				self.pdb.playerUpdate(self.Clients[uid])
 
