@@ -1,6 +1,7 @@
 import database
 import auth
 import time 
+from init import A
 
 class Player():
 	def __init__(self, uid, data):
@@ -44,6 +45,13 @@ class Player():
 		for i in data.keys(): #Strip line endings
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
+	
+	def updateData(self, data):
+		if 'team' in data.keys():
+			if data['team'] != self.team:
+				print 'Fired change team from updateData'
+				A.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
+		self.setData(data)
 
 class PlayerDatabase():
 	def __init__(self):
