@@ -1,15 +1,15 @@
 import database
 import auth
 import time 
-from init import A
 
 class Player():
-	def __init__(self, uid, data):
+	def __init__(self, uid, data, api):
 		self.uid = int(uid)
 		self.cid = None #<<< get from the db
 		self.data = data
 		self.group = 0
 		self.status = None
+		self.api = api
 		try:
 			self.name = None
 			self.ip = None
@@ -50,7 +50,7 @@ class Player():
 		if 'team' in data.keys():
 			if data['team'] != self.team:
 				print 'Fired change team from updateData'
-				A.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
+				self.api.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
 		self.setData(data)
 
 class PlayerDatabase():

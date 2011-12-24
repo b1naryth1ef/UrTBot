@@ -176,7 +176,7 @@ def parse(inp):
 			BOT.Clients[uid].updateData(varz)
 		else:
 			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
-			BOT.Clients[uid] = player.Player(uid, varz)
+			BOT.Clients[uid] = player.Player(uid, varz, A)
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
 
