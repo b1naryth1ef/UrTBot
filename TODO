@@ -34,7 +34,7 @@ DONE - Add name completion method to API (for !kick, etc.)
 	- ban, mute management, etc. I'd like this in a plugin and not in core. Thoughts? [Prolly in default yes? or seperate?]
 - Fairplay plugin:
 	- !teams could be smarter [Should probablly use stats]
-	DONE - !force team w/ 'lock'/'unlock' should be added
+	DONE - !force team w/ 'lock'/'unlock' should be added (Except that its not working...)
 - Make sure wrapper tells us what errors are what (For instantce, if there is no avalible RAM, it just prints out shits of lines, and then a vague trace)
 
 STUPID URT THINGS:

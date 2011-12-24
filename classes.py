@@ -160,7 +160,7 @@ class API():
 				ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
-		elif len(ret) >= 2: return False
+		elif len(ret) >= 2: return None
 	def findClients(self, name):
 		if name.isdigit() and len(name) <= 2:
 			client = self.getClients().get(int(name))

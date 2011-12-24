@@ -49,7 +49,7 @@ def cmdLock(obj, t):
 	if len(obj.msgsplit) != 2: return A.tell(obj.sender, "Usage: %s <client>" % obj.cmd) #Sneaky bastard that I am
 
 	play = A.findClient(obj.msgsplit[1])
-	if play: playobj = A.getClient(nameToCID(play))
+	if play: playobj = A.getClient(play)
 	else: return None
 
 	if 'fairplay_locked' not in playobj.__dict__.keys(): playobj.fairplay_locked = False
@@ -70,7 +70,7 @@ def cmdForce(obj, t):
 	sender = obj.data['sender'] #The sender id
 	team = msg[2] #Team to switch player to
 	play = A.findClient(msg[1]) #Player name/id to autocomplete
-	if play: playobj = A.getClient(nameToCID(play)) #Player obj
+	if play: playobj = A.getClient(play) #Player obj
 	else: return None
 
 	if A.canInt(team): team = const.teams[int(team)] #Is the team an integer representation of a team? if so use the team name
