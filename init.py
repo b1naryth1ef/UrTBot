@@ -85,7 +85,7 @@ def parseKill(inp):
 	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
 	elif method in [7, 6, 10, 31, 32]: 
 		BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
-		if method == 10:
+		if method == 10 and atkobj.team != 'spec':
 			BOT.eventFire('CLIENT_SWITCHTEAM', {'client':attacker, 'fromteam':atkobj.team, 'toteam':None})
 			atkobj.team = const.switchTeam(atkobj.team)
 	elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})

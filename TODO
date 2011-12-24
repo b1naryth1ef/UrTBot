@@ -36,6 +36,7 @@ DONE - Add name completion method to API (for !kick, etc.)
 	- !teams could be smarter [Should probablly use stats]
 	DONE - !force team w/ 'lock'/'unlock' should be added (Except that its not working...)
 - Make sure wrapper tells us what errors are what (For instantce, if there is no avalible RAM, it just prints out shits of lines, and then a vague trace)
+- Set teams/data on boot (team is left as none on boot)
 
 STUPID URT THINGS:
 - Figure out all the weapon hits/etc
