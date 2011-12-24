@@ -40,7 +40,7 @@ def eveLock(obj, t):
 	cobj = A.getClient(obj.client)
 	if 'fairplay_locked' in cobj.__dict__.keys():
 		if cobj.fairplay_locked is True:
-			A.rcon('forceteam %s %s' % (cobj.uid, obj.fromteam))
+			A.rcon('forceteam %s %s' % (cobj.uid, cobj.fairplay_lockedteam))
 
 @command('!lock', 'Lock a player to the team they are on. Usage: !lock <player>', 3)
 @command('!unlock', 'Unlock a locked player. Usage: !unlock <player>', 3)
@@ -55,11 +55,15 @@ def cmdLock(obj, t):
 
 	if obj.cmd == '!lock':
 		if playobj.fairplay_locked is True: return A.tell(obj.sender, "%s is already locked! Unlock with !unlock %s" % (playobj.name, playobj.uid))
-		else: playobj.fairplay_locked = True
+		else: 
+			playobj.fairplay_locked = True
+			playobj.fairplay_lockedteam = playobj.team
 		A.tell(obj.sender, 'Success! %s was locked to %s' % (playobj.name, playobj.team))
 
 	elif obj.cmd == '!unlock':
-		if playobj.fairplay_locked is True: playobj.fairplay_locked = False
+		if playobj.fairplay_locked is True: 
+			playobj.fairplay_locked = False
+			playobj.fairplay_lockedteam = None #Will this cause an error? Cuz i'm thinking yeah it will...
 		else: return A.tell(obj.sender, '%s is already unlocked!' % playobj.name)
 		A.tell(obj.sender, 'Success! %s was unlocked!' % (playobj.name))
 
@@ -83,6 +87,7 @@ def cmdForce(obj, t):
 	elif len(msg) == 4 and msg[3] == 'lock': #!force player team lock
 		A.rcon('forceteam %s %s' % (playobj.uid, team))
 		playobj.fairplay_locked = True
+		playobj.fairplay_lockedteam = team
 		A.tell(sender, '%s was forced and locked to %s. Type !unlock %s to unlock player.' % (playobj.name, team, playobj.name))
 	else:
 		A.tell(sender, "Usage: !force <client> <team> [lock]")
