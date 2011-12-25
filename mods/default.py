@@ -193,7 +193,7 @@ def cmdBan(obj, t):
 		if banr != None:
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
-			rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
 			db.commit()
 
 @command('!tempban', 'Temporarily ban a player. Usage: !tempban <player> <duration> [reason]', 3)
