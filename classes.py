@@ -161,10 +161,16 @@ class API():
 				print int(name), i.uid
 				if int(name) == i.uid:
 					ret.append(i)
+					break
 		else:
 			for i in self.getClients().values():
 				print name.lower(), i.name.lower()
-				if name.lower() in i.name.lower() or name.lower() == i.name.lower(): ret.append(i)
+				if name.lower() in i.name.lower(): 
+					ret.append(i)
+					break
+				if name.lower() == i.name.lower(): 
+					ret.append(i)
+					break
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
 		elif len(ret) >= 2: return None
