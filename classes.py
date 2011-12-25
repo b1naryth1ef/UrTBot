@@ -155,9 +155,11 @@ class API():
 		if len(x) == 1: return x[0]
 		else: return False
 	def findClient(self, name, ret=[]):
+		print 'Finding Client:'
 		for i in self.getClients().values():
-			if name in i.name.lower() or name == i.name.lower():
-				ret.append(i)
+			print name, i.name.lower()
+			if name.lower() in i.name.lower(): ret.append(i)
+			if name.lower() == i.name.lower(): ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
 		elif len(ret) >= 2: return None
