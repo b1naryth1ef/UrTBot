@@ -102,6 +102,7 @@ def cmdSlap(obj, t):
 			cli = A.findClient(msg[1])
 			if cli != None:
 				slap = cli.uid
+			else: return None
 		count = 1
 		if len(msg) == 3:
 			if canInt(msg[2]): count = int(msg[2])

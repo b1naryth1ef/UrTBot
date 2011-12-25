@@ -158,10 +158,12 @@ class API():
 		print 'Finding Client:'
 		if type(name) is int or name.isdigit():
 			for i in self.getClients().values():
+				print int(name), i.uid
 				if int(name) == i.uid:
 					ret.append(i)
 		else:
 			for i in self.getClients().values():
+				print name.lower(), i.name.lower()
 				if name.lower() in i.name.lower() or name.lower() == i.name.lower(): ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
