@@ -156,10 +156,13 @@ class API():
 		else: return False
 	def findClient(self, name, ret=[]):
 		print 'Finding Client:'
-		for i in self.getClients().values():
-			print name, i.name.lower()
-			if name.lower() in i.name.lower(): ret.append(i)
-			if name.lower() == i.name.lower(): ret.append(i)
+		if type(i) is int:
+			for i in self.getClients().values:
+				if i == i.uid:
+					ret.append(i)
+		else:
+			for i in self.getClients().values():
+				if name.lower() in i.name.lower() or name.lower() == i.name.lower(): ret.append(i)
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
 		elif len(ret) >= 2: return None
