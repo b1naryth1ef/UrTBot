@@ -267,6 +267,8 @@ def Start():
 	loadMods()
 	proc = GameOutput(config_serversocket)
 	x = os.uname()
+	db = database.DB()
+	db.defaultTableSet()
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
