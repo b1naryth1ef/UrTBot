@@ -157,7 +157,7 @@ class API():
 	def findClient(self, name, ret=[]):
 		print 'Finding Client:'
 		if type(name) is int or name.isdigit():
-			for i in self.getClients().values:
+			for i in self.getClients().values():
 				if int(name) == i.uid:
 					ret.append(i)
 		else:
