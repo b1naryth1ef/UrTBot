@@ -8,6 +8,7 @@ _version = 0.1
 
 TIMERZ = {}
 
+
 class Timer(object): #@CREDIT B1
 	def __init__(self):
 		self.startt = 0
@@ -75,7 +76,7 @@ def cmdList(obj, t):
 	for c in A.getClients().values():
 		A.tell(sender, "[%s] %s (%s)" % (c.uid, c.name, c.ip))
 
-@command('!kick', 'Kick a user. Usage: !kick <NAME/UID>', 3)
+@command('!kick', 'Kick a user. Usage: !kick <player>', 3)
 def cmdKick(obj, t):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
@@ -171,6 +172,36 @@ def cmdTime(obj, t):
 		TIMERZ[sender] = Timer()
 		TIMERZ[sender].start()
 		A.tell(sender, 'Timer Started!')
+
+@command('!ban', 'Ban a player. Usage: !ban <player> [reason]', 4)
+def cmdBan(obj, t):
+	#!ban Joey He's an idiot
+	db = database.DB()
+	db.tableSelect('clients')
+	msg = obj.data["msg"].split(" ", 2)
+	sender = obj.data['sender']
+	senderobj = A.findClient(sender)
+
+	if len(msg) == 2: #!ban joey
+		reason = 'No Reason Given'
+	elif len(msg) == 3: #!ban joey my special reason
+		reason = msg[2].strip()
+	else: A.tell(sender, 'Usage: !ban <player> [reason]')
+
+	if 1 < len(msg) < 4:
+		banr = A.findClient(msg[1])
+		if banr != None:
+			banrdb = db.rowFind(banr.cid)
+			db.tableSelect('penalties')
+			rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
+			db.commit()
+
+@command('!tempban', 'Temporarily ban a player. Usage: !tempban <player> <duration> [reason]', 3)
+def cmdTempBan(obj, t): pass
+
+@command('!unban', 'Unban a temp, or permabanned player. Usage: !unban <player>', 3)
+def cmdUnBan(obj, t): pass
+
 
 def cmdIDDQD(obj, t):
 	sender = obj.data['sender']

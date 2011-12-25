@@ -80,7 +80,7 @@ class DB(db_plugin.DBPlugin):
 		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
 		else:
 			self.tableCreate('penalties', {'id':'integer primary key', 'userid':'integer',
-			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer'})
+			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer', 'status':'integer'})
 		self.commit()
 
 if __name__ == '__main__':
