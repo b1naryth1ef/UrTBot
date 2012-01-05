@@ -14,6 +14,7 @@ lastsent = None
 keepLoop = True
 botDEBUGS = []
 pluginDEBUGS = []
+db = None
 
 #--GLOB--#
 config_prefix = None
@@ -258,7 +259,7 @@ def loop():
 			parse(line)
 
 def Start():
-	global BOT, proc, A, config_debugmode
+	global BOT, proc, A, config_debugmode, db
 	loadConfig()
 	auth.load()
 	BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, player.PlayerDatabase())
