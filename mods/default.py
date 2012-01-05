@@ -1,5 +1,5 @@
 import time, sys, const
-from init import canInt, A, command, listener, __Version__
+from init import canInt, A, command, listener, __Version__, db
 import database
 
 _name = "Default/Built-in Plugin"
@@ -33,7 +33,6 @@ class Timer(object): #@CREDIT B1
 @command('!test', 'Test Command', 0)
 def tester(obj, t):
 	print 'Test!'
-	db = database.DB()
 	db.tableSelect('penalties')
 	db.rowCreate({'userid':1, 'adminid':3, 'type':'Blah', 'time':time.time(), 'expiration':-1, 'status':1})
 	db.commit()
