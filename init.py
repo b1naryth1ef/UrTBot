@@ -198,6 +198,7 @@ def parse(inp):
 								enx = db.rowFind(en['id'], 'id')
 								print enx
 								enx['status'] = 0
+								enx['id'] = en['id']
 								db.rowUpdate(enx)
 								db.commit()
 
