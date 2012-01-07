@@ -194,9 +194,11 @@ def parse(inp):
 								BOT.Q.rcon('kick %s' % uid)
 							else:
 								print 'Setting tempban unactive'
-								en2 = db.rowFind(en['id'], 'id')
-								en2['status'] = 0
-								db.rowUpdate(en2)
+								print en['id']
+								enx = db.rowFind(en['id'], 'id')
+								print enx
+								enx['status'] = 0
+								db.rowUpdate(enx)
 								db.commit()
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
