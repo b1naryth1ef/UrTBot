@@ -155,7 +155,8 @@ class API():
 		x = self.findClients(name)
 		if len(x) == 1: return x[0]
 		else: return False
-	def findClient(self, name, ret=[]):
+	def findClient(self, name):
+		ret = []
 		print 'Finding Client (%s):' % name
 		if type(name) is int or name.isdigit():
 			for i in self.getClients().values():
@@ -165,6 +166,7 @@ class API():
 					ret.append(i)
 					break
 		else:
+			print self.getClients().values()
 			for i in self.getClients().values():
 				print name.lower(), i.name.lower()
 				if name.lower() in i.name.lower(): 
