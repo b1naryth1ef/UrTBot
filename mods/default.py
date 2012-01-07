@@ -230,7 +230,7 @@ def cmdTempBan(obj, t):
 		if banr != None:
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
-			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'ban', 'reason':reason, 'time':ctime, 'expiration':exptime, 'status':1})
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'tempban', 'reason':reason, 'time':ctime, 'expiration':exptime, 'status':1})
 			db.commit()
 			A.kick(banr.uid)
 			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, exptime))
