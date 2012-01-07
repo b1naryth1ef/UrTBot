@@ -34,6 +34,7 @@ class Timer(object): #@CREDIT B1
 def tester(obj, t):
 	print 'Test!'
 	db = A.db
+	print db.tableExists('penalties')
 	db.tableSelect('penalties')
 	db.rowCreate({'userid':1, 'adminid':3, 'type':'Blah', 'time':time.time(), 'expiration':-1, 'status':1})
 	db.commit()
