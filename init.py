@@ -187,8 +187,8 @@ def parse(inp):
 						print 'Disconnecting user because he/she has been banned'
 						BOT.Q.rcon('kick %s' % uid)
 					elif en['type'] == 'tempban':
-						print float(en['expiration'])-float(time.time())
-						if float(en['expiration'])-float(time.time()) > 0:
+						print float(time.time())-float(en['expiration'])
+						if float(time.time())-float(en['expiration']) > 0:
 							print 'Disconnecting user because he/she has been tempbanned'
 							BOT.Q.rcon('kick %s' % uid)
 
