@@ -1,4 +1,4 @@
-import re, time, calender
+import re, time
 
 teams = {
 1:'red',

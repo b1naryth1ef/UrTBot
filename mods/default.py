@@ -216,7 +216,7 @@ def cmdTempBan(obj, t):
 	sender = obj.data['sender']
 	senderobj = A.findClient(sender)
 	ctime = datetime.now()
-	etime = datetime(now.year, now.month, now.day, now.hour, now.minute, now.second) + timedelta(minutes=const.timeparse(msg[2]))
+	etime = datetime(ctime.year, ctime.month, ctime.day, ctime.hour, ctime.minute, ctime.second) + timedelta(minutes=const.timeparse(msg[2]))
 	exptime = etime.__str__()
 	
 	if len(msg) == 3: #!ban joey
