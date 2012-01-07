@@ -179,7 +179,7 @@ def parse(inp):
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
 				db.tableSelect('penalties', 'userid')
-				en = db.rowfind(BOT.Clients[uid].cid)
+				en = db.rowFind(BOT.Clients[uid].cid)
 				if en != None:
 					print 'Disconnecting user because he/she has been banned'
 					BOT.Q.rcon('kick %s' % BOT.Clients[uid].uid)
