@@ -217,7 +217,7 @@ def cmdTempBan(obj, t):
 	senderobj = A.findClient(sender)
 	ctime = datetime.now()
 	etime = datetime(ctime.year, ctime.month, ctime.day, ctime.hour, ctime.minute, ctime.second) + timedelta(minutes=const.timeparse(msg[2]))
-	exptime = etime.__str__()
+	exptime = time.mktime(etime.timetuple())
 	
 	if len(msg) == 3: #!ban joey
 		reason = 'No Reason Given'
