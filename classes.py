@@ -139,6 +139,7 @@ class API():
 	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
+	def kick(self, user, reason): pass
 	def rcon(self,cmd): return self.Q.rcon(cmd)
 	def getClients(self): return self.B.Clients
 	def getCommands(self): return self.B.Commands
@@ -155,22 +156,26 @@ class API():
 		if len(x) == 1: return x[0]
 		else: return False
 	def findClient(self, name, ret=[]):
-		print 'Finding Client:'
+		print 'Finding Client (%s):' % name
 		if type(name) is int or name.isdigit():
 			for i in self.getClients().values():
 				print int(name), i.uid
 				if int(name) == i.uid:
+					print 'Found!'
 					ret.append(i)
 					break
 		else:
 			for i in self.getClients().values():
 				print name.lower(), i.name.lower()
 				if name.lower() in i.name.lower(): 
+					print 'Found!'
 					ret.append(i)
 					break
 				if name.lower() == i.name.lower(): 
+					print 'Found!'
 					ret.append(i)
 					break
+		print '[[[[[%s]]]]]' % ret
 		if len(ret) == 1: return ret[0]
 		elif len(ret) == 0: return None
 		elif len(ret) >= 2: return None

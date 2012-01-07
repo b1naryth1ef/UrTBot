@@ -67,7 +67,7 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
 	for i in var:
 		varz[i[0]] = i[1]
-	print varz
+	#print varz
 	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
 	if 'n' in varz.keys(): vary['name'] = varz['n']
 	# probably should figure out what those other fields are?
@@ -136,7 +136,7 @@ def parseFlagReturn(inp):
 def parseCommand(inp, cmd):
 	uid = int(inp[0])
 	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-	print "shit", BOT.Clients[uid].group
+	print 'User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group)
 	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 		obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
 		thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
@@ -154,7 +154,6 @@ def parse(inp):
 		if inp[2].startswith('!'):
 			inp[2] = inp[2].lower()
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
-			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
 			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
@@ -268,8 +267,7 @@ def Start():
 	proc = GameOutput(config_serversocket)
 	x = os.uname()
 	db = database.DB()
-	db.defaultTableSet()
-	A.db = db
+	db.defaultTableSet() #Do we need to run this?
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
 	loop()
 
