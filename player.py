@@ -88,6 +88,7 @@ class PlayerDatabase():
 		entry = self.db.rowFind(player.cl_guid)
 		if entry != None:
 			player.group = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
+			player.cid = entry['id']
 			if join != False:
 				entry["joincount"] += 1
 				self.db.rowUpdate(entry)
