@@ -159,9 +159,9 @@ def cmdMap(obj, t):
 			A.rcon('vstr thismap')
 
 # Of course CLIENT_BEGIN has nothing to do with the client connect protocol. Frackin UrT.
-# @listener('CLIENT_BEGIN')
-# def welcomeEvent(obj, t):
-# 	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
+@listener('CLIENT_CONNECTED')
+def welcomeEvent(obj, t):
+	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
 @command('!timer', 'Start/stop the timer. Usage: !timer', 1)
 def cmdTime(obj, t):
@@ -197,14 +197,13 @@ def cmdBan(obj, t):
 
 	if 1 < len(msg) < 4:
 		banr = A.findClient(msg[1])
-		print 'TRU DAT 1'
 		if banr != None:
-			print 'TRU DAT 2'
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
 			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
 			db.commit()
 			A.tell(sender, 'Banned %s!' % banr.name)
+			A.kick(banr.cid)
 
 @command('!tempban', 'Temporarily ban a player. Usage: !tempban <player> <duration> [reason]', 3)
 def cmdTempBan(obj, t): pass

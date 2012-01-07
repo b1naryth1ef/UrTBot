@@ -171,18 +171,19 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
-		#print uid, varz
-		if uid in BOT.Clients.keys():
-			# if 'team' in varz:
-				# if BOT.Clients[uid].team != varz['team']:
-				# 	BOT.eventFire('CLIENT_SWITCHTEAM', {'client':uid, 'toteam':varz['team'], 'fromteam':BOT.Clients[uid].team})
-
-			BOT.Clients[uid].updateData(varz)
+		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 		else:
 			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz, A)
+
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
+				db.tableSelect('penalties', 'userid')
+				en = db.rowfind(BOT.Clients[uid].cid)
+				if en != None:
+					print 'Disconnecting user because he/she has been banned'
+					BOT.Q.rcon('kick %s' % BOT.Clients[uid].uid)
+
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
