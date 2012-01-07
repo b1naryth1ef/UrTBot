@@ -197,7 +197,9 @@ def cmdBan(obj, t):
 
 	if 1 < len(msg) < 4:
 		banr = A.findClient(msg[1])
+		print 'TRU DAT 1'
 		if banr != None:
+			print 'TRU DAT 2'
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
 			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
