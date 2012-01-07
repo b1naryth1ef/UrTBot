@@ -182,7 +182,7 @@ def parse(inp):
 				print BOT.Clients[uid].cid
 				en2 = db.rowFindAll(BOT.Clients[uid].cid)
 				print en2
-				for en in en2
+				for en in en2:
 					if en != None:
 						if en['type'] == 'ban' and en['status'] == 1:
 							print 'Disconnecting user because he/she has been banned'
