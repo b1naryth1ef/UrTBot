@@ -81,7 +81,7 @@ class DB(db_plugin.DBPlugin):
 		else:
 			print 'Adding penalties'
 			self.tableCreate('penalties', {'id':'integer primary key', 'userid':'integer',
-			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer', 'status':'integer'})
+			'adminid':'integer', 'type':'text', 'reason':'text', 'time':'text', 'expiration':'text', 'status':'integer'})
 		self.commit()
 
 if __name__ == '__main__':

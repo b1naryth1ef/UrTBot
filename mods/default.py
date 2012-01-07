@@ -1,6 +1,7 @@
 import time, sys, const
 from init import canInt, A, command, listener, __Version__
 import database
+from datetime import datetime, timedelta
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -188,6 +189,7 @@ def cmdBan(obj, t):
 	msg = obj.data["msg"].split(" ", 2)
 	sender = obj.data['sender']
 	senderobj = A.findClient(sender)
+	ctime = datetime.now()
 
 	if len(msg) == 2: #!ban joey
 		reason = 'No Reason Given'
@@ -200,14 +202,38 @@ def cmdBan(obj, t):
 		if banr != None:
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
-			print banr.__dict__
-			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'ban', 'reason':reason, 'time':ctime, 'expiration':-1, 'status':1})
 			db.commit()
-			A.tell(sender, 'Banned %s!' % banr.name)
 			A.kick(banr.uid)
+			A.tell(sender, 'Banned %s!' % banr.name)
 
 @command('!tempban', 'Temporarily ban a player. Usage: !tempban <player> <duration> [reason]', 3)
-def cmdTempBan(obj, t): pass
+def cmdTempBan(obj, t): 
+	#!tempban Joey length reason
+	db = database.DB()
+	db.tableSelect('clients')
+	msg = obj.data["msg"].split(" ", 3)
+	sender = obj.data['sender']
+	senderobj = A.findClient(sender)
+	ctime = datetime.now()
+	etime = datetime(now.year, now.month, now.day, now.hour, now.minute, now.second) + timedelta(minutes=const.timeparse(msg[2]))
+	exptime = etime.__str__()
+	
+	if len(msg) == 3: #!ban joey
+		reason = 'No Reason Given'
+	elif len(msg) == 4: #!ban joey my special reason
+		reason = msg[2].strip()
+	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
+
+	if 1 < len(msg) < 4:
+		banr = A.findClient(msg[1])
+		if banr != None:
+			banrdb = db.rowFind(banr.cid)
+			db.tableSelect('penalties')
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'ban', 'reason':reason, 'time':ctime, 'expiration':exptime, 'status':1})
+			db.commit()
+			A.kick(banr.uid)
+			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, exptime))
 
 @command('!unban', 'Unban a temp, or permabanned player. Usage: !unban <player>', 3)
 def cmdUnBan(obj, t): pass

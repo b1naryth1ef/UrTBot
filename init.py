@@ -183,9 +183,11 @@ def parse(inp):
 				en = db.rowFind(BOT.Clients[uid].cid)
 				print en
 				if en != None:
-					print 'Disconnecting user because he/she has been banned'
-					BOT.Q.rcon('kick %s' % BOT.Clients[uid].uid)
-
+					if en['type'] == 'ban':
+						print 'Disconnecting user because he/she has been banned'
+						BOT.Q.rcon('kick %s' % BOT.Clients[uid].uid)
+					elif en['type'] == 'tempban':
+						print 'Its a tempban!'
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
