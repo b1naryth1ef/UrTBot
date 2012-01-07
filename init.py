@@ -188,6 +188,8 @@ def parse(inp):
 						BOT.Q.rcon('kick %s' % BOT.Clients[uid].uid)
 					elif en['type'] == 'tempban':
 						print 'Its a tempban!'
+						print en['time']
+						print en['expiration']
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
