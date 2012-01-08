@@ -65,12 +65,15 @@ class Bot():
 		return r[0][0]
 		 
 	def getStatus(self):
+		varz = []
 		r = self.Q.rcon('status')
-		for line in r.split('\n')[3:]:
-			print re.findall('^(?P<slot>[0-9]+)\s+(?P<score>[0-9-]+)\s+(?P<ping>[0-9]+)\s+(?P<guid>[0-9a-zA-Z]+)\s+(?P<name>.*?)\s+(?P<last>[0-9]+)\s+(?P<ip>[0-9.]+):(?P<port>[0-9-]+)\s+(?P<qport>[0-9]+)\s+(?P<rate>[0-9]+)$', line.strip())
-			#print re.match(const.rconStatus, line.strip())
-		#r = re.findall(const.rconStatus, r)
-		
+		r = r.split('\n')[:4]
+		for i in r:
+			i = i.split(' ')
+			i = [o for o in i if o != '']
+			varz.append(i)
+		return varz
+
 	def getCurrentMap(self):
 		r = self.Q.rcon('mapname')
 		r = const.rconCurrentMap.search(r)
