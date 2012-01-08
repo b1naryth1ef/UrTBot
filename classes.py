@@ -56,6 +56,7 @@ class Bot():
 		self.Aliases = {} #aliases BIATCH
 
 		self.Clients = {} #AKA players
+		self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 		
 	def getClient(self, uid): return self.Clients[uid]
 	def getGameType(self):
@@ -63,7 +64,30 @@ class Bot():
 		r = re.findall(const.rconGameType, r)
 		self.gameData['g_gametype'] = r[0][0]
 		return r[0][0]
+
+	def dumpUser(self, uid):
+		vz = []
+		varz = {}
+		r = self.Q.rcon('dumpuser %s' % uid)
+		r = r.split('\n')
+		for i in r[3:]:
+			if i != '':
+				vz.append([j for j in i.split(' ') if j != ''])
+		for i in vz:
+			varz[i[0]] = i[1]
+		return varz
 		 
+	def getStatus(self):
+		varz = []
+		r = self.Q.rcon('status')
+		r = r.split('\n')[4:]
+		for i in r:
+			if i != '':
+				i = i.split(' ')
+				i = [o for o in i if o != '']
+				varz.append(i)
+		return varz
+
 	def getCurrentMap(self):
 		r = self.Q.rcon('mapname')
 		r = const.rconCurrentMap.search(r)
@@ -81,7 +105,7 @@ class Bot():
 		return obj
 
 	def Startup(self):
-		print 'CALLED STARTUP'
+		#print 'CALLED STARTUP'
 		from config import UrTConfig
 		self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
 		
@@ -92,21 +116,31 @@ class Bot():
 		self.maplist += pk3s
 		print self.maplist
 
-		# We only take active client ids from status, everything else from dumpuser
-		status = self.Q.rcon("status").splitlines(False)[4:-1]
-		if status == []: return #If no users are connected, we should just ignore them...
+		# # We only take active client ids from status, everything else from dumpuser
+		# status = self.Q.rcon("status").splitlines(False)[4:-1]
+		# if status == []: return #If no users are connected, we should just ignore them...
 
-		for uid in [info.split()[0] for info in status]:
-			uid = int(uid)
-			info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
-			if info == []: continue
-			data = {}
-			for line in info:
-				 line = line.split()
-				 data[line[0]] = line[1]
-			self.Clients[uid] = player.Player(uid, data, init.A)
+		status = self.getStatus()
+		if status == []: return
+
+		for i in status:
+			print i, i[0]
+			uid = int(i[0])
+			self.Clients[uid] = player.Player(uid, self.dumpUser(uid), init.A)
 			if self.Clients[uid].cl_guid != None:
-				self.pdb.playerUpdate(self.Clients[uid])
+		 		self.pdb.playerUpdate(self.Clients[uid])
+
+		# for uid in [info.split()[0] for info in status]:
+		# 	uid = int(uid)
+		# 	info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
+		# 	if info == []: continue
+		# 	data = {}
+		# 	for line in info:
+		# 		 line = line.split()
+		# 		 data[line[0]] = line[1]
+		# 	self.Clients[uid] = player.Player(uid, data, init.A)
+		# 	if self.Clients[uid].cl_guid != None:
+		# 		self.pdb.playerUpdate(self.Clients[uid])
 
 		self.getGameType()
 		self.getCurrentMap()
@@ -139,6 +173,7 @@ class API():
 	def tester(self): self.debug("TESTING! 1! 2! 3!")
 	def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
 	def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
+	def kick(self, uid): self.Q.rcon('kick %s' % uid)
 	def rcon(self,cmd): return self.Q.rcon(cmd)
 	def getClients(self): return self.B.Clients
 	def getCommands(self): return self.B.Commands
@@ -154,17 +189,18 @@ class API():
 		x = self.findClients(name)
 		if len(x) == 1: return x[0]
 		else: return False
-	def findClient(self, name, ret=[]):
-		print 'Finding Client:'
+	def findClient(self, name, multi=False):
+		ret = []
+		print 'Finding Client (%s):' % name
 		if type(name) is int or name.isdigit():
 			for i in self.getClients().values():
-				print int(name), i.uid
+				#print int(name), i.uid
 				if int(name) == i.uid:
 					ret.append(i)
 					break
 		else:
 			for i in self.getClients().values():
-				print name.lower(), i.name.lower()
+				#print name.lower(), i.name.lower()
 				if name.lower() in i.name.lower(): 
 					ret.append(i)
 					break
@@ -172,8 +208,8 @@ class API():
 					ret.append(i)
 					break
 		if len(ret) == 1: return ret[0]
-		elif len(ret) == 0: return None
-		elif len(ret) >= 2: return None
+		elif len(ret) > 1 and multi is True: return ret
+		else: return None
 	def findClients(self, name):
 		if name.isdigit() and len(name) <= 2:
 			client = self.getClients().get(int(name))

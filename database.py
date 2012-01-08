@@ -73,6 +73,9 @@ class DB(db_plugin.DBPlugin):
 			# Not sure why we'd do this, but hey... 
 			self.setField(self.table, {self.tablekey:row[self.tablekey]}, self.tablekey, row[self.tablekey])
 
+	def rowsGetAll(self):
+		return self.getAllRows(self.table)
+
 	def rowBlank(self):
 		return self.cols.copy()
 
@@ -80,8 +83,8 @@ class DB(db_plugin.DBPlugin):
 		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
 		else:
 			print 'Adding penalties'
-			self.tableCreate('penalties', {'id':'integer primary key', 'userid':'integer',
-			'adminid':'integer', 'type':'text', 'time':'integer', 'expiration':'integer', 'status':'integer'})
+			self.tableCreate('penalties', {'id':'integer primary key autoincrement', 'userid':'integer',
+			'adminid':'integer', 'type':'text', 'reason':'text', 'time':'text', 'expiration':'text', 'status':'integer'})
 		self.commit()
 
 if __name__ == '__main__':

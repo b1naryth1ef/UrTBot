@@ -5,7 +5,7 @@ import const, database, auth, select, thread, events
 from classes import GameOutput, Bot, API
 from events import *
 
-__Version__ = 0.4
+__Version__ = 0.5
 
 #--SETTRZ--#
 A = None
@@ -67,7 +67,7 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
 	for i in var:
 		varz[i[0]] = i[1]
-	print varz
+	#print varz
 	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
 	if 'n' in varz.keys(): vary['name'] = varz['n']
 	# probably should figure out what those other fields are?
@@ -136,13 +136,22 @@ def parseFlagReturn(inp):
 def parseCommand(inp, cmd):
 	uid = int(inp[0])
 	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-	print "shit", BOT.Clients[uid].group
+	print 'User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group)
 	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 		obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
 		thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
 	else:
 		msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
 		BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
+
+def parseUserKicked(inp):
+	time.sleep(5)
+	cur = BOT.curClients()
+	for i in BOT.Clients.keys():
+		print i, cur
+		if i not in cur:
+			print 'SENDING CLIENT_KICKED'
+			BOT.eventFire('CLIENT_KICKED', {'client':i})
 
 def parse(inp):
 	global BOT
@@ -154,7 +163,6 @@ def parse(inp):
 		if inp[2].startswith('!'):
 			inp[2] = inp[2].lower()
 			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
-			print BOT.Commands, inp[2].rstrip().split(' ')[0]
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
 			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
@@ -172,23 +180,40 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
-		#print uid, varz
-		if uid in BOT.Clients.keys():
-			# if 'team' in varz:
-				# if BOT.Clients[uid].team != varz['team']:
-				# 	BOT.eventFire('CLIENT_SWITCHTEAM', {'client':uid, 'toteam':varz['team'], 'fromteam':BOT.Clients[uid].team})
-
-			BOT.Clients[uid].updateData(varz)
+		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 		else:
-			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz, A)
+
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
+				db.tableSelect('penalties', 'userid')
+				print 'User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid)
+				en2 = db.rowFindAll(BOT.Clients[uid].cid)
+				if en2 != None:
+					for en in en2:
+						if en != None:
+							if en['type'] == 'ban' and en['status'] == 1:
+								print 'Disconnecting user because he/she has been banned'
+								return BOT.Q.rcon('kick %s' % uid)
+							elif en['type'] == 'tempban' and en['status'] == 1:
+								#print float(time.time())-float(en['expiration'])
+								if float(time.time())-float(en['expiration']) < 0:
+									print 'Disconnecting user because he/she has been tempbanned'
+									return BOT.Q.rcon('kick %s' % uid)
+								else:
+									print 'Setting tempban unactive'
+									db2 = database.DB()
+									db2.tableSelect('penalties')
+									enx = db2.rowFind(en['id'])
+									enx['status'] = 0
+									db2.rowUpdate(enx)
+									db2.commit()
+			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
 		uid, varz = parseUserInfoChange(inp, {}, {})
-		print uid, varz
+		#print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
@@ -219,7 +244,10 @@ def parse(inp):
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 	elif inp.startswith('InitRound:'): pass
-		
+	elif inp.startswith('clientkick') or inp.startswith('kick'):
+		print 'Seems like a user was kicked...'
+		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
+
 def loadConfig():
 	"""Loads the bot config"""
 	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
@@ -268,9 +296,9 @@ def Start():
 	proc = GameOutput(config_serversocket)
 	x = os.uname()
 	db = database.DB()
-	db.defaultTableSet()
-	A.db = db
-	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
+	if not db.tableExists('penalties'):
+		db.defaultTableSet()
+	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
 	loop()
 
 def Exit(): sys.exit()

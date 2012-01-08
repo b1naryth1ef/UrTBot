@@ -1,6 +1,7 @@
 import database
 import auth
 import time 
+from config import securityConfig
 
 class Player():
 	def __init__(self, uid, data, api):
@@ -62,7 +63,7 @@ class PlayerDatabase():
 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
 			'lastjoin':'integer'})
 			self.db.commit()
-		self.db.tableSelect("clients", "guid")
+		self.db.tableSelect("clients")
 
 	def playerCreate(self, player):
 		newplayer = self.db.rowBlank()
@@ -85,9 +86,23 @@ class PlayerDatabase():
 		# Ignore bots (what works best for this?)
 		if player.cl_guid == None or player.cl_guid == "": return
 		# If the player is in the db already, set player data from db
-		entry = self.db.rowFind(player.cl_guid)
+		#secConf = securityConfig['level']
+		# if secConf == 4:
+		# 	entrys = self.db.rowFindAll(player.nick, 'nick')
+		# 	if entrys != None:
+		# 		if len(entrys) == 1:
+		# 			entry = entrys[0]
+		# 		else:
+		# 			entry = None
+		# else:
+		# 	entry = self.db.rowFind(player.cl_guid)
+		ent = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
+		if ent[0] != None: entry = self.db.rowFind(ent[0]['id'], 'id')
+		else: entry = None
+
 		if entry != None:
-			player.group = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
+			player.group = ent[1]
+			player.cid = entry['id']
 			if join != False:
 				entry["joincount"] += 1
 				self.db.rowUpdate(entry)
@@ -97,7 +112,7 @@ class PlayerDatabase():
 			player.group = 0
 
 	def playerJoin(self, player):
-		entry = self.db.findRow(player.cl_guid)
+		entry = self.db.findRow(player.cl_guid, 'guid')
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
 # 'headmodel': 'sarge', 'team_model': 'james', 

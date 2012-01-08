@@ -1,4 +1,4 @@
-import re
+import re, time
 
 teams = {
 1:'red',
@@ -204,6 +204,33 @@ gearInfo = {
 	'A':None #None :D
 }
 
+def timeparse(timeStr): #CREDIT TO B3
+    if not timeStr:
+        return 0
+    elif type(timeStr) is int:
+        return timeStr
+
+    timeStr = str(timeStr)
+    if not timeStr:
+        return 0
+    elif timeStr[-1:] == 'h':
+        return minutes2int(timeStr[:-1]) * 60
+    elif timeStr[-1:] == 'm':
+        return minutes2int(timeStr[:-1])
+    elif timeStr[-1:] == 's':
+        return minutes2int(timeStr[:-1]) / 60
+    elif timeStr[-1:] == 'd':
+        return minutes2int(timeStr[:-1]) * 60 * 24
+    elif timeStr[-1:] == 'w':
+        return minutes2int(timeStr[:-1]) * 60 * 24 * 7
+    else:
+        return minutes2int(timeStr)
+
+def minutes2int(mins): #CREDIT TO B3
+    if re.match('^[0-9.]+$', mins):
+        return round(float(mins), 2)
+    else:
+        return 0
 
 class UrTBotError(Exception): pass
 class ConfigError(Exception): pass
@@ -216,7 +243,8 @@ def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
 
 rconGameType = '.*?(\\d+).*?\\d+.*?(\\d+)'
-rconCurrentMap = re.compile('.*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?((?:[a-z][a-z0-9_]*))', re.IGNORECASE|re.DOTALL)
+rconCurrentMap = re.compile(r'.*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?((?:[a-z][a-z0-9_]*))', re.IGNORECASE|re.DOTALL)
+rconStatus = re.compile(r'^(?P<slot>[0-9]+)\s+(?P<score>[0-9-]+)\s+(?P<ping>[0-9]+)\s+(?P<guid>[0-9a-zA-Z]+)\s+(?P<name>.*?)\s+(?P<last>[0-9]+)\s+(?P<ip>[0-9.]+):(?P<port>[0-9-]+)\s+(?P<qport>[0-9]+)\s+(?P<rate>[0-9]+)$', re.I)
 
 """
 Some content in this file has been found in the B3 source. 

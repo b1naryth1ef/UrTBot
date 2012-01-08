@@ -1,6 +1,7 @@
 import time, sys, const
 from init import canInt, A, command, listener, __Version__
 import database
+from datetime import datetime, timedelta
 
 _name = "Default/Built-in Plugin"
 _author = "B1naryth1ef"
@@ -32,13 +33,8 @@ class Timer(object): #@CREDIT B1
 
 @command('!test', 'Test Command', 0)
 def tester(obj, t):
-	print 'Test!'
-	db = database.DB()
-	print '[[[[[',tableExists('penalties'),']]]]]'
-	db.tableSelect('penalties')
-	db.rowCreate({'userid':1, 'adminid':3, 'type':'Blah', 'time':time.time(), 'expiration':-1, 'status':1})
-	db.commit()
-	db.rowFind(0)
+	print A.B.getStatus()
+	print A.B.dumpUser(0)
 
 @command('!help', 'List all commands, or info on a specific command. Usage: !help <cmd>', 0)
 def cmdHelp(obj, t): #@CREDIT Neek
@@ -94,6 +90,14 @@ def cmdKick(obj, t):
 			if cli != None:
 				kick = cli.uid
 		A.rcon('clientkick %d' % kick)
+
+@command('!kickall', 'Kick everyone but yourself. Usage: !kickall', 4)
+def cmdKickAll(obj, t):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	for i in A.B.Clients.values():
+		if i.uid != int(sender):
+			A.kick(i.uid)
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
 def cmdSlap(obj, t):
@@ -158,9 +162,10 @@ def cmdMap(obj, t):
 			A.rcon('vstr thismap')
 
 # Of course CLIENT_BEGIN has nothing to do with the client connect protocol. Frackin UrT.
-# @listener('CLIENT_BEGIN')
-# def welcomeEvent(obj, t):
-# 	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
+@listener('CLIENT_CONNECTED')
+def welcomeEvent(obj, t):
+	time.sleep(8)
+	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
 @command('!timer', 'Start/stop the timer. Usage: !timer', 1)
 def cmdTime(obj, t):
@@ -187,6 +192,7 @@ def cmdBan(obj, t):
 	msg = obj.data["msg"].split(" ", 2)
 	sender = obj.data['sender']
 	senderobj = A.findClient(sender)
+	ctime = datetime.now()
 
 	if len(msg) == 2: #!ban joey
 		reason = 'No Reason Given'
@@ -199,16 +205,91 @@ def cmdBan(obj, t):
 		if banr != None:
 			banrdb = db.rowFind(banr.cid)
 			db.tableSelect('penalties')
-			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':reason, 'time':time.time(), 'expiration':-1, 'status':1})
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'ban', 'reason':reason, 'time':ctime, 'expiration':-1, 'status':1})
 			db.commit()
+			A.kick(banr.uid)
 			A.tell(sender, 'Banned %s!' % banr.name)
+		else:
+			A.tell(sender, 'No users matching %s' % msg[1])
 
 @command('!tempban', 'Temporarily ban a player. Usage: !tempban <player> <duration> [reason]', 3)
-def cmdTempBan(obj, t): pass
+def cmdTempBan(obj, t): 
+	#!tempban Joey length reason
+	db = database.DB()
+	db.tableSelect('clients')
+	msg = obj.data["msg"].split(" ", 3)
+	sender = obj.data['sender']
+	senderobj = A.findClient(sender)
+
+	if len(msg) == 3: #!ban joey
+		reason = 'No Reason Given'
+	elif len(msg) == 4: #!ban joey my special reason
+		reason = msg[2].strip()
+	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
+
+	if 1 < len(msg) < 5:
+		ctime = datetime.now()
+		etime = datetime(ctime.year, ctime.month, ctime.day, ctime.hour, ctime.minute, ctime.second) + timedelta(minutes=const.timeparse(msg[2]))
+		exptime = time.mktime(etime.timetuple())
+		banr = A.findClient(msg[1])
+		if banr != None:
+			banrdb = db.rowFind(banr.cid)
+			db.tableSelect('penalties')
+			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'tempban', 'reason':reason, 'time':ctime, 'expiration':exptime, 'status':1})
+			db.commit()
+			A.tell(banr.uid, 'Temp Banned tell %s' % etime.__str__())
+			A.kick(banr.uid)
+			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, etime.__str__()))
+	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
 
 @command('!unban', 'Unban a temp, or permabanned player. Usage: !unban <player>', 3)
-def cmdUnBan(obj, t): pass
+def cmdUnBan(obj, t):
+	#!unban blah
+	db = database.DB()
+	db.tableSelect('clients')
+	sender = obj.data['sender']
+	senderobj = A.findClient(sender)
+	msg = obj.data["msg"].split(" ", 1)
+	rid = None
 
+	if len(msg) == 2:
+		if msg[0].isdigit():
+			rid = int(msg[0])
+		else:
+			entr = db.rowFindAll(msg[1], 'nick')
+			print db.rowsGetAll()
+			if entr == None:
+				A.tell(sender, 'Couldnt find a ban for user with nickname %s' % msg[1])
+			elif len(entr) > 1:
+				A.tell(sender, 'Multiple users found... listing...')
+				if len(entr) <= 15:
+					for i in entr:
+						objz = A.findClient(i)
+						A.tell(sender, '[%s] %s' % (objz.cid, objz.name))
+				else:
+					A.tell(sender, 'Too many (<15) users to list...')
+			elif len(entr) == 1:
+				rid = entr['id']
+		
+		if rid != None:
+			objz = A.findClient(rid)
+			db.tableSelect('penalties')
+			entr = db.rowFindAll(rid, 'userid')
+			if entr is None:
+				return A.tell(sender, 'No bans found for userid %s' % rid)
+			elif len(entr) == 1:
+				entr[0]['status'] = 0
+				db.rowUpdate(entr[0])
+			elif len(entr) > 1:
+				for i in entr:
+					if i['type'] in ('ban', 'tempban'):
+						r = db.rowFind(i['id'])
+						r['status'] = 0
+						db.rowUpdate(r)
+			db.commit()
+			A.tell(sender, 'Unbanned %s' % objz.name)
+	else:
+		return A.tell(sender, 'Usage: !unban <player>')
 
 def cmdIDDQD(obj, t):
 	sender = obj.data['sender']
