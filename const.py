@@ -243,7 +243,8 @@ def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
 
 rconGameType = '.*?(\\d+).*?\\d+.*?(\\d+)'
-rconCurrentMap = re.compile('.*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?((?:[a-z][a-z0-9_]*))', re.IGNORECASE|re.DOTALL)
+rconCurrentMap = re.compile(r'.*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?(?:[a-z][a-z0-9_]*).*?((?:[a-z][a-z0-9_]*))', re.IGNORECASE|re.DOTALL)
+rconStatus = re.compile(r'^(?P<slot>[0-9]+)\s+(?P<score>[0-9-]+)\s+(?P<ping>[0-9]+)\s+(?P<guid>[0-9a-zA-Z]+)\s+(?P<name>.*?)\s+(?P<last>[0-9]+)\s+(?P<ip>[0-9.]+):(?P<port>[0-9-]+)\s+(?P<qport>[0-9]+)\s+(?P<rate>[0-9]+)$', re.I)
 
 """
 Some content in this file has been found in the B3 source. 

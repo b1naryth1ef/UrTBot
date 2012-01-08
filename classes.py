@@ -64,6 +64,11 @@ class Bot():
 		self.gameData['g_gametype'] = r[0][0]
 		return r[0][0]
 		 
+	def getStatus(self):
+		r = self.Q.rcon('status')
+		r = re.findall(const.rconStatus, r)
+		return r
+		
 	def getCurrentMap(self):
 		r = self.Q.rcon('mapname')
 		r = const.rconCurrentMap.search(r)
