@@ -41,7 +41,7 @@ def level2(db, guid, ip, nick):
 	if ipList != None:
 		for cl in ipList:
 			if cl['guid'] == guid: return (cl, cl['cgroup'])
-	if nicklist != None:
+	if nickList != None:
 		for cl in nickList:
 			if cl['guid'] == guid: return (cl, cl['cgroup'])
 	return (None, 0)
