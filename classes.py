@@ -67,7 +67,7 @@ class Bot():
 	def getStatus(self):
 		varz = []
 		r = self.Q.rcon('status')
-		r = r.split('\n')[:4]
+		r = r.split('\n')[4:]
 		for i in r:
 			i = i.split(' ')
 			i = [o for o in i if o != '']
