@@ -46,11 +46,16 @@ def listener(event): #WOOT! DECORATERS ARE THE SHIZ
 	return decorator
 
 def parseInitGame(inp, varz={}):
-	options = re.findall(r'\\([^\\]+)\\([^\\]+)', data)
+	options = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
 	for o in options:
 		varz[o[0]] = o[1]
 	return varz
       
+def parseTimeLimitHit(inp):
+	BOT.eventFire('GAME_MATCH_END')
+	BOT.updatePlayers()
+	BOT.newRound()
+
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
 	uid = int(inp2[1])
@@ -249,6 +254,8 @@ def parse(inp):
 	elif inp.startswith('clientkick') or inp.startswith('kick'):
 		print 'Seems like a user was kicked...'
 		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
+	elif inp.startswith('Exit: Timelimit hit.'):
+		parseTimeLimitHit(inp)
 
 def loadConfig():
 	"""Loads the bot config"""

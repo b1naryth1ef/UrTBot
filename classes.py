@@ -61,6 +61,8 @@ class Bot():
 		self.Clients = {} #AKA players
 		self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 		
+	def newRound(self): pass
+	
 	def getClient(self, uid): return self.Clients[uid]
 	def getGameType(self):
 		r = self.Q.rcon('g_gametype')

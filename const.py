@@ -190,7 +190,7 @@ gearInfo = {
 
 	#Grenades
 	'O':{'id':UT_MOD_HEGRENADE['id'], 'name':'HE Grenade', 'damage': damage[UT_MOD_HEGRENADE['id']]},
-	'Q':None, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
+	'Q':{'name':'Smoke Grenade'}, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
 
 	#Items
 	'R':{'name':'Kevlar Vest'}, #Kevlar vest
