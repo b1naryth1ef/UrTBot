@@ -237,7 +237,7 @@ class ConfigError(Exception): pass
 class UrbanTerrorError(Exception): pass
 
 def switchTeam(team):
-	x = {'blue':'red', 'red':'blue'}
+	x = {'blue':'red', 'red':'blue', None:'spec'}
 	return x[team]
 def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
