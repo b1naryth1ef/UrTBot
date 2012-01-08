@@ -242,9 +242,11 @@ def parse(inp):
 		for i in BOT.Clients.keys():
 			print i, cur
 			if i not in cur:
+				print 'SENDING CLIENT_KICKED'
 				BOT.eventFire('CLIENT_KICKED', {'client':i})
-		cur = BOT.curClients()
-		
+		print BOT.curClients()
+		time.sleep(3)
+		print BOT.curClients()
 def loadConfig():
 	"""Loads the bot config"""
 	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
