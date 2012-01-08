@@ -70,7 +70,8 @@ class Bot():
 		r = self.Q.rcon('dumpuser %s' % uid)
 		r = r.split('\n')
 		for i in r[3:]:
-			vz.append([j for j in i.split(' ') if j != ''])
+			if i != '':
+				vz.append([j for j in i.split(' ') if j != ''])
 		for i in vz:
 			varz[i[0]] = i[1]
 		return varz
