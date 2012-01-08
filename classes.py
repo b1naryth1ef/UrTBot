@@ -139,10 +139,6 @@ class Bot():
 		self.maplist += pk3s
 		print self.maplist
 
-		# # We only take active client ids from status, everything else from dumpuser
-		# status = self.Q.rcon("status").splitlines(False)[4:-1]
-		# if status == []: return #If no users are connected, we should just ignore them...
-
 		status = self.getStatus()
 		if status == []: return
 
@@ -153,20 +149,9 @@ class Bot():
 			if self.Clients[uid].cl_guid != None:
 		 		self.pdb.playerUpdate(self.Clients[uid])
 
-		# for uid in [info.split()[0] for info in status]:
-		# 	uid = int(uid)
-		# 	info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
-		# 	if info == []: continue
-		# 	data = {}
-		# 	for line in info:
-		# 		 line = line.split()
-		# 		 data[line[0]] = line[1]
-		# 	self.Clients[uid] = player.Player(uid, data, init.A)
-		# 	if self.Clients[uid].cl_guid != None:
-		# 		self.pdb.playerUpdate(self.Clients[uid])
-
-		self.getGameType()
-		self.getCurrentMap()
+		self.updatePlayers() #Set team/score for players
+		self.getGameType() #Set g_gametype in self.gamedata
+		self.getCurrentMap() #set mapname in self.gamedata
 
 		self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
 		print 'STARTUP DONE'
