@@ -62,6 +62,9 @@ class Bot():
 		self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 		
 	def newRound(self): pass
+	def newMatch(self):
+		print 'Match Over...'
+		print 'RED: %s BLUE: %s' % (self.redScore, self.blueScore)
 	
 	def getClient(self, uid): return self.Clients[uid]
 	def getGameType(self):

@@ -54,7 +54,7 @@ def parseInitGame(inp, varz={}):
 def parseTimeLimitHit(inp):
 	BOT.eventFire('GAME_MATCH_END')
 	BOT.updatePlayers()
-	BOT.newRound()
+	BOT.newMatch()
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)
@@ -226,17 +226,15 @@ def parse(inp):
 		inp = int(inp.split(" ")[1])
 		BOT.eventFire('CLIENT_DISCONNECT', {'client':inp})
 		if inp in BOT.Clients.keys(): del BOT.Clients[inp]
-	elif inp.startswith('Kill:'): 
-		parseKill(inp)
-	elif inp.startswith('Hit:'): 
-		parseHit(inp)
-	elif inp.startswith('Item'):
-		parseItem(inp)
+	elif inp.startswith('Kill:'): parseKill(inp)
+	elif inp.startswith('Hit:'): parseHit(inp)
+	elif inp.startswith('Item'): parseItem(inp)
 	elif inp.startswith('Flag:'): parseFlag(inp)
 	elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
 	elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
 	elif inp.startswith('ShutdownGame:'):
 		BOT.eventFire('GAME_SHUTDOWN', {})
+		BOT.newMatch()
 		# We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
 		# when the mapcycle changes maps? hrmph. investigate.
 		# In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
@@ -246,16 +244,17 @@ def parse(inp):
 		for key in BOT.Clients.keys():
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
-	elif inp.startswith('InitGame:'):
-		BOT.gameData.update(parseInitGame(inp))
+	elif inp.startswith('InitGame:'): BOT.gameData.update(parseInitGame(inp))
+	elif inp.startswith('InitRound:'): pass
 	elif inp.startswith('SurvivorWinner:'): 
-		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
+		BOT.newRound()
+		if int(BOT.gameData['g_gametype']) in [4, 8]: BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
+		else: print 'Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?'
 	elif inp.startswith('InitRound:'): pass
 	elif inp.startswith('clientkick') or inp.startswith('kick'):
 		print 'Seems like a user was kicked...'
 		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
-	elif inp.startswith('Exit: Timelimit hit.'):
-		parseTimeLimitHit(inp)
+	elif inp.startswith('Exit: Timelimit hit.'): parseTimeLimitHit(inp)
 
 def loadConfig():
 	"""Loads the bot config"""

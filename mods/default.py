@@ -298,7 +298,7 @@ def cmdLoadout(obj, t):
 	if len(msg) == 2:
 		usr = A.findClient(msg[1])
 		if usr != None:
-			A.B.Clients[usr.uid].updateData(A.B.dumpUser(usr.uid))
+			#A.B.Clients[usr.uid].updateData(A.B.dumpUser(usr.uid)) This should refresh automatically w/ ClientUserInfo[Change]
 			A.tell(obj.sender, 'Loadout for %s:' % A.B.Clients[usr.uid].name)
 			for i in A.B.Clients[usr.uid].gear:
 				if const.gearInfo[i] != None:
