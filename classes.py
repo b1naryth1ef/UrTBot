@@ -63,15 +63,27 @@ class Bot():
 		r = re.findall(const.rconGameType, r)
 		self.gameData['g_gametype'] = r[0][0]
 		return r[0][0]
+
+	def dumpUser(self, uid):
+		vz = []
+		varz = {}
+		r = self.Q.rcon('dumpuser %s' % uid)
+		r = r.split('\n')
+		for i in y[3:]:
+			vz.append([j for j in i.split(' ') if j != ''])
+		for i in vz:
+			varz[i[0]] = i[1]
+		return varz
 		 
 	def getStatus(self):
 		varz = []
 		r = self.Q.rcon('status')
 		r = r.split('\n')[4:]
 		for i in r:
-			i = i.split(' ')
-			i = [o for o in i if o != '']
-			varz.append(i)
+			if i != '':
+				i = i.split(' ')
+				i = [o for o in i if o != '']
+				varz.append(i)
 		return varz
 
 	def getCurrentMap(self):
