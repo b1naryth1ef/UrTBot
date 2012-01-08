@@ -22,12 +22,15 @@ def level1(db, guid, ip, nick):
 	ipList = db.rowFindAll(ip, 'ip')
 	nickList = db.rowFindAll(nick, 'nick')
 
-	for cl in guidList:
-		if cl['ip'] == ip and cl['nick'] == nick: return (cl, cl['cgroup'])
-	for cl in ipList:
-		if cl['guid'] == guid and cl['nick'] == nick: return (cl, cl['cgroup'])
-	for cl in nickList:
-		if cl['ip'] == ip and cl['guid'] == guid: return (cl, cl['cgroup'])
+	if guidList != None:
+		for cl in guidList:
+			if cl['ip'] == ip and cl['nick'] == nick: return (cl, cl['cgroup'])
+	if ipList != None:
+		for cl in ipList:
+			if cl['guid'] == guid and cl['nick'] == nick: return (cl, cl['cgroup'])
+	if nickList != None:
+		for cl in nickList:
+			if cl['ip'] == ip and cl['guid'] == guid: return (cl, cl['cgroup'])
 	return (None, 0)
 
 def level2(db, guid, ip, nick):
@@ -35,10 +38,12 @@ def level2(db, guid, ip, nick):
 	ipList = db.rowFindAll(ip, 'ip')
 	nickList = db.rowFindAll(nick, 'nick')
 
-	for cl in ipList:
-		if cl['guid'] == guid: return (cl, cl['cgroup'])
-	for cl in nickList:
-		if cl['guid'] == guid: return (cl, cl['cgroup'])
+	if ipList != None:
+		for cl in ipList:
+			if cl['guid'] == guid: return (cl, cl['cgroup'])
+	if nicklist != None:
+		for cl in nickList:
+			if cl['guid'] == guid: return (cl, cl['cgroup'])
 	return (None, 0)
 
 def level3(db, guid, ip, nick): 
