@@ -181,25 +181,25 @@ def parse(inp):
 				db.tableSelect('penalties', 'userid')
 				print BOT.Clients[uid].cid
 				en2 = db.rowFindAll(BOT.Clients[uid].cid)
-				print en2
-				for en in en2:
-					if en != None:
-						if en['type'] == 'ban' and en['status'] == 1:
-							print 'Disconnecting user because he/she has been banned'
-							BOT.Q.rcon('kick %s' % uid)
-						elif en['type'] == 'tempban' and en['status'] == 1:
-							print float(time.time())-float(en['expiration'])
-							if float(time.time())-float(en['expiration']) < 0:
-								print 'Disconnecting user because he/she has been tempbanned'
+				if en2 != None:
+					for en in en2:
+						if en != None:
+							if en['type'] == 'ban' and en['status'] == 1:
+								print 'Disconnecting user because he/she has been banned'
 								BOT.Q.rcon('kick %s' % uid)
-							else:
-								print 'Setting tempban unactive'
-								db2 = database.DB()
-								db2.tableSelect('penalties')
-								enx = db2.rowFind(en['id'])
-								enx['status'] = 0
-								db2.rowUpdate(enx)
-								db2.commit()
+							elif en['type'] == 'tempban' and en['status'] == 1:
+								print float(time.time())-float(en['expiration'])
+								if float(time.time())-float(en['expiration']) < 0:
+									print 'Disconnecting user because he/she has been tempbanned'
+									BOT.Q.rcon('kick %s' % uid)
+								else:
+									print 'Setting tempban unactive'
+									db2 = database.DB()
+									db2.tableSelect('penalties')
+									enx = db2.rowFind(en['id'])
+									enx['status'] = 0
+									db2.rowUpdate(enx)
+									db2.commit()
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
