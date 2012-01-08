@@ -179,7 +179,7 @@ def parse(inp):
 			if BOT.Clients[uid].cl_guid != None:
 				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
 				db.tableSelect('penalties', 'userid')
-				print BOT.Clients[uid].cid
+				print 'User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid)
 				en2 = db.rowFindAll(BOT.Clients[uid].cid)
 				if en2 != None:
 					for en in en2:
@@ -188,7 +188,7 @@ def parse(inp):
 								print 'Disconnecting user because he/she has been banned'
 								BOT.Q.rcon('kick %s' % uid)
 							elif en['type'] == 'tempban' and en['status'] == 1:
-								print float(time.time())-float(en['expiration'])
+								#print float(time.time())-float(en['expiration'])
 								if float(time.time())-float(en['expiration']) < 0:
 									print 'Disconnecting user because he/she has been tempbanned'
 									BOT.Q.rcon('kick %s' % uid)

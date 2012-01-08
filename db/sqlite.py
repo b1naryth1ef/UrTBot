@@ -92,6 +92,9 @@ class DBPlugin(DBBase):
 		query += ")"
 		return self.c.execute(query)
 
+	def getAllRows(self, table):
+		query = '''select * from %s''' % table
+		return self.c.execute(query).fetchall()
 
 	def delTable(self, table):
 		return self.c.execute("drop table " + table)

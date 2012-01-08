@@ -73,6 +73,9 @@ class DB(db_plugin.DBPlugin):
 			# Not sure why we'd do this, but hey... 
 			self.setField(self.table, {self.tablekey:row[self.tablekey]}, self.tablekey, row[self.tablekey])
 
+	def rowsGetAll(self):
+		return self.getAllRows(self.table)
+
 	def rowBlank(self):
 		return self.cols.copy()
 

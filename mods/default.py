@@ -225,7 +225,7 @@ def cmdTempBan(obj, t):
 		reason = msg[2].strip()
 	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
 
-	if 1 < len(msg) < 4:
+	if 1 < len(msg) < 5:
 		banr = A.findClient(msg[1])
 		if banr != None:
 			banrdb = db.rowFind(banr.cid)
@@ -235,10 +235,16 @@ def cmdTempBan(obj, t):
 			A.tell(banr.uid, 'Temp Banned tell %s' % etime.__str__())
 			A.kick(banr.uid)
 			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, etime.__str__()))
+	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
 
 @command('!unban', 'Unban a temp, or permabanned player. Usage: !unban <player>', 3)
-def cmdUnBan(obj, t): pass
-
+def cmdUnBan(obj, t):
+	#!unban blah
+	db = database.DB()
+	db.tableSelect('clients')
+	msg = obj.data["msg"].split(" ", 1)
+	print db.rowsGetAll()
+	print db.rowFindAll(msg[1], 'name')
 
 def cmdIDDQD(obj, t):
 	sender = obj.data['sender']
