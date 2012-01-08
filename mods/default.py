@@ -302,7 +302,8 @@ def cmdLoadout(obj, t):
 			A.tell(obj.sender, 'Loadout for %s:' % A.B.Clients[usr.uid].name)
 			for i in A.B.Clients[usr.uid].gear:
 				if const.gearInfo[i] != None:
-					A.tell(obj.sender, '%s' % const.gearInfo[i]['name'])
+					m.append(const.gearInfo[i]['name'])
+			A.tell(obj.sender, '%s' % ', '.join(m))
 		else:
 			A.tell(obj.sender, 'Unknown user %s' % msg[1])
 	else:
