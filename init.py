@@ -235,6 +235,13 @@ def parse(inp):
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 	elif inp.startswith('InitRound:'): pass
+	elif inp.startswith('kick'):
+		print 'User was kicked... sending client_kick out'
+		cur = BOT.curClients()
+		for i in BOT.Clients.keys():
+			print i, cur
+			if i not in cur:
+				BOT.eventFire('CLIENT_KICKED', {'client':i})
 		
 def loadConfig():
 	"""Loads the bot config"""

@@ -96,7 +96,7 @@ def cmdKickAll(obj, t):
 	msg = obj.data["msg"].split(" ")
 	sender = obj.data["sender"]
 	for i in A.B.Clients.values():
-		if i.uid != sender:
+		if i.uid != int(sender):
 			A.kick(i.uid)
 
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)

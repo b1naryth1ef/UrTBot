@@ -56,6 +56,7 @@ class Bot():
 		self.Aliases = {} #aliases BIATCH
 
 		self.Clients = {} #AKA players
+		self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 		
 	def getClient(self, uid): return self.Clients[uid]
 	def getGameType(self):
