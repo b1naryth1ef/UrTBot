@@ -242,9 +242,56 @@ def cmdUnBan(obj, t):
 	#!unban blah
 	db = database.DB()
 	db.tableSelect('clients')
+	sender = obj.data['sender']
+	senderobj = A.findClient(sender)
 	msg = obj.data["msg"].split(" ", 1)
-	print db.rowsGetAll()
-	print db.rowFindAll(msg[1], 'name')
+	rid = None
+
+	if len(msg) == 2:
+		if msg[0].isdigit():
+			rid = int(msg[0])
+		else:
+			entr = db.rowFindAll(msg[1], 'nick')
+			if entr == None:
+				A.tell(sender, 'Couldnt find a ban for user with nickname %s' % msg[1])
+			elif len(entr) > 1:
+				A.tell(sender, 'Multiple users found... listing...')
+				if len(entr) <= 15:
+					for i in entr:
+						objz = A.findClient(i)
+						A.tell(sender, '[%s] %s' % (objz.cid, objz.name))
+				else:
+					A.tell(sender, 'Too many (<15) users to list...')
+			elif len(entr) == 1:
+				rid = entr['id']
+		
+		if rid != None:
+			objz = A.findClient(rid)
+			db.tableSelect('penalties')
+			entr = db.rowFindAll(rid, 'userid')
+			if entr is None:
+				return A.tell(sender, 'No bans found for userid %s' % rid)
+			elif len(entr) == 1:
+				entr[0]['status'] = 0
+				db.rowUpdate(entr[0])
+			elif len(entr) > 1:
+				for i in entr:
+					if i['type'] in ('ban', 'tempban'):
+						r = db.rowFind(i['id'])
+						r['status'] = 0
+						db.rowUpdate(r)
+			db.commit()
+			A.tell(sender, 'Unbanned %s' % objz.name)
+					
+						
+
+			
+	else:
+		return A.tell(sender, 'Usage: !unban <player>')
+
+		
+			
+
 
 def cmdIDDQD(obj, t):
 	sender = obj.data['sender']
