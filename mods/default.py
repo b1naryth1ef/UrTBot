@@ -296,8 +296,8 @@ def cmdIDDQD(obj, t):
 	client = A.getClient(sender)
 
 	db = database.DB()
-	db.tableSelect("clients", "guid")
-	entry = db.rowFind(client.cl_guid)
+	db.tableSelect("clients")
+	entry = db.rowFind(client.cl_guid, 'guid')
 	entry["cgroup"] = 5
 	db.rowUpdate(entry)
 	db.commit()
