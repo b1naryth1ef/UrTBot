@@ -66,6 +66,7 @@ class Bot():
 		 
 	def getStatus(self):
 		r = self.Q.rcon('status')
+		print r
 		r = re.findall(const.rconStatus, r)
 		return r
 		
