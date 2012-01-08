@@ -297,7 +297,7 @@ def cmdLoadout(obj, t):
 	if len(msg) == 2:
 		usr = A.findClient(msg[1])
 		if usr != None:
-			A.B.Clients[usr.uid].updateData(A.B.dumpUser(uid))
+			A.B.Clients[usr.uid].updateData(A.B.dumpUser(usr.uid))
 			A.tell(obj.sender, 'Loadout: %s' % A.B.Clients[usr.uid].gear)
 		else:
 			A.tell(obj.sender, 'Unknown user %s' % msg[1])
