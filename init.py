@@ -57,6 +57,8 @@ def parseUserInfo(inp, varz={}):
 	var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
 	for i in var:
 		varz[i[0]] = i[1]
+	if 'name' in varz.keys():
+		varz['name'] = varz['name'].lower()
 	return uid,varz
 	
 def parseUserInfoChange(inp, varz={}, vary={}):
@@ -69,7 +71,7 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 		varz[i[0]] = i[1]
 	#print varz
 	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
-	if 'n' in varz.keys(): vary['name'] = varz['n']
+	if 'n' in varz.keys(): vary['name'] = varz['n'].lower()
 	# probably should figure out what those other fields are?
 	return uid,vary
 
@@ -162,7 +164,7 @@ def parse(inp):
 		inp[1] = inp[1].strip(':')
 		if inp[2].startswith('!'):
 			inp[2] = inp[2].lower()
-			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1], 'sender':inp[0], 'msg':inp[2]})
+			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1].lower(), 'sender':inp[0], 'msg':inp[2]})
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
 			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
