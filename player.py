@@ -11,6 +11,8 @@ class Player():
 		self.group = 0
 		self.status = None
 		self.api = api
+
+		self.score = [0,0]
 		try:
 			self.name = None
 			self.ip = None

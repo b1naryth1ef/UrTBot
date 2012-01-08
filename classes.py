@@ -49,6 +49,9 @@ class Bot():
 		self.currentMap = None
 		self.gameData = {}
 
+		self.redScore = 0
+		self.blueScore = 0
+
 		self.Modules = {} #Plugins
 		self.Listeners = {} #Plugins waiting for Triggers
 		self.Triggers = {} #Possible Triggers (Events)
@@ -64,6 +67,26 @@ class Bot():
 		r = re.findall(const.rconGameType, r)
 		self.gameData['g_gametype'] = r[0][0]
 		return r[0][0]
+
+	def setScores(self, line):
+		#Scores: R:11 B:9
+		line = line.split(':')
+		self.redScore = int(line[2].strip(' B'))
+		self.blueScore = int(line[3])
+	
+	def updatePlayers(self):
+		#0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
+		r = self.Q.rcon('players')
+		r = r.split('\n')
+		self.setScores(r[3])
+		for i in r[4:]:
+			if i != '':
+				i = i.split(' ')
+				cid = i[0].strip(':')
+				obj = self.Clients[cid]
+				obj.team = i[2].lower()
+				obj.score[0] = i[3].strip('k:')
+				obj.score[1] = i[4].strip('d:')
 
 	def dumpUser(self, uid):
 		vz = []
