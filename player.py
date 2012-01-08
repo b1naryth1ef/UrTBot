@@ -63,7 +63,7 @@ class PlayerDatabase():
 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
 			'lastjoin':'integer'})
 			self.db.commit()
-		self.db.tableSelect("clients", "guid")
+		self.db.tableSelect("clients")
 
 	def playerCreate(self, player):
 		newplayer = self.db.rowBlank()
@@ -111,7 +111,7 @@ class PlayerDatabase():
 			player.group = 0
 
 	def playerJoin(self, player):
-		entry = self.db.findRow(player.cl_guid)
+		entry = self.db.findRow(player.cl_guid, 'guid')
 # {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
 # 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
 # 'headmodel': 'sarge', 'team_model': 'james', 
