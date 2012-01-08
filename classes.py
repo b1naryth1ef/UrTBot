@@ -82,7 +82,7 @@ class Bot():
 		for i in r[4:]:
 			if i != '':
 				i = i.split(' ')
-				cid = i[0].strip(':')
+				cid = int(i[0].strip(':'))
 				obj = self.Clients[cid]
 				obj.team = i[2].lower()
 				obj.score[0] = i[3].strip('k:')
