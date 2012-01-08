@@ -115,21 +115,30 @@ class Bot():
 		self.maplist += pk3s
 		print self.maplist
 
-		# We only take active client ids from status, everything else from dumpuser
-		status = self.Q.rcon("status").splitlines(False)[4:-1]
-		if status == []: return #If no users are connected, we should just ignore them...
+		# # We only take active client ids from status, everything else from dumpuser
+		# status = self.Q.rcon("status").splitlines(False)[4:-1]
+		# if status == []: return #If no users are connected, we should just ignore them...
 
-		for uid in [info.split()[0] for info in status]:
-			uid = int(uid)
-			info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
-			if info == []: continue
-			data = {}
-			for line in info:
-				 line = line.split()
-				 data[line[0]] = line[1]
-			self.Clients[uid] = player.Player(uid, data, init.A)
+		status = self.getStatus()
+		if status == []: return
+
+		for i in status:
+			uid = int(i[0])
+			self.Clients[uid] = player.Player(uid, dumpUser(uid), init.A)
 			if self.Clients[uid].cl_guid != None:
-				self.pdb.playerUpdate(self.Clients[uid])
+		 		self.pdb.playerUpdate(self.Clients[uid])
+
+		# for uid in [info.split()[0] for info in status]:
+		# 	uid = int(uid)
+		# 	info = self.Q.rcon("dumpuser %s" % uid).splitlines(False)[3:]
+		# 	if info == []: continue
+		# 	data = {}
+		# 	for line in info:
+		# 		 line = line.split()
+		# 		 data[line[0]] = line[1]
+		# 	self.Clients[uid] = player.Player(uid, data, init.A)
+		# 	if self.Clients[uid].cl_guid != None:
+		# 		self.pdb.playerUpdate(self.Clients[uid])
 
 		self.getGameType()
 		self.getCurrentMap()
