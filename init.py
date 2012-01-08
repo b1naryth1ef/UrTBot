@@ -237,11 +237,13 @@ def parse(inp):
 	elif inp.startswith('InitRound:'): pass
 	elif inp.startswith('clientkick') or inp.startswith('kick'):
 		print 'User was kicked... sending client_kick out'
+		time.sleep(1)
 		cur = BOT.curClients()
 		for i in BOT.Clients.keys():
 			print i, cur
 			if i not in cur:
 				BOT.eventFire('CLIENT_KICKED', {'client':i})
+		cur = BOT.curClients()
 		
 def loadConfig():
 	"""Loads the bot config"""
@@ -291,7 +293,8 @@ def Start():
 	proc = GameOutput(config_serversocket)
 	x = os.uname()
 	db = database.DB()
-	db.defaultTableSet() #Do we need to run this?
+	if not db.tableExists('penalties'):
+		db.defaultTableSet()
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
 	loop()
 
