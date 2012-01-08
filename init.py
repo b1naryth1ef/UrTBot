@@ -173,7 +173,6 @@ def parse(inp):
 		uid, varz = parseUserInfo(inp)
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 		else:
-			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 			BOT.Clients[uid] = player.Player(uid, varz, A)
 
 			if BOT.Clients[uid].cl_guid != None:
@@ -186,12 +185,12 @@ def parse(inp):
 						if en != None:
 							if en['type'] == 'ban' and en['status'] == 1:
 								print 'Disconnecting user because he/she has been banned'
-								BOT.Q.rcon('kick %s' % uid)
+								return BOT.Q.rcon('kick %s' % uid)
 							elif en['type'] == 'tempban' and en['status'] == 1:
 								#print float(time.time())-float(en['expiration'])
 								if float(time.time())-float(en['expiration']) < 0:
 									print 'Disconnecting user because he/she has been tempbanned'
-									BOT.Q.rcon('kick %s' % uid)
+									return BOT.Q.rcon('kick %s' % uid)
 								else:
 									print 'Setting tempban unactive'
 									db2 = database.DB()
@@ -200,6 +199,7 @@ def parse(inp):
 									enx['status'] = 0
 									db2.rowUpdate(enx)
 									db2.commit()
+			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update

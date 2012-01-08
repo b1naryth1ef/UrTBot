@@ -162,6 +162,7 @@ def cmdMap(obj, t):
 # Of course CLIENT_BEGIN has nothing to do with the client connect protocol. Frackin UrT.
 @listener('CLIENT_CONNECTED')
 def welcomeEvent(obj, t):
+	time.sleep(8)
 	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
 
 @command('!timer', 'Start/stop the timer. Usage: !timer', 1)
@@ -252,6 +253,7 @@ def cmdUnBan(obj, t):
 			rid = int(msg[0])
 		else:
 			entr = db.rowFindAll(msg[1], 'nick')
+			print db.rowsGetAll()
 			if entr == None:
 				A.tell(sender, 'Couldnt find a ban for user with nickname %s' % msg[1])
 			elif len(entr) > 1:
