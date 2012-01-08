@@ -5,7 +5,7 @@ import const, database, auth, select, thread, events
 from classes import GameOutput, Bot, API
 from events import *
 
-__Version__ = 0.4
+__Version__ = 0.5
 
 #--SETTRZ--#
 A = None
@@ -213,7 +213,7 @@ def parse(inp):
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
 		uid, varz = parseUserInfoChange(inp, {}, {})
-		print uid, varz
+		#print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
