@@ -97,7 +97,9 @@ class PlayerDatabase():
 		# else:
 		# 	entry = self.db.rowFind(player.cl_guid)
 		ent = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
-		entry = self.db.rowFind(ent[0]['id'], 'id')
+		print ent
+		if ent != None: entry = self.db.rowFind(ent[0]['id'], 'id')
+		else: entry = None
 
 		if entry != None:
 			player.group = ent[1]
