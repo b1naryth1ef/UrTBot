@@ -232,8 +232,9 @@ def cmdTempBan(obj, t):
 			db.tableSelect('penalties')
 			db.rowCreate({'userid':banr.cid, 'adminid':senderobj.cid, 'type':'tempban', 'reason':reason, 'time':ctime, 'expiration':exptime, 'status':1})
 			db.commit()
+			A.tell(banr.uid, 'Temp Banned tell %s' % etime.__str__())
 			A.kick(banr.uid)
-			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, exptime))
+			A.tell(sender, 'Temp Banned %s tell %s!' % (banr.name, etime.__str__()))
 
 @command('!unban', 'Unban a temp, or permabanned player. Usage: !unban <player>', 3)
 def cmdUnBan(obj, t): pass
