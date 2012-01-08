@@ -91,6 +91,14 @@ def cmdKick(obj, t):
 				kick = cli.uid
 		A.rcon('clientkick %d' % kick)
 
+@command('!kickall', 'Kick everyone but yourself. Usage: !kickall', 4)
+def cmdKickAll(obj, t):
+	msg = obj.data["msg"].split(" ")
+	sender = obj.data["sender"]
+	for i in A.B.Clients.values():
+		if i.uid != sender:
+			A.kick(i.uid)
+
 @command('!slap', 'Slap a player. Usage: !slap <NAME/UID>', 3)
 def cmdSlap(obj, t):
 	msg = obj.data["msg"].split(" ")
