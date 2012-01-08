@@ -201,6 +201,7 @@ gearInfo = {
 	'W':None, #kevlar helmet
 	'X':None, #extra ammo
 
+    'U':None, #idk
 	'A':None #None :D
 }
 

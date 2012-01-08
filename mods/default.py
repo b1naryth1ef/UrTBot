@@ -291,6 +291,19 @@ def cmdUnBan(obj, t):
 	else:
 		return A.tell(sender, 'Usage: !unban <player>')
 
+@command('!loadout', 'See a players loadout. Usage: !loadout <player>', 3)
+def cmdLoadout(obj, t):
+	msg = obj.msg.split(' ', 1)
+	if len(msg) == 2:
+		usr = A.findClient(msg[1])
+		if usr != None:
+			A.B.Clients[usr.uid].updateData(A.B.dumpUser(uid))
+			A.tell(obj.sender, 'Loadout: %s' % A.B.Clients[usr.uid].gear)
+		else:
+			A.tell(obj.sender, 'Unknown user %s' % msg[1])
+	else:
+		A.tell(obj.sender, 'Usage: !loadout <player>')
+
 def cmdIDDQD(obj, t):
 	sender = obj.data['sender']
 	client = A.getClient(sender)
