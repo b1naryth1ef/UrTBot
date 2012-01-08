@@ -123,6 +123,7 @@ class Bot():
 		if status == []: return
 
 		for i in status:
+			print i, i[0]
 			uid = int(i[0])
 			self.Clients[uid] = player.Player(uid, self.dumpUser(uid), init.A)
 			if self.Clients[uid].cl_guid != None:
