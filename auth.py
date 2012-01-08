@@ -9,7 +9,8 @@ def load():
 	sec_level = securityConfig['level']
 	sec_multi = securityConfig['multi']
 	if sec_level > 4: raise ConfigError('Unknown Security Level (%s)' % (sec_level))
-	elif sec_level == 4: print "[WARNING] Security Level 4 is NOT RECOMMENDED!"
+	elif sec_level == 4: print "[WARNING] Security Level 4 is EXTREMLY unsecure! It authorizes users by simply there NICKNAME!"
+	elif sec_level == 1: print "[WARNING] Security Level 1 is a little over-secure. We do NOT recommend it for production."
 
 def level0(db, guid, ip, nick): 
 	#- Method 0: Dynamic
@@ -31,7 +32,14 @@ def level1(db, guid, ip, nick):
 
 def level2(db, guid, ip, nick):
 	#- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
-	pass
+	ipList = db.rowFindAll(ip, 'ip')
+	nickList = db.rowFindAll(nick, 'nick')
+
+	for cl in ipList:
+		if cl['guid'] == guid: return (cl, cl['cgroup'])
+	for cl in nickList:
+		if cl['guid'] == guid: return (cl, cl['cgroup'])
+	return (None, 0)
 
 def level3(db, guid, ip, nick): 
 	#- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
