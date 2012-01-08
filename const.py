@@ -170,36 +170,36 @@ damage = {
 
 gearInfo = {
 	#Sidearms
-	'F':{'id':UT_MOD_BERETTA['id'], 'name':'beretta', 'damage':damage[UT_MOD_BERETTA['id']]},
-	'G':{'id':UT_MOD_DEAGLE['id'],'name':'desert eagle', 'damage':damage[UT_MOD_DEAGLE['id']]},
+	'F':{'id':UT_MOD_BERETTA['id'], 'name':'Beretta', 'damage':damage[UT_MOD_BERETTA['id']]},
+	'G':{'id':UT_MOD_DEAGLE['id'],'name':'Desert Eagle', 'damage':damage[UT_MOD_DEAGLE['id']]},
 
 	#Primary
-	'K':{'id':UT_MOD_HK69['id'], 'name':'hk69', 'damage': damage[UT_MOD_HK69['id']]},
-	'L':{'id':UT_MOD_LR300['id'], 'name':'lr300', 'damage': damage[UT_MOD_LR300['id']]},
-	'M':{'id':UT_MOD_G36['id'], 'name':'g36', 'damage': damage[UT_MOD_G36['id']]},
-	'N':{'id':UT_MOD_PSG1['id'], 'name':'psg1','damage': damage[UT_MOD_PSG1['id']]},
-	'Z':{'id':UT_MOD_SR8['id'],'name':'sr8','damage': damage[UT_MOD_SR8['id']]},
-	'a':{'id':UT_MOD_AK103['id'],'name':'ak103','damage': damage[UT_MOD_AK103['id']]},
-	'c':{'id':UT_MOD_NEGEV['id'],'name':'negav','damage': damage[UT_MOD_NEGEV['id']]},
-	'e':{'id':UT_MOD_M4['id'],'name':'m4','damage': damage[UT_MOD_M4['id']]},
+	'K':{'id':UT_MOD_HK69['id'], 'name':'HK69', 'damage': damage[UT_MOD_HK69['id']]},
+	'L':{'id':UT_MOD_LR300['id'], 'name':'LR300', 'damage': damage[UT_MOD_LR300['id']]},
+	'M':{'id':UT_MOD_G36['id'], 'name':'G36', 'damage': damage[UT_MOD_G36['id']]},
+	'N':{'id':UT_MOD_PSG1['id'], 'name':'PSG1','damage': damage[UT_MOD_PSG1['id']]},
+	'Z':{'id':UT_MOD_SR8['id'],'name':'SR8','damage': damage[UT_MOD_SR8['id']]},
+	'a':{'id':UT_MOD_AK103['id'],'name':'AK103','damage': damage[UT_MOD_AK103['id']]},
+	'c':{'id':UT_MOD_NEGEV['id'],'name':'Negav','damage': damage[UT_MOD_NEGEV['id']]},
+	'e':{'id':UT_MOD_M4['id'],'name':'M4','damage': damage[UT_MOD_M4['id']]},
 
 	#Primary and Secondary
-	'H':{'id':UT_MOD_SPAS['id'],'name':'spas', 'damage': damage[UT_MOD_SPAS['id']]},
-	'I':{'id':UT_MOD_MP5K['id'],'name':'mp5k', 'damage': damage[UT_MOD_MP5K['id']]},
-	'J':{'id':UT_MOD_UMP45['id'],'name':'ump45', 'damage': damage[UT_MOD_UMP45['id']]},
+	'H':{'id':UT_MOD_SPAS['id'],'name':'Spas', 'damage': damage[UT_MOD_SPAS['id']]},
+	'I':{'id':UT_MOD_MP5K['id'],'name':'MP5k', 'damage': damage[UT_MOD_MP5K['id']]},
+	'J':{'id':UT_MOD_UMP45['id'],'name':'UMP45', 'damage': damage[UT_MOD_UMP45['id']]},
 
 	#Grenades
-	'O':{'id':UT_MOD_HEGRENADE['id'], 'name':'he grenade', 'damage': damage[UT_MOD_HEGRENADE['id']]},
+	'O':{'id':UT_MOD_HEGRENADE['id'], 'name':'HE Grenade', 'damage': damage[UT_MOD_HEGRENADE['id']]},
 	'Q':None, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
 
 	#Items
-	'R':None, #Kevlar vest
-	'S':None, #TAC Goggles
-	'T':None, #Medkit
-	'Y':None, #Silencer
-	'V':None, #laser sight
-	'W':None, #kevlar helmet
-	'X':None, #extra ammo
+	'R':{'name':'Kevlar Vest'}, #Kevlar vest
+	'S':{'name':'Tac Goggles'}, #TAC Goggles
+	'T':{'name':'Medkit'}, #Medkit
+	'Y':{'name':'Silencer'}, #Silencer
+	'V':{'name':'Laser Sight'}, #laser sight
+	'W':{'name':'Kevlar Helmet'}, #kevlar helmet
+	'X':{'name':'Extra Ammo'}, #extra ammo
 
     'U':None, #idk
 	'A':None #None :D
