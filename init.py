@@ -144,6 +144,15 @@ def parseCommand(inp, cmd):
 		msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
 		BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
 
+def parseUserKicked(inp):
+	time.sleep(5)
+	cur = BOT.curClients()
+	for i in BOT.Clients.keys():
+		print i, cur
+		if i not in cur:
+			print 'SENDING CLIENT_KICKED'
+			BOT.eventFire('CLIENT_KICKED', {'client':i})
+
 def parse(inp):
 	global BOT
 	if inp.startswith("say:"):
@@ -236,17 +245,9 @@ def parse(inp):
 		BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 	elif inp.startswith('InitRound:'): pass
 	elif inp.startswith('clientkick') or inp.startswith('kick'):
-		print 'User was kicked... sending client_kick out'
-		time.sleep(1)
-		cur = BOT.curClients()
-		for i in BOT.Clients.keys():
-			print i, cur
-			if i not in cur:
-				print 'SENDING CLIENT_KICKED'
-				BOT.eventFire('CLIENT_KICKED', {'client':i})
-		print BOT.curClients()
-		time.sleep(3)
-		print BOT.curClients()
+		print 'Seems like a user was kicked...'
+		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
+
 def loadConfig():
 	"""Loads the bot config"""
 	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
