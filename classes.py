@@ -66,8 +66,8 @@ class Bot():
 		 
 	def getStatus(self):
 		r = self.Q.rcon('status')
-		for line in data.split('\n')[3:]:
-        	print re.match(const.rconStatus, line.strip())
+		for line in r.split('\n')[3:]:
+			print re.match(const.rconStatus, line.strip())
 		#r = re.findall(const.rconStatus, r)
 		
 	def getCurrentMap(self):
