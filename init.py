@@ -195,10 +195,9 @@ def parse(inp):
 							else:
 								print 'Setting tempban unactive'
 								print en['id']
-								enx = db.rowFind(en['id'], 'id')
+								enx = db.rowFind(en['id'])
 								print enx
 								enx['status'] = 0
-								enx['id'] = en['id']
 								db.rowUpdate(enx)
 								db.commit()
 
@@ -286,7 +285,8 @@ def Start():
 	x = os.uname()
 	db = database.DB()
 	db.defaultTableSet() #Do we need to run this?
-	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4])) 
+	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
+	cleanup()
 	loop()
 
 def Exit(): sys.exit()
