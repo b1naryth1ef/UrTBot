@@ -11,20 +11,27 @@ def load():
 	if sec_level > 4: raise ConfigError('Unknown Security Level (%s)' % (sec_level))
 	elif sec_level == 4: print "[WARNING] Security Level 4 is NOT RECOMMENDED!"
 
+def level0(db, guid, ip, nick): 
+	#- Method 0: Dynamic
+	pass
 
 def level1(db, guid, ip, nick):
 	#- Method 1: User must match GUID/IP/NICK to be auto-logged in
-	clist = db.rowFindAll(guid)
-	for cl in clist:
-		if cl['ip'] == ip and cl['nick'] == nick: return cl['cgroup']
-	return 0
+	guidList = db.rowFindAll(guid, 'guid')
+	ipList = db.rowFindAll(ip, 'ip')
+	nickList = db.rowFindAll(nick, 'nick')
+
+	for cl in guidList:
+		if cl['ip'] == ip and cl['nick'] == nick: return (cl, cl['cgroup'])
+	for cl in ipList:
+		if cl['guid'] == guid and cl['nick'] == nick: return (cl, cl['cgroup'])
+	for cl in nickList:
+		if cl['ip'] == ip and cl['guid'] == guid: return (cl, cl['cgroup'])
+	return (None, 0)
 
 def level2(db, guid, ip, nick):
 	#- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
-	clist = db.rowFindAll(guid)
-	for cl in clist:
-		if cl['ip'] == ip or cl['nick'] == nick: return cl['cgroup']
-	return 0
+	pass
 
 def level3(db, guid, ip, nick): 
 	#- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
@@ -34,11 +41,11 @@ def level4(db, guid, ip, nick):
 	#- Method 4: User must match NICK to be logged in...
 	cl = db.rowFind(nick, 'nick')
 	if cl != None:
-		return cl['cgroup']
-	return 0
-
+		return (cl, cl['cgroup'])
+	return (None, 0)
 
 levelz = {
+	0:level0,
 	1:level1,
 	2:level2,
 	3:level3,

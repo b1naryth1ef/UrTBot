@@ -1,6 +1,7 @@
 import database
 import auth
 import time 
+from config import securityConfig
 
 class Player():
 	def __init__(self, uid, data, api):
@@ -85,9 +86,21 @@ class PlayerDatabase():
 		# Ignore bots (what works best for this?)
 		if player.cl_guid == None or player.cl_guid == "": return
 		# If the player is in the db already, set player data from db
-		entry = self.db.rowFind(player.cl_guid)
+		#secConf = securityConfig['level']
+		# if secConf == 4:
+		# 	entrys = self.db.rowFindAll(player.nick, 'nick')
+		# 	if entrys != None:
+		# 		if len(entrys) == 1:
+		# 			entry = entrys[0]
+		# 		else:
+		# 			entry = None
+		# else:
+		# 	entry = self.db.rowFind(player.cl_guid)
+		ent = auth.checkUserAuth(player.cl_guid, player.ip, player.name)
+		entry = ent[0]
+
 		if entry != None:
-			player.group = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
+			player.group = ent[1]
 			player.cid = entry['id']
 			if join != False:
 				entry["joincount"] += 1
