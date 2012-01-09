@@ -276,7 +276,7 @@ def cmdUnBan(obj, t):
 			db.tableSelect('penalties')
 			entr = db.rowFindAll(rid, 'userid')
 			if entr is None:
-				return A.tell(sender, 'No bans found for userid %s' % rid)
+				return A.tell(sender, 'No bans found for %s' % msg[1])
 			elif len(entr) == 1:
 				entr[0]['status'] = 0
 				db.rowUpdate(entr[0])
