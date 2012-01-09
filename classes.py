@@ -49,6 +49,7 @@ class Bot():
 		self.currentMap = None
 		self.gameData = {}
 		self.loadingMap = False
+		self.justChangedMap = False
 
 		self.redScore = 0
 		self.blueScore = 0
@@ -66,6 +67,7 @@ class Bot():
 	def roundEnd(self): pass
 	def matchNew(self):
 		self.loadingMap = False
+		self.justChangedMap = True
 	def matchEnd(self):
 		print 'Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore)
 		self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})

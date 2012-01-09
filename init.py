@@ -183,9 +183,11 @@ def parse(inp):
 		if inp in BOT.Clients.keys():
 			#'til we find ways to work around the missing ClientDisconnect messages... this won't be fatal. 
 			#raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
-			if BOT.loadingMap is False:
+			if BOT.loadingMap is False and BOT.justChangedMap is False:
 				print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
 				del BOT.Clients[inp]
+			else:
+				BOT.justChangedMap = False
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
 
 	elif inp.startswith('ClientUserinfo:'):
