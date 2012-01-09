@@ -256,6 +256,7 @@ def cmdUnBan(obj, t):
 		if msg[0].isdigit():
 			rid = int(msg[0])
 		else:
+			print msg[1]
 			entr = db.rowFindAll(msg[1], 'nick')
 			print db.rowsGetAll()
 			if entr == None:

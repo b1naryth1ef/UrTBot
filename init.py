@@ -52,9 +52,8 @@ def parseInitGame(inp, varz={}):
 	return varz
       
 def parseTimeLimitHit(inp):
-	BOT.eventFire('GAME_MATCH_END')
 	BOT.updatePlayers()
-	BOT.newMatch()
+	BOT.matchEnd()
 
 def parseUserInfo(inp, varz={}):
 	inp2 = inp.split(' ', 2)

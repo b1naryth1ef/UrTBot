@@ -25,8 +25,9 @@ def init(x=0):
 	A.debug('ads.init() was called... looping', _name)
 	while True:
 		time.sleep(leng)
-		A.say(msg[x])
-		x+=1
-		if x >= len(msg): x = 0
+		if len(A.B.Clients) > 1: #Only print ads
+			A.say(msg[x])
+			x+=1
+			if x >= len(msg): x = 0
 		
 
