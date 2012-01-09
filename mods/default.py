@@ -223,7 +223,7 @@ def cmdTempBan(obj, t):
 	if len(msg) == 3: #!ban joey
 		reason = 'No Reason Given'
 	elif len(msg) == 4: #!ban joey my special reason
-		reason = msg[2].strip()
+		reason = msg[3].strip()
 	else: A.tell(sender, 'Usage: !tempban <player> <duration> [reason]')
 
 	if 1 < len(msg) < 5:
@@ -245,6 +245,7 @@ def cmdTempBan(obj, t):
 def cmdUnBan(obj, t):
 	#!unban blah
 	db = database.DB()
+	db2 = database.DB()
 	db.tableSelect('clients')
 	sender = obj.data['sender']
 	senderobj = A.findClient(sender)
@@ -273,21 +274,21 @@ def cmdUnBan(obj, t):
 		
 		if rid != None:
 			objz = A.findClient(rid)
-			db.tableSelect('penalties')
-			print db.rowsGetAll()
-			entr = db.rowFindAll(rid, 'userid')
+			db2.tableSelect('penalties')
+			print db2.rowsGetAll()
+			entr = db2.rowFindAll(rid, 'userid')
 			if entr is None:
 				return A.tell(sender, 'No bans found for %s' % msg[1])
 			elif len(entr) == 1:
 				entr[0]['status'] = 0
-				db.rowUpdate(entr[0])
+				db2.rowUpdate(entr[0])
 			elif len(entr) > 1:
 				for i in entr:
 					if i['type'] in ('ban', 'tempban'):
 						r = db.rowFind(i['id'])
 						r['status'] = 0
-						db.rowUpdate(r)
-			db.commit()
+						db2.rowUpdate(r)
+			db2.commit()
 			A.tell(sender, 'Unbanned %s' % objz.name)
 	else:
 		return A.tell(sender, 'Usage: !unban <player>')
