@@ -274,6 +274,7 @@ def cmdUnBan(obj, t):
 		if rid != None:
 			objz = A.findClient(rid)
 			db.tableSelect('penalties')
+			print db.rowsGetAll()
 			entr = db.rowFindAll(rid, 'userid')
 			if entr is None:
 				return A.tell(sender, 'No bans found for %s' % msg[1])
