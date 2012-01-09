@@ -48,6 +48,7 @@ class Bot():
 		self.maplist = UrTConfig['maps']
 		self.currentMap = None
 		self.gameData = {}
+		self.loadingMap = False
 
 		self.redScore = 0
 		self.blueScore = 0
@@ -63,10 +64,12 @@ class Bot():
 		
 	def roundNew(self): pass
 	def roundEnd(self): pass
-	def matchNew(self): pass
+	def matchNew(self):
+		self.loadingMap = False
 	def matchEnd(self):
 		print 'Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore)
 		self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
+		self.loadingMap = True
 	
 	def getClient(self, uid): return self.Clients[uid]
 	def getGameType(self):

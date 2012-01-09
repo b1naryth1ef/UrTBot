@@ -183,8 +183,9 @@ def parse(inp):
 		if inp in BOT.Clients.keys():
 			#'til we find ways to work around the missing ClientDisconnect messages... this won't be fatal. 
 			#raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
-			print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
-			del BOT.Clients[inp]
+			if BOT.loadingMap is False:
+				print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
+				del BOT.Clients[inp]
 		if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
 
 	elif inp.startswith('ClientUserinfo:'):
@@ -247,7 +248,9 @@ def parse(inp):
 		# 	BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 		# 	del BOT.Clients[key]
 		# ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
-	elif inp.startswith('InitGame:'): BOT.gameData.update(parseInitGame(inp))
+	elif inp.startswith('InitGame:'): 
+		BOT.gameData.update(parseInitGame(inp))
+		matchNew()
 	elif inp.startswith('InitRound:'): BOT.roundNew()
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.roundEnd()
