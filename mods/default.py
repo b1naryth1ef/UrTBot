@@ -270,7 +270,7 @@ def cmdUnBan(obj, t):
 				else:
 					A.tell(sender, 'Too many (<15) users to list...')
 			elif len(entr) == 1:
-				rid = entr['id']
+				rid = entr[0]['id']
 		
 		if rid != None:
 			objz = A.findClient(rid)

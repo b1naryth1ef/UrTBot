@@ -62,6 +62,7 @@ def parseUserInfo(inp, varz={}):
 	for i in var:
 		varz[i[0]] = i[1]
 	if 'name' in varz.keys():
+		varz['nick'] = varz['name']
 		varz['name'] = varz['name'].lower()
 	return uid,varz
 	
@@ -75,7 +76,9 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 		varz[i[0]] = i[1]
 	#print varz
 	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
-	if 'n' in varz.keys(): vary['name'] = varz['n'].lower()
+	if 'n' in varz.keys(): 
+		vary['name'] = varz['n'].lower()
+		vary['nick'] = varz['n']
 	# probably should figure out what those other fields are?
 	return uid,vary
 
@@ -244,9 +247,9 @@ def parse(inp):
 			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
 			del BOT.Clients[key]
 	elif inp.startswith('InitGame:'): BOT.gameData.update(parseInitGame(inp))
-	elif inp.startswith('InitRound:'): pass
+	elif inp.startswith('InitRound:'): BOT.roundNew()
 	elif inp.startswith('SurvivorWinner:'): 
-		BOT.newRound()
+		BOT.roundEnd()
 		if int(BOT.gameData['g_gametype']) in [4, 8]: BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 		else: print 'Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?'
 	elif inp.startswith('InitRound:'): pass

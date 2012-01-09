@@ -11,6 +11,7 @@ class Player():
 		self.group = 0
 		self.status = None
 		self.api = api
+		self.nick = None
 
 		self.score = [0,0]
 		try:

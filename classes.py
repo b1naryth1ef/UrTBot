@@ -61,7 +61,9 @@ class Bot():
 		self.Clients = {} #AKA players
 		self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 		
-	def newRound(self): pass
+	def roundNew(self): pass
+	def roundEnd(self): pass
+	def matchNew(self): pass
 	def matchEnd(self):
 		print 'Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore)
 		self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
