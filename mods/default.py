@@ -161,11 +161,10 @@ def cmdMap(obj, t):
 			A.rcon('set thismap "map %s"' % maps[0])
 			A.rcon('vstr thismap')
 
-# Of course CLIENT_BEGIN has nothing to do with the client connect protocol. Frackin UrT.
 @listener('CLIENT_CONNECTED')
 def welcomeEvent(obj, t):
 	time.sleep(8)
-	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].name)
+	A.say('Everyone welcome ^1%s ^3to the server!' % A.B.Clients[obj.data['client']].nick)
 
 @command('!timer', 'Start/stop the timer. Usage: !timer', 1)
 def cmdTime(obj, t):
