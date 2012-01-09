@@ -250,7 +250,7 @@ def parse(inp):
 		# ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 	elif inp.startswith('InitGame:'): 
 		BOT.gameData.update(parseInitGame(inp))
-		matchNew()
+		BOT.matchNew()
 	elif inp.startswith('InitRound:'): BOT.roundNew()
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.roundEnd()
