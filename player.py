@@ -46,11 +46,15 @@ class Player():
 			print e
 
 	def setData(self, data):
+		if 'name' in data.keys():
+			data['name'] = data['name'].lower()
 		for i in data.keys(): #Strip line endings
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
 	
 	def updateData(self, data):
+		if 'name' in data.keys():
+			data['name'] = data['name'].lower()
 		if 'team' in data.keys():
 			if data['team'] != self.team:
 				print 'Fired change team from updateData'
