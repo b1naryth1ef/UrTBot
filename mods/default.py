@@ -285,7 +285,7 @@ def cmdUnBan(obj, t):
 			elif len(entr) > 1:
 				for i in entr:
 					if i['type'] in ('ban', 'tempban'):
-						r = db.rowFind(i['id'])
+						r = db2.rowFind(i['id'])
 						r['status'] = 0
 						db2.rowUpdate(r)
 			db2.commit()

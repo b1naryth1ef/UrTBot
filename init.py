@@ -243,9 +243,10 @@ def parse(inp):
 		# rcon from 127.0.0.1:
 		# map
 		# That should work ye?
-		for key in BOT.Clients.keys():
-			BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
-			del BOT.Clients[key]
+		# for key in BOT.Clients.keys():
+		# 	BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
+		# 	del BOT.Clients[key]
+		# ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 	elif inp.startswith('InitGame:'): BOT.gameData.update(parseInitGame(inp))
 	elif inp.startswith('InitRound:'): BOT.roundNew()
 	elif inp.startswith('SurvivorWinner:'): 
