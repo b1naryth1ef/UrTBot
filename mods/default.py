@@ -256,7 +256,7 @@ def cmdUnBan(obj, t):
 			rid = int(msg[0])
 		else:
 			print msg[1]
-			entr = db.rowFindAll(msg[1], 'nick')
+			entr = db.rowFindAll(msg[1].strip(), 'nick')
 			print db.rowsGetAll()
 			if entr == None:
 				A.tell(sender, 'Couldnt find a ban for user with nickname %s' % msg[1])
