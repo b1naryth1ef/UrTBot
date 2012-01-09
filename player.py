@@ -72,7 +72,7 @@ class PlayerDatabase():
 		newplayer = self.db.rowBlank()
 		newplayer["id"] = None
 		newplayer["cgroup"] = 0
-		newplayer["nick"] = player.name
+		newplayer["nick"] = player.name.lower()
 		newplayer["guid"] = player.cl_guid
 		newplayer["password"] = ""
 		newplayer["ip"] = player.ip

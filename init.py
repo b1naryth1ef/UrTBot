@@ -236,7 +236,7 @@ def parse(inp):
 	elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
 	elif inp.startswith('ShutdownGame:'):
 		BOT.eventFire('GAME_SHUTDOWN', {})
-		BOT.newMatch()
+		BOT.matchEnd()
 		# We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
 		# when the mapcycle changes maps? hrmph. investigate.
 		# In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
