@@ -289,7 +289,7 @@ def cmdUnBan(obj, t):
 						r['status'] = 0
 						db2.rowUpdate(r)
 			db2.commit()
-			A.tell(sender, 'Unbanned %s' % objz.name)
+			A.tell(sender, 'Unbanned %s' % msg[1])
 	else:
 		return A.tell(sender, 'Usage: !unban <player>')
 
