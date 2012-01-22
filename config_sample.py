@@ -32,13 +32,17 @@ botConfig = {
 #	'prefix': '',
 #}
 
-dbConfig = { #Default for SQLite
-	'database_type': "sqlite",
-	'server': '',
-	'user': '',
-	'password': '',
-	'database': '/tmp/urtbot.db',
-	'prefix': '',
+# dbConfig = { #Default for SQLite
+# 	'database_type': "sqlite",
+# 	'server': '',
+# 	'user': '',
+# 	'password': '',
+# 	'database': '/tmp/urtbot.db',
+# 	'prefix': '',
+# }
+
+dbConfig = {
+	'database':'/tmp/urtbot_beta.db',
 }
 
 #Security Levels:

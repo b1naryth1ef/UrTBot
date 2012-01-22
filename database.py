@@ -1,113 +1,41 @@
 import sys
 import time
 from config import dbConfig
+from buzhug import TS_Base #Thread safety anyone?
 
-__import__('db.' + dbConfig['database_type'])
-db_plugin = sys.modules['db.' + dbConfig['database_type']]
+#__import__('db.' + dbConfig['database_type'])
+#db_plugin = sys.modules['db.' + dbConfig['database_type']]
+glob = None
+# {'id':'integer primary key autoincrement',
+# 			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
+# 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
+# 			'lastjoin':'integer'})
 
-class DB(db_plugin.DBPlugin):
-	def __init__(self):
-		db_plugin.DBPlugin.__init__(self)
-		self.connect(dbConfig)
-		self.table = None
-		self.tablekey = None
-		self.cols = {}
-		self.colsOrder = []
 
-	def tableCreate(self, table, values):
-		return self.addTable(table, values)
-	def tableDelete(self, table):
-		return self.delTable(table)
-	def tableExists(self, table):
-		return self.checkTable(table)
+class DB():
+	def __init__(self, config):
+		self.config = config
+		self.db = None
 
-	def tableSelect(self, table, key="id"):
-		self.table = table
-		self.tablekey = key
-		self.colsOrder = []
+	def connect(self):
+		path = self.config['database']
+		try:
+			self.c = TS_Base(path).open()
+			print 'BuzHug database found, opening...'
+		except IOError as e:
+			print 'No BuzHug database found, creating new...'
+			self.c = TS_Base(path)
+			self.c.create(('cgroup',int), ('nick',str), ('guid',str))
+		return self
 
-		cols = self.getColumns(table)
-		value = None
-		for field in cols:
-			if field[1] == 'id': pass # leave as none for autoid
-			elif field[2] == 'text': value = ""
-			elif field[2] == 'integer': value = 0
-			else: print "[WARNING] sqlite column of neither integer nor text. Not yet supported!"
-			self.cols[field[1]] = value
-			self.colsOrder.append(field[1])
+	def disconnect(self):
+		self.c.close()
 
-	def rowToDict(self, row):
-		""" Helper function for the class """
-		rowDict = self.cols.copy()
-		i = 0
-		for column in self.colsOrder:
-			rowDict[column] = row[i]
-			i += 1 # Not very pythonish :D Alternatives?!
-		return rowDict
+def init(): pass
 
-	def rowCreate(self, row):
-		return self.addRow(self.table, row)
-
-	def rowFind(self, search, key=None):
-		if key == None: key = self.tablekey
-		result = self.getRow(self.table, {key:search})
-		if len(result) == 0: return None
-		return self.rowToDict(result[0])
-
-	def rowFindAll(self, search=None, key=None):
-		if key == None: key = self.tablekey
-		if search == None: result = self.getTable(self.table)
-		else: result = self.getRow(self.table, {key:search})
-		if len(result) == 0: return None
-		rows = []
-		for row in result:
-			rows.append(self.rowToDict(row))
-		return rows
-
-	def rowUpdate(self, row):
-		# This could be improved by a dbplugin method to update multiple fields at once... doh :D
-		for field in row:
-			if field == self.tablekey: continue
-			self.setField(self.table, {self.tablekey:row[self.tablekey]}, field, row[field])
-		if self.tablekey in row:
-			# Not sure why we'd do this, but hey... 
-			self.setField(self.table, {self.tablekey:row[self.tablekey]}, self.tablekey, row[self.tablekey])
-
-	def rowsGetAll(self):
-		return self.getAllRows(self.table)
-
-	def rowBlank(self):
-		return self.cols.copy()
-
-	def defaultTableSet(self):
-		if self.tableExists("penalties") == True: print "Table 'penalties' already exists."
-		else:
-			print 'Adding penalties'
-			self.tableCreate('penalties', {'id':'integer primary key autoincrement', 'userid':'integer',
-			'adminid':'integer', 'type':'text', 'reason':'text', 'time':'text', 'expiration':'text', 'status':'integer'})
-		self.commit()
+def testConnection():
+	x = DB({'database':'/tmp/urtbot_test_database.db'}).connect()
+	x.disconnect()
 
 if __name__ == '__main__':
-	db = DB()		
-	print "Making default tables..."
-	try:
-		db.defaultTableSet()
-	except Exception, e:
-		print "Ruh roh! Failed because %s." % e
-		sys.exit()
-	print "All done!"
-
-	print "Now for some tests..."
-	db.tableSelect("clients", "guid")
-	result = db.rowFind("THISISNOTAREALGUIDOMGTHISISCOOLZ")
-	print result
-	result["cgroup"] = 4
-	db.rowUpdate(result)
-	# If this were real, we'd db.commit() after doing a rowUpdate()
-	result = db.rowFind("THISISNOTAREALGUIDOMGTHISISCOOLZ")
-	print result
-
-	print "#######################################"
-	print "#######################################"
-	result = db.rowFindAll()
-	print result
+	testConnection()
