@@ -41,7 +41,7 @@ class Client():
 				self.firstjoin = datetime.now()
 			self.lastjoin = datetime.now()
 			self.joincount += 1
-			self.push(True)
+			self.push()
 
 	def find(self):
 		if self.__id__ == None:
@@ -82,6 +82,7 @@ class Client():
 def init():
 	global db
 	db = TS_Base('/tmp/urtbot_beta.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
+	return db
 
 def close():
 	global db
