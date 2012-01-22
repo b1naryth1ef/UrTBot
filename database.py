@@ -2,17 +2,17 @@ import sys
 import time
 from config import dbConfig
 from buzhug import TS_Base #Thread safety anyone?
-from datetime import date
+from datetime import date, datetime
 
 #__import__('db.' + dbConfig['database_type'])
 #db_plugin = sys.modules['db.' + dbConfig['database_type']]
 glob = None
 db = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
-
+botaz = ['nick', 'guid', 'ip']
 
 class Client():
-	def __init__(self, nick, group, guid, password, ip, joincount, firstjoin, lastjoin, db):
+	def __init__(self, nick, guid=None, ip=None, group=0, password=None, joincount=None, firstjoin=None, lastjoin=None, db=None):
 		self.nick = nick
 		self.cgroup = group
 		self.guid = guid
@@ -25,22 +25,23 @@ class Client():
 		self.__id__ = None
 		self.db = db
 
-	def dict(self): #@NOTE hacky anyone?
+		self.insert()
+
+	def dict(self, f): #@NOTE hacky anyone?
 		r = {}
 		for i in self.__dict__.keys():
-			if i in az and i != '__id__':
+			if i in f and i != '__id__':
 				r[i] = self.__dict__[i]
 		return r
 
 	def clientJoin(self):
-		if self.__id__ == None:
-			query = [r for r in self.db if r.nick == self.nick and r.guid == self.guid]
-			if len(query) > 1:
-				return False
-			else:
-				x = query[0]
-				self.joincount += 1
-				db.update(aston, nick=self.nick, cgroup=self.group,)
+		row = self.find()
+		if row != None:
+			if self.firstjoin == None:
+				self.firstjoin = datetime.now()
+			self.lastjoin = datetime.now()
+			self.joincount += 1
+			self.push(True)
 
 	def find(self):
 		if self.__id__ == None:
@@ -52,7 +53,7 @@ class Client():
 		else:
 			return self.db.select_for_update(az, __id__=self.__id__)[0]
 
-	def pull():
+	def pull(self):
 		row = self.find()
 		if row != None:
 			self.nick = row.nick
@@ -65,10 +66,18 @@ class Client():
 			self.lastjoin = row.firstjoin
 			self.__id__ = row.__id__
 
-	def push(self):
+	def push(self, pushall=False):
 		row = self.find()
 		if row != None:
-			row.update(**self.dict())
+			if pushall is True:
+				row.update(**self.dict(az))
+			elif pushall is False:
+				row.update(**self.dict(botaz))
+
+	def insert(self):
+		if self.find() == None:
+			db.insert(**self.dict(az))
+			self.push(True) #We're inserting, so assume all our data is correct
 
 def init():
 	global db
@@ -82,17 +91,10 @@ def testConnection():
 	global db
 	init()
 	#db.insert(nick='Joe', client=cli)
-	JOE = Client('Joe', 5, 'GUID', '', '127.0.0.1', 1, date(2011, 1, 1), date(2011, 1, 1), db)
-	db.insert(nick='Joe', guid='GUID', joincount=0, ip='127.0.0.1')
-	JOE.push()
-	#JOE.clientJoin()
-	# f = [r for r in db if r.nick == "Joe" ][0]
-	# f.joincount += 1
-	#f = [r for r in db if r.nick == "Joe" ][0]
-	#f = db.select_for_update(az, __id__=0)
-	#f[0].joincount += 1
-	#f[0].update(joincount=f[0].joincount)
-	print [r for r in db if r.nick == "Joe" ][0]
+	JOE = Client('Joe', 'GUID', '127.0.0.1', 5, '', 1, db=db)
+	JIM = Client('Jim', 'GUID2', '127.0.0.2', 3, '', 4, db=db)
+	JIM.clientJoin()
+	print [r for r in db]
 	close()
 
 if __name__ == '__main__':
