@@ -11,6 +11,11 @@ db = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
 botaz = ['nick', 'guid', 'ip']
 
+#Idk, but I might have done this in a stupid way. This is kinda just a demo of how it should work
+#I feel like if we actually just used this, we would get conflicts with push/pull.
+#Probablly use this IDEA and implement it into the player, but only push NICK/GUID/IP, because
+#we know those are constant, and the Player class should have them correct because it gets them
+#straight from the game
 class Client():
 	def __init__(self, nick, guid=None, ip=None, group=0, password=None, joincount=None, firstjoin=None, lastjoin=None, db=None):
 		self.nick = nick
