@@ -29,7 +29,7 @@ def load():
 #we know those are constant, and the Player class should have them correct because it gets them
 #straight from the game
 class Client():
-	def __init__(self, nick, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None, db=db):
+	def __init__(self, nick, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None, db=None):
 		self.nick = nick
 		self.cgroup = group
 		self.guid = guid
