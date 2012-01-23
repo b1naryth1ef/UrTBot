@@ -62,7 +62,7 @@ class Client():
 
 	def find(self):
 		if self.__id__ == None:
-			q1 = self.db.select_for_update(az, guid=self.guid, ip=self.ip)
+			q = self.db.select_for_update(az, guid=self.guid, ip=self.ip)
 			if len(q) == 1: return q[0]
 			else: return None
 		else:
@@ -114,6 +114,8 @@ def testConnection():
 	JIM.clientJoin()
 	print [r for r in db]
 	close()
+
+init()
 
 if __name__ == '__main__':
 	testConnection()
