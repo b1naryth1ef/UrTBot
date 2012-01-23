@@ -1,5 +1,5 @@
 from rcon import RCON
-import init, socket, select, time, player, re, thread, const
+import init, socket, select, time, player, re, thread, const, database
 
 class GameOutput():
 	def __init__(self, usockname=None):
@@ -34,14 +34,14 @@ class GameOutput():
 		return self.lines.pop(0)
 
 class Bot():
-	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, playerdb=None):
+	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
 		from config import UrTConfig
 
 		self.prefix = prefix
 		self.ip = ip
 		self.rcon = rcon
 		self.Q = RCON(self.ip, self.rcon)
-		self.pdb = playerdb
+		self.clientDB = database.db
 		self.status = 1 #1 is on, 0 is off
 		self.debug = debug #False will hide messages, True will print them and log them to vars
 		
@@ -158,8 +158,8 @@ class Bot():
 			print i, i[0]
 			uid = int(i[0])
 			self.Clients[uid] = player.Player(uid, self.dumpUser(uid), init.A)
-			if self.Clients[uid].cl_guid != None:
-		 		self.pdb.playerUpdate(self.Clients[uid])
+			# if self.Clients[uid].cl_guid != None: @NOTE This is for the old db
+		 # 		self.pdb.playerUpdate(self.Clients[uid])
 
 		self.updatePlayers() #Set team/score for players
 		self.getGameType() #Set g_gametype in self.gamedata

@@ -33,8 +33,7 @@ class Timer(object): #@CREDIT B1
 
 @command('!test', 'Test Command', 0)
 def tester(obj, t):
-	print A.B.getStatus()
-	print A.B.dumpUser(0)
+	print A.B.Clients
 
 @command('!help', 'List all commands, or info on a specific command. Usage: !help <cmd>', 0)
 def cmdHelp(obj, t): #@CREDIT Neek

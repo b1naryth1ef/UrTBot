@@ -11,13 +11,25 @@ db = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
 botaz = ['nick', 'guid', 'ip']
 
+sec_level = None
+sec_multi = None
+
+def load():
+	from config import securityConfig
+	global sec_level
+	sec_level = securityConfig['level']
+	sec_multi = securityConfig['multi']
+	if sec_level > 4: raise ConfigError('Unknown Security Level (%s)' % (sec_level))
+	elif sec_level == 4: print "[WARNING] Security Level 4 is EXTREMLY unsecure! It authorizes users by simply there NICKNAME!"
+	elif sec_level == 1: print "[WARNING] Security Level 1 is a little over-secure. We do NOT recommend it for production."
+
 #Idk, but I might have done this in a stupid way. This is kinda just a demo of how it should work
 #I feel like if we actually just used this, we would get conflicts with push/pull.
 #Probablly use this IDEA and implement it into the player, but only push NICK/GUID/IP, because
 #we know those are constant, and the Player class should have them correct because it gets them
 #straight from the game
 class Client():
-	def __init__(self, nick, guid=None, ip=None, group=0, password=None, joincount=None, firstjoin=None, lastjoin=None, db=None):
+	def __init__(self, nick, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None, db=db):
 		self.nick = nick
 		self.cgroup = group
 		self.guid = guid
@@ -50,11 +62,9 @@ class Client():
 
 	def find(self):
 		if self.__id__ == None:
-			q = self.db.select_for_update(az, nick=self.nick, guid=self.guid, ip=self.ip)
-			if len(q) == 1:
-				return q[0]
-			else:
-				return None
+			q1 = self.db.select_for_update(az, guid=self.guid, ip=self.ip)
+			if len(q) == 1: return q[0]
+			else: return None
 		else:
 			return self.db.select_for_update(az, __id__=self.__id__)[0]
 
@@ -82,7 +92,8 @@ class Client():
 	def insert(self):
 		if self.find() == None:
 			db.insert(**self.dict(az))
-			self.push(True) #We're inserting, so assume all our data is correct
+			self.push(True) #We're inserting, so assume all our data is correct/sterile
+			self.pull()
 
 def init():
 	global db
@@ -94,6 +105,7 @@ def close():
 	db.close()
 
 def testConnection():
+	print 'Testing connection...'
 	global db
 	init()
 	#db.insert(nick='Joe', client=cli)
