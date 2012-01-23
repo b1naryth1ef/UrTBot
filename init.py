@@ -144,7 +144,8 @@ def parseFlagReturn(inp):
 
 def parseCommand(inp, cmd):
 	uid = int(inp[0])
-	BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
+	BOT.Clients[uid].checkAuth()
+	#BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
 	print 'User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group)
 	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 		obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
@@ -197,7 +198,7 @@ def parse(inp):
 			BOT.Clients[uid] = player.Player(uid, varz, A)
 
 			if BOT.Clients[uid].cl_guid != None:
-				BOT.pdb.playerUpdate(BOT.Clients[uid], True)
+				#BOT.pdb.playerUpdate(BOT.Clients[uid], True) WTF DOES THIS DO?
 				db.tableSelect('penalties', 'userid')
 				print 'User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid)
 				en2 = db.rowFindAll(BOT.Clients[uid].cid)

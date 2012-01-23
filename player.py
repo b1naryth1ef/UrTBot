@@ -47,6 +47,13 @@ class Player():
 
 		self.client = database.Client(nick=self.name, ip=self.ip, guid=self.cl_guid, db=database.db)
 		self.cid = self.client.__id__
+		self.group = self.client.group
+
+	def checkAuth(): #@DEV Fix this some
+		self.client.push()
+		self.client.pull()
+		self.cid = self.client.__id__
+		self.group = self.client.group
 
 	def setData(self, data):
 		if 'name' in data.keys():
