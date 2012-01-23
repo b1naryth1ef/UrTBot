@@ -46,7 +46,7 @@ class Player():
 			print e
 
 		self.client = database.Client(nick=self.name, ip=self.ip, guid=self.cl_guid, db=database.db)
-		self.cid = client.__id__
+		self.cid = self.client.__id__
 
 	def setData(self, data):
 		if 'name' in data.keys():
