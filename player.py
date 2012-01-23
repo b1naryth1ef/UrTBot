@@ -49,7 +49,7 @@ class Player():
 		self.cid = self.client.__id__
 		self.group = self.client.cgroup
 
-	def checkAuth(): #@DEV Fix this some
+	def checkAuth(self): #@DEV Fix this some
 		self.client.push()
 		self.client.pull()
 		self.cid = self.client.__id__
