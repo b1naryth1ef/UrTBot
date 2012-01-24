@@ -8,6 +8,7 @@ from datetime import date, datetime
 #db_plugin = sys.modules['db.' + dbConfig['database_type']]
 glob = None
 db = None
+pendb = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
 botaz = ['nick', 'guid', 'ip']
 
@@ -92,12 +93,13 @@ class Client():
 	def insert(self):
 		if self.find() == None:
 			db.insert(**self.dict(az))
-			self.push(True) #We're inserting, so assume all our data is correct/sterile
+			self.push(True) #Inserting, so assume all our data is correct/sterile
 			self.pull()
 
 def init():
-	global db
-	db = TS_Base('/tmp/urtbot_beta.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
+	global db, pendb
+	db = TS_Base('/tmp/urtbot/beta.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
+	#pendb = TS_Base('/tmp/urtbot/penaltiles.db')
 	return db
 
 def close():

@@ -46,6 +46,7 @@ class Player():
 			print e
 
 		self.client = database.Client(nick=self.name, ip=self.ip, guid=self.cl_guid, db=database.db)
+		self.client.clientJoin()
 		self.cid = self.client.__id__
 		self.group = self.client.cgroup
 
@@ -70,76 +71,3 @@ class Player():
 				print 'Fired change team from updateData'
 				self.api.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
 		self.setData(data)
-
-# class PlayerDatabase():
-# 	def __init__(self):
-# 		self.db = database.DB()
-# 		if not self.db.tableExists("clients"): #PYTHON BABEH! NO HAS == FOR TRUE/FALSE!
-# 			self.db.tableCreate('clients', {'id':'integer primary key autoincrement',
-# 			'cgroup':'integer', 'nick':'text', 'guid':'text', 'password':'text',
-# 			'ip':'text', 'joincount':'integer', 'firstjoin':'integer',
-# 			'lastjoin':'integer'})
-# 			self.db.commit()
-# 		self.db.tableSelect("clients")
-
-# 	def playerCreate(self, player):
-		
-		
-# 		newplayer = self.db.rowBlank()
-# 		newplayer["id"] = None
-# 		newplayer["cgroup"] = 0
-# 		newplayer["nick"] = player.name.lower()
-# 		newplayer["guid"] = player.cl_guid
-# 		newplayer["password"] = ""
-# 		newplayer["ip"] = player.ip
-# 		newplayer["joincount"] = 1
-# 		newplayer["firstjoin"] = int(time.time())
-# 		newplayer["lastjoin"] = newplayer["firstjoin"]
-# 		try:
-# 			newplayer["ip"] = player.ip.split(":")[0]
-# 		except: print "[WARNING] Mal-formed IP address... that's all. :D"
-# 		self.db.rowCreate(newplayer)
-# 		return self.db.commit()
-
-# 	def playerUpdate(self, player, join=False):
-# 		# Ignore bots (what works best for this?)
-# 		if player.cl_guid == None or player.cl_guid == "": return
-# 		# If the player is in the db already, set player data from db
-# 		#secConf = securityConfig['level']
-# 		# if secConf == 4:
-# 		# 	entrys = self.db.rowFindAll(player.nick, 'nick')
-# 		# 	if entrys != None:
-# 		# 		if len(entrys) == 1:
-# 		# 			entry = entrys[0]
-# 		# 		else:
-# 		# 			entry = None
-# 		# else:
-# 		# 	entry = self.db.rowFind(player.cl_guid)
-# 		ent = auth.checkUserAuth(self.db, player.cl_guid, player.ip, player.name)
-# 		if ent[0] != None: entry = self.db.rowFind(ent[0]['id'], 'id')
-# 		else: entry = None
-
-# 		if entry != None:
-# 			player.group = ent[1]
-# 			player.cid = entry['id']
-# 			if join != False:
-# 				entry["joincount"] += 1
-# 				self.db.rowUpdate(entry)
-# 				self.db.commit()
-# 		else:
-# 			self.playerCreate(player)
-# 			player.group = 0
-
-# 	def playerJoin(self, player):
-# 		entry = self.db.findRow(player.cl_guid, 'guid')
-# {'racered': '1', 'protocol': '68', 'ip': '127.0.0.1', 
-# 'sex': 'male', 'rate': '25000', 'cg_predictitems': '0', 
-# 'headmodel': 'sarge', 'team_model': 'james', 
-# 'cl_anonymous': '0', 'funred': 'phat, goggles', 
-# 'weapmodes': '00000111220000020002\n', 
-# 'cl_guid': '5748E6243644AFFEF9B6B2F2A2F3A6D1', 'snaps': '20', 
-# 'cg_rgb': '0 255 0', 'gear': 'FKAOXSA', 'handicap': '100', 
-# 'color1': '4', 'qport': '42659', 'color2': '5', 'cg_physics': '1', 
-# 'teamtask': '0', 'name': '[WoC]*B1naryTh1ef', 'challenge': '-585209824',
-#  'team_headmodel': '*james', 'ut_timenudge': '30', 'raceblue': '1', 'model': 'sarge'}
-
