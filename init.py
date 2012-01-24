@@ -199,28 +199,28 @@ def parse(inp):
 
 			if BOT.Clients[uid].cl_guid != None:
 				#BOT.pdb.playerUpdate(BOT.Clients[uid], True) WTF DOES THIS DO?
-				db.tableSelect('penalties', 'userid')
+				#db.tableSelect('penalties', 'userid')
 				print 'User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid)
-				en2 = db.rowFindAll(BOT.Clients[uid].cid)
-				if en2 != None:
-					for en in en2:
-						if en != None:
-							if en['type'] == 'ban' and en['status'] == 1:
-								print 'Disconnecting user because he/she has been banned'
-								return BOT.Q.rcon('kick %s' % uid)
-							elif en['type'] == 'tempban' and en['status'] == 1:
-								#print float(time.time())-float(en['expiration'])
-								if float(time.time())-float(en['expiration']) < 0:
-									print 'Disconnecting user because he/she has been tempbanned'
-									return BOT.Q.rcon('kick %s' % uid)
-								else:
-									print 'Setting tempban unactive'
-									db2 = database.DB()
-									db2.tableSelect('penalties')
-									enx = db2.rowFind(en['id'])
-									enx['status'] = 0
-									db2.rowUpdate(enx)
-									db2.commit()
+				#en2 = db.rowFindAll(BOT.Clients[uid].cid)
+				# if en2 != None:
+				# 	for en in en2:
+				# 		if en != None:
+				# 			if en['type'] == 'ban' and en['status'] == 1:
+				# 				print 'Disconnecting user because he/she has been banned'
+				# 				return BOT.Q.rcon('kick %s' % uid)
+				# 			elif en['type'] == 'tempban' and en['status'] == 1:
+				# 				#print float(time.time())-float(en['expiration'])
+				# 				if float(time.time())-float(en['expiration']) < 0:
+				# 					print 'Disconnecting user because he/she has been tempbanned'
+				# 					return BOT.Q.rcon('kick %s' % uid)
+				# 				else:
+				# 					print 'Setting tempban unactive'
+				# 					db2 = database.DB()
+				# 					db2.tableSelect('penalties')
+				# 					enx = db2.rowFind(en['id'])
+				# 					enx['status'] = 0
+				# 					db2.rowUpdate(enx)
+				# 					db2.commit()
 			BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
 
 	elif inp.startswith('ClientUserinfoChanged:'): 
