@@ -2,10 +2,10 @@
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
 import const, database, auth, select, thread, events
-from classes import GameOutput, Bot, API
+from classes import Bot, API
+from wrapper import GameOutput
+from config_handler import ConfigFile
 from events import *
-
-__Version__ = 0.5
 
 #--SETTRZ--#
 A = None
@@ -16,6 +16,7 @@ botDEBUGS = []
 pluginDEBUGS = []
 
 #--GLOB--#
+config = None
 config_prefix = None
 config_rcon = None
 config_rconip = None
@@ -226,7 +227,6 @@ def parse(inp):
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
 		uid, varz = parseUserInfoChange(inp, {}, {})
-		#print uid, varz
 		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
@@ -260,16 +260,16 @@ def parse(inp):
 		if int(BOT.gameData['g_gametype']) in [4, 8]: BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
 		else: print 'Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?'
 	elif inp.startswith('InitRound:'): pass
-	elif inp.startswith('clientkick') or inp.startswith('kick'):
+	elif inp.startswith('clientkick') or inp.startswith('kick'): #@DEV This needs to be fixed in beta
 		print 'Seems like a user was kicked...'
 		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
 	elif inp.startswith('Exit: Timelimit hit.'): parseTimeLimitHit(inp)
 
-def loadConfig():
+def loadConfig(cfg):
 	"""Loads the bot config"""
 	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
 	try:
-		from config import botConfig
+		botConfig = cfg.config['botConfig']
 		config_prefix = botConfig['prefix']
 		config_rcon = botConfig['rcon']
 		config_rconip = botConfig['rconip']
@@ -279,17 +279,17 @@ def loadConfig():
 		config_serversocket = botConfig['serversocket']
 		config_debugmode = botConfig['debug_mode']
 	except Exception, e:
-		A.debug("Error loading config! [%s]" % (e))
+		A.debug("Error loading config! [%s]" % (e)) #@TODO Debug
 
 def loadMods():
 	global BOT, A
 	for i in config_plugins:
-		A.debug('Loading: %s...' % (i))
+		A.debug('Loading: %s...' % (i)) #@TODO Debug
 		__import__('mods.'+i)
 		i = sys.modules['mods.'+i]
 		try: thread.start_new_thread(i.init, ())
 		except Exception, e:
-			A.debug('Error in loadMods() [%s]' % (e))
+			A.debug('Error in loadMods() [%s]' % (e)) #@TODO Debug
 
 def loop():
 	"""Round and round in circles we go!"""
@@ -303,17 +303,22 @@ def loop():
 			parse(line)
 
 def Start():
-	global BOT, proc, A, config_debugmode, db
-	loadConfig()
-	auth.load()
+	global BOT, proc, A, config_debugmode, db, config
+	config = ConfigFile()
+	loadConfig(config)
+	auth.load() #@TODO Take this out
 	BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)
-	A = API()
+	A = API() #@TODO Fix this bullshit
 	BOT.Startup()
 	loadMods()
 	proc = GameOutput(config_serversocket)
-	x = os.uname()
+	
 	db = database.init()
+	log = None#@TODO Remember to add logging stuff here
+
+	x = os.uname()
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
+
 	loop()
 
 def Exit(): sys.exit()

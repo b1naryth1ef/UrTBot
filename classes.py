@@ -1,38 +1,6 @@
 from rcon import RCON
 import init, socket, select, time, player, re, thread, const, database
 
-class GameOutput():
-	def __init__(self, usockname=None):
-		self.usockname = usockname
-		self.usock = None
-		self.buf = ''
-		self.lines = []
-
-		if self.usockname: self.connect(self.usockname)
-
-	def connect(self, usockname):
-		if self.usock: self.usock.close()
-		self.usock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-		self.usock.connect(usockname)
-
-	def checkAndRead(self):
-		newbuf = None
-		readrdy = select.select([self.usock], [], [], 0.10)[0]
-		if readrdy != []:
-			self.buf += self.usock.recv(4096)
-			for line in self.buf.splitlines(True):
-				if line.endswith("\n"): self.lines.append(line.strip())
-				else: newbuf = line
-			if newbuf: self.buf = newbuf
-			else: self.buf = ''
-
-	def hasLine(self):
-		if len(self.lines): return 1
-		return 0
-
-	def getLine(self):
-		return self.lines.pop(0)
-
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
 		from config import UrTConfig

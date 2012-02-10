@@ -5,15 +5,15 @@ from config import securityConfig
 
 class Player():
 	def __init__(self, uid, data, api):
-		self.uid = int(uid)
-		self.cid = None #<<< get from the db
+		self.uid = -1 #<<< get from the db
+		self.cid = int(uid)
 		self.data = data
-		self.group = 0
+		self.group = -1
 		self.status = None
-		self.api = api
-		self.nick = None
-
 		self.score = [0,0]
+
+		self.api = api
+
 		try:
 			self.name = None
 			self.ip = None

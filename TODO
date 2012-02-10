@@ -1,3 +1,9 @@
+NEW TODO:
+- RTFT (Read the fucking todos)
+
+HOW IT SHOULD WORK:
+- When a users level changes, effect it inside the user object and then mirror it out to the database. Thus we no longer have to recheck perms everytime someone runs a command.
+
 EVENTS:
 	api.registerEve('event', function)
 	Should pull events from const (deaths) and allow for dynamic ones, so modules can do, api.registerHook('hook', **args) and then api.fireHook('hook')

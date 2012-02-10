@@ -1,34 +1,15 @@
-import sys
-import time
+import sys, time
 from config import dbConfig
 from buzhug import TS_Base #Thread safety anyone?
 from datetime import date, datetime
 
-#__import__('db.' + dbConfig['database_type'])
-#db_plugin = sys.modules['db.' + dbConfig['database_type']]
 glob = None
 db = None
 pendb = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
 botaz = ['nick', 'guid', 'ip']
 
-sec_level = None
-sec_multi = None
 
-def load():
-	from config import securityConfig
-	global sec_level
-	sec_level = securityConfig['level']
-	sec_multi = securityConfig['multi']
-	if sec_level > 4: raise ConfigError('Unknown Security Level (%s)' % (sec_level))
-	elif sec_level == 4: print "[WARNING] Security Level 4 is EXTREMLY unsecure! It authorizes users by simply there NICKNAME!"
-	elif sec_level == 1: print "[WARNING] Security Level 1 is a little over-secure. We do NOT recommend it for production."
-
-#Idk, but I might have done this in a stupid way. This is kinda just a demo of how it should work
-#I feel like if we actually just used this, we would get conflicts with push/pull.
-#Probablly use this IDEA and implement it into the player, but only push NICK/GUID/IP, because
-#we know those are constant, and the Player class should have them correct because it gets them
-#straight from the game
 class Client():
 	def __init__(self, nick, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None, db=None):
 		self.nick = nick

@@ -1,4 +1,9 @@
-botConfig = {
+#from debug import log
+import sys, os
+
+default = """
+config = {
+'botConfig':{
 	'prefix': "^1[^2BOT^1]:",
 	'rcon': "MyPassword123",
 	'rconip': "localhost:27960",
@@ -14,51 +19,19 @@ botConfig = {
 		'uberadmin':5
 	},
 	'debug_mode':True
-}
+},
 
-##################################
-### Database config
-###		Pick one, delete the rest
-###		'python database.py' will create 
-###		the database and setup the tables. Doit.	
-##################################
-
-#dbConfig = { #Default for MySQL [NOT IMPLEMENTED]
-#	'database_type': "mysql",
-#	'server': 'localhost',
-#	'user': 'root',
-#	'password': '',
-#	'database': 'urtbot',
-#	'prefix': '',
-#}
-
-# dbConfig = { #Default for SQLite
-# 	'database_type': "sqlite",
-# 	'server': '',
-# 	'user': '',
-# 	'password': '',
-# 	'database': '/tmp/urtbot.db',
-# 	'prefix': '',
-# }
-
-dbConfig = {
+'dbConfig':{
 	'database':'/tmp/urtbot_beta.db',
-}
+},
 
-#Security Levels:
-#- Method 1: User must match GUID/IP/NICK to be auto-logged in
-#- Method 2: User must match GUID/IP, GUID/NICK to be auto-logged in...
-#- Method 3: User must match GUID/IP, GUID/NICK or IP/NICK to be auto-logged in
-#- Method 4: User must match NICK to be logged in...
+'developerConfig':{
+	'logging':True,
+	'logfile':'debug.log',
+	'loglevel':'debug'
+},
 
-securityConfig = {
-	'level': 2,
-	'multi': False,
-}
-
-# Urban Terror config --
-# YOU MOST LIKELY DO NOT NEED TO TOUCH THIS!
-UrTConfig = {
+'UrTConfig':{
     # Maps that don't have their own PK3
     'maps' : [ 'ut4_abbey','ut4_abbeyctf','ut4_algiers','ut4_ambush',
     'ut4_austria','ut4_casa','ut4_company','ut4_crossing','ut4_docks',
@@ -71,5 +44,27 @@ UrTConfig = {
     # PK3s that aren't actually maps
     'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
                         'pak0^7', 'common-spog']
-}
+}}
+"""
 
+class ConfigFile():
+	def __init__(self, configfile='config'):
+		self.configfile = configfile
+		self.f = self.open()
+		self.config = self.loadVars()
+
+	def loadVars(self): return self.f.config
+
+	def open(self):
+		try: 
+			__import__('config')
+			return sys.modules['config']
+		except ImportError, e:
+			self.createDefaultConfig()
+			return self.open()
+		
+
+	def createDefaultConfig(self):
+		self.f = open(self.configfile+'.py', 'w')
+		self.f.write(default)
+		self.f.close()
