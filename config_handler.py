@@ -1,8 +1,11 @@
 #from debug import log
 import sys, os
 
-default = """
-config = {
+checkKeys = ['botConfig', 'dbConfig', 'developerConfig', 'speed', 'UrTConfig']
+
+header = 'config = '
+footer = ''
+default = {
 'botConfig':{
 	'prefix': "^1[^2BOT^1]:",
 	'rcon': "MyPassword123",
@@ -31,6 +34,11 @@ config = {
 	'loglevel':'debug'
 },
 
+'speed':{
+	'threading':0, #0: Normal, 1: Low (Less threads), 2: High (More threads), 3: Insane (Thread all the things!)
+	'max-threads':20, #Probablly just leave this. If your on threading mode 3, this will be ignored!
+},
+
 'UrTConfig':{
     # Maps that don't have their own PK3
     'maps' : [ 'ut4_abbey','ut4_abbeyctf','ut4_algiers','ut4_ambush',
@@ -45,26 +53,40 @@ config = {
     'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
                         'pak0^7', 'common-spog']
 }}
-"""
 
 class ConfigFile():
 	def __init__(self, configfile='config'):
 		self.configfile = configfile
-		self.f = self.open()
-		self.config = self.loadVars()
+		self.config = self.open()
+		self.fi = None
 
-	def loadVars(self): return self.f.config
+		self.check()
+		self.loadVars()
+
+	def loadVars(self):
+		for key in self.config:
+			self.__dict__[key] = self.config[key]
+
+	def writeDict(self, dicty):
+		self.fi = open(self.configfile+'.py', 'w')
+		self.fi.write(header)
+		self.fi.write(dicty.__str__())
+		self.fi.write(footer)
+		self.fi.close()
+
+	def check(self):
+		for key in default:
+			if key not in self.config.keys():
+				print '%s not in!' % key
+				self.config[key] = default[key]
+		self.writeDict(self.config)
 
 	def open(self):
 		try: 
-			__import__('config')
-			return sys.modules['config']
+			return getattr(__import__(self.configfile), 'config')
 		except ImportError, e:
 			self.createDefaultConfig()
-			return self.open()
-		
+			return self.open()		
 
-	def createDefaultConfig(self):
-		self.f = open(self.configfile+'.py', 'w')
-		self.f.write(default)
-		self.f.close()
+	def createDefaultConfig(self): self.writeDict(default)
+
