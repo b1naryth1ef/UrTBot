@@ -4,9 +4,9 @@ import time
 from config import securityConfig
 
 class Player():
-	def __init__(self, uid, data, api):
-		self.uid = -1 #<<< get from the db
-		self.cid = int(uid)
+	def __init__(self, cid, data, api):
+		self.uid = -1 #User ID which is gotten from the DATABASE
+		self.cid = int(cid) #Client ID which is gotten from the GAME
 		self.data = data
 		self.group = -1
 		self.status = None
@@ -63,7 +63,7 @@ class Player():
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
 	
-	def updateData(self, data):
+	def updateData(self, data): #@TODO Move this shit out of the class
 		if 'name' in data.keys():
 			data['name'] = data['name'].lower()
 		if 'team' in data.keys():

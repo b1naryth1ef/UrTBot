@@ -1,5 +1,6 @@
 from rcon import RCON
-import init, socket, select, time, player, re, thread, const, database
+import init, socket, select, time, player, re, thread, const, database, events
+from debug import log
 
 class Bot():
 	def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
@@ -99,7 +100,16 @@ class Bot():
 		return r.group(1)
 
 	def eventFire(self, event, data): 
-		obj = init.events.EVENTS[event](data)
+		obj = events.EVENTS[event](data)
+		if event in init.events.EVENTS:
+			obj = events.Event(event, data)
+		elif event in init.events.CUSTOM_EVENTS:
+			obj = events.EventCustom(event, data)
+		elif event in init.events.PLUGIN_EVENTS:
+			obj = events.EventPlugin(event, data)
+		else:
+			return log.warning('Unknown/Unregistered event was fired!')
+			
 		for i in self.Listeners.keys():
 			if i == event:
 				for listener in self.Listeners[i]:
