@@ -1,6 +1,6 @@
 import logging, sys
-from config import developerConfig
 import thread
+from init import config
 
 log = None
 FH, SH = (None, None)
@@ -29,10 +29,10 @@ def disableLog():
 	log.removeHandler(SH)
 	log.removeHandler(FH)
 
-def init(cfg):
+def init():
 	global log, SH, FH
 	try:
-		developerConfig = cfg.config['developerConfig']
+		developerConfig = config.developerConfig
 		level = logLevels[developerConfig['loglevel']]
 		logfile = developerConfig['logfile']
 		status = developerConfig['logging']

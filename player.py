@@ -1,7 +1,6 @@
 import database
 import auth
 import time 
-from config import securityConfig
 
 class Player():
 	def __init__(self, cid, data, api):
@@ -49,8 +48,13 @@ class Player():
 		self.client.clientJoin()
 		self.cid = self.client.__id__
 		self.group = self.client.cgroup
+	
+	def changeGroup(self, group):
+		self.client.pullField('cgroup')
+		self.group = group
+		self.client.pushField('cgroup')
 
-	def checkAuth(self): #@DEV Fix this some
+	def checkAuth(self): #@TODO This should comply with the new method of authing
 		self.client.push()
 		self.client.pull()
 		self.cid = self.client.__id__

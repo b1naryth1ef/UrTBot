@@ -63,6 +63,16 @@ class Client():
 			self.lastjoin = row.firstjoin
 			self.__id__ = row.__id__
 
+	def pullField(self, field):
+		row = self.find()
+		if row != None:
+			self.__dict__[field] = row.__dict__[field]
+
+	def pushField(self, field):
+		row = self.find()
+		if row != None:
+			row.update(**self.dict(field))
+
 	def push(self, pushall=False):
 		row = self.find()
 		if row != None:

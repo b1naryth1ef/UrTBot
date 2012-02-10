@@ -79,6 +79,10 @@ class ConfigFile():
 			if key not in self.config.keys():
 				print '%s not in!' % key
 				self.config[key] = default[key]
+		for key in self.config:
+			if key not in default:
+				print '%s in!' % key
+				del self.config[key]
 		self.writeDict(self.config)
 
 	def open(self):
