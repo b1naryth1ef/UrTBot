@@ -54,7 +54,7 @@ class Player():
 		self.group = group
 		self.client.pushField('cgroup')
 
-	def checkAuth(self): #@TODO This should comply with the new method of authing
+	def checkAuth(self): #@NOTE Everything seems okay here. Check back later?
 		self.client.push()
 		self.client.pull()
 		self.cid = self.client.__id__

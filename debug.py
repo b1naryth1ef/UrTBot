@@ -48,3 +48,4 @@ def init():
 		log.addHandler(SH)
 		log.addHandler(FH)
 	log.info('Logging sub-system started')
+	return log

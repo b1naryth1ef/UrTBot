@@ -75,7 +75,6 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
 	for i in var:
 		varz[i[0]] = i[1]
-	#print varz
 	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
 	if 'n' in varz.keys(): 
 		vary['name'] = varz['n'].lower()
@@ -145,9 +144,7 @@ def parseFlagReturn(inp):
 
 def parseCommand(inp, cmd):
 	uid = int(inp[0])
-	BOT.Clients[uid].checkAuth()
-	#BOT.pdb.playerUpdate(BOT.Clients[uid]) #@DEV Auth is rechecked for each command; shotgun approach, do this more elegantly
-	print 'User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group)
+	log.info('User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group))
 	if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
 		obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
 		thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
@@ -173,7 +170,7 @@ def parse(inp):
 		inp[1] = inp[1].strip(':')
 		if inp[2].startswith('!'):
 			inp[2] = inp[2].lower()
-			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1].lower(), 'sender':inp[0], 'msg':inp[2]})
+			BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1].lower(), 'sender':inp[0], 'msg':inp[2]}) #@FIX ffs dont fire chat_message fire command!
 			cmd = inp[2].rstrip().split(' ')[0]
 			if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
 			if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
@@ -267,9 +264,9 @@ def parse(inp):
 
 def loadConfig(cfg):
 	"""Loads the bot config"""
-	global config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
+	global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
 	try:
-		botConfig = cfg.config['botConfig']
+		botConfig = cfg.botConfig
 		config_prefix = botConfig['prefix']
 		config_rcon = botConfig['rcon']
 		config_rconip = botConfig['rconip']
@@ -279,17 +276,20 @@ def loadConfig(cfg):
 		config_serversocket = botConfig['serversocket']
 		config_debugmode = botConfig['debug_mode']
 	except Exception, e:
-		A.debug("Error loading config! [%s]" % (e)) #@TODO Debug
+		log.critical('Error loading main config... [%s]' % e)
+		sys.exit()
 
 def loadMods():
 	global BOT, A
 	for i in config_plugins:
-		A.debug('Loading: %s...' % (i)) #@TODO Debug
+		log.info('Loading plugin %s...' % i)
 		__import__('mods.'+i)
 		i = sys.modules['mods.'+i]
-		try: thread.start_new_thread(i.init, ())
+		try: 
+			thread.start_new_thread(i.init, ())
+			log.info('Loaded mod %s' % i)
 		except Exception, e:
-			A.debug('Error in loadMods() [%s]' % (e)) #@TODO Debug
+			A.warning('Error loading mod %s [%s]' % (i, e))
 
 def loop():
 	"""Round and round in circles we go!"""
@@ -306,6 +306,7 @@ def Start():
 	global BOT, proc, A, config_debugmode, db, config
 	config = ConfigFile()
 	loadConfig(config)
+	log = debug.init()
 	auth.load() #@TODO Take this out
 	BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)
 	A = API() #@TODO Fix this bullshit
@@ -314,7 +315,6 @@ def Start():
 	proc = GameOutput(config_serversocket)
 	
 	db = database.init()
-	log = None#@TODO Remember to add logging stuff here
 
 	x = os.uname()
 	A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
