@@ -1,4 +1,8 @@
 #!/usr/bin/python
+
+#--HEADER GLOBALS--#
+config = None
+
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
 import const, database, auth, select, thread, events
@@ -17,7 +21,6 @@ botDEBUGS = []
 pluginDEBUGS = []
 
 #--GLOB--#
-config = None
 config_prefix = None
 config_rcon = None
 config_rconip = None
