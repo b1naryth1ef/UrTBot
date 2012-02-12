@@ -1,5 +1,5 @@
 import sys, time
-from config import dbConfig
+from init import config
 from buzhug import TS_Base #Thread safety anyone?
 from datetime import date, datetime
 
@@ -8,7 +8,6 @@ db = None
 pendb = None
 az = ['cgroup', 'nick', 'guid', 'password', 'ip', 'joincount', 'firstjoin', 'lastjoin']
 botaz = ['nick', 'guid', 'ip']
-
 
 class Client():
 	def __init__(self, nick, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None, db=None):
@@ -89,7 +88,7 @@ class Client():
 
 def init():
 	global db, pendb
-	db = TS_Base('/tmp/urtbot/beta.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
+	db = TS_Base(config.dbConfig['database']+'/client_database.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
 	#pendb = TS_Base('/tmp/urtbot/penaltiles.db')
 	return db
 
