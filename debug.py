@@ -33,13 +33,12 @@ def init(config):
     global log, SH, FH
     try:
         developerConfig = config.developerConfig
-        level = logLevels[developerConfig['loglevel']]
+        level = logLevels[developerConfig['loglevel'].upper()]
         logfile = developerConfig['logfile']
         status = developerConfig['logging']
         mode = 'w'
     except Exception, e:
-        print 'Error with config section "Developer Config"', e
-        raise Exception("Cant continue without logger!")
+        raise Exception("Error in loading logging config... Can't continue on! [%s]" % e)
     
     logging.basicConfig(filename=logfile, level=level, filemode=mode, format='%(asctime)s %(levelname)s [%(module)s #%(lineno)d in %(funcName)s]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     SH = logging.StreamHandler(sys.stdout)
