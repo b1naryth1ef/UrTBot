@@ -1,6 +1,6 @@
 import logging, sys
 import thread
-from init import config
+#from init import config
 
 log = None
 FH, SH = (None, None)
@@ -29,7 +29,7 @@ def disableLog():
     log.removeHandler(SH)
     log.removeHandler(FH)
 
-def init():
+def init(config):
     global log, SH, FH
     try:
         developerConfig = config.developerConfig
@@ -39,6 +39,7 @@ def init():
         mode = 'w'
     except:
         print 'Error with config section "Developer Config"'
+        raise Exception("Cant continue without logger!")
     
     logging.basicConfig(filename=logfile, level=level, filemode=mode, format='%(asctime)s %(levelname)s [%(module)s #%(lineno)d in %(funcName)s]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     SH = logging.StreamHandler(sys.stdout)

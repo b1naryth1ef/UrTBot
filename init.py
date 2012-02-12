@@ -6,6 +6,7 @@ config = None
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
 import const, database, select, thread, events, thread_handler, debug
+from start import _version_
 from events import *
 from classes import Bot, API
 from wrapper import GameOutput
@@ -306,7 +307,7 @@ def Start():
     config = ConfigFile()
     thread_handler.init(config)
     loadConfig(config)
-    log = debug.init()
+    log = debug.init(config)
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)
     A = API() #@TODO Fix this bullshit
     BOT.Startup()
@@ -316,7 +317,7 @@ def Start():
     db = database.init()
 
     x = os.uname()
-    A.say('UrTBot V%s loaded on %s (%s/%s)' % (__Version__, sys.platform, x[2], x[4]))
+    A.say('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
 
     loop()
 
