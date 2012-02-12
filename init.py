@@ -308,7 +308,7 @@ def Start():
     thread_handler.init(config)
     loadConfig(config)
     log = debug.init(config)
-    BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)
+    BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config)
     A = API() #@TODO Fix this bullshit
     BOT.Startup()
     loadMods()

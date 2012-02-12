@@ -3,8 +3,7 @@ import init, socket, select, time, player, re, thread, const, database, events
 from debug import log
 
 class Bot():
-    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False):
-        from config import UrTConfig
+    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None):
 
         self.prefix = prefix
         self.ip = ip
@@ -13,8 +12,9 @@ class Bot():
         self.clientDB = database.db
         self.status = 1 #1 is on, 0 is off
         self.debug = debug #False will hide messages, True will print them and log them to vars
+        self.config = config
         
-        self.maplist = UrTConfig['maps']
+        self.maplist = self.config.UrTConfig['maps']
         self.currentMap = None
         self.gameData = {}
         self.loadingMap = False
@@ -119,12 +119,11 @@ class Bot():
 
     def Startup(self):
         #print 'CALLED STARTUP'
-        from config import UrTConfig
         self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
         
         # Get the PK3s/maps the server has loaded
         pk3s = self.Q.rcon("sv_pakNames").split('"')[3].split()
-        for ignore in UrTConfig['ignoremaps']:
+        for ignore in self.config.UrTConfig['ignoremaps']:
             if ignore in pk3s: pk3s.remove(ignore)
         self.maplist += pk3s
         print self.maplist
@@ -159,7 +158,7 @@ class API():
     def __init__(self, auth=None):
         self.B = init.BOT
         self.Q = init.BOT.Q
-    def debug(self, msg, plugin=None): 
+    def debug(self, msg, plugin=None): #@TODO Take this out / dep this
         if self.B.debug is True: 
             if plugin is None:
                 print '[DEBUG]', msg
