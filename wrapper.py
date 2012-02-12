@@ -16,8 +16,9 @@ def sigHandler(signum, frame):
 	sys.exit()
 
 def loadConfig():
-	from config import botConfig
+	from config_handler import ConfigFile
 	global serverexe, serversocket
+	botConfig = ConfigFile().botConfig
 	serverexe = botConfig['servercommand']
 	serversocket = botConfig['serversocket']
 
