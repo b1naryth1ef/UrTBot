@@ -37,8 +37,8 @@ def init(config):
         logfile = developerConfig['logfile']
         status = developerConfig['logging']
         mode = 'w'
-    except:
-        print 'Error with config section "Developer Config"'
+    except Exception, e:
+        print 'Error with config section "Developer Config"', e
         raise Exception("Cant continue without logger!")
     
     logging.basicConfig(filename=logfile, level=level, filemode=mode, format='%(asctime)s %(levelname)s [%(module)s #%(lineno)d in %(funcName)s]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
