@@ -12,7 +12,8 @@ flagtypes = {
 flagactions = {
 0:'drop',
 1:'return',
-2:'score'	
+2:'score'    
+ 
 }
 
 gametypes = {
@@ -70,20 +71,34 @@ UT_MOD_GOOMBA= {'id':'40'}
 
 # Hits (yes these differ from the kill ones, go fig)
 """
-1	UT_MOD_KNIFE
-2	UT_MOD_BERETTA
-3	UT_MOD_DEAGLE
-4	UT_MOD_SPAS
-5	UT_MOD_MP5K
-6	UT_MOD_UMP45
-8	UT_MOD_LR300
-9	UT_MOD_G36
-10	UT_MOD_PSG1
-14	UT_MOD_SR8
-15	UT_MOD_AK103
-17	UT_MOD_NEGEV
-19	UT_MOD_M4
-21	UT_MOD_HEGRENADE
+1    
+ UT_MOD_KNIFE
+2    
+ UT_MOD_BERETTA
+3    
+ UT_MOD_DEAGLE
+4    
+ UT_MOD_SPAS
+5    
+ UT_MOD_MP5K
+6    
+ UT_MOD_UMP45
+8    
+ UT_MOD_LR300
+9    
+ UT_MOD_G36
+10    
+ UT_MOD_PSG1
+14    
+ UT_MOD_SR8
+15    
+ UT_MOD_AK103
+17    
+ UT_MOD_NEGEV
+19    
+ UT_MOD_M4
+21    
+ UT_MOD_HEGRENADE
 """
 
 # Hitzones
@@ -140,7 +155,8 @@ UT_ITEM_BOMB
 """
 
 damage = {
-	'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
+    
+ 'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
     MOD_TELEFRAG['id']: [0, 0, 0, 0, 0, 0, 0, 0],
     UT_MOD_KNIFE['id']: [100, 60, 44, 35, 20, 20, 44, 100],
     UT_MOD_KNIFE_THROWN['id']: [100, 60, 44, 35, 20, 20, 44, 100],
@@ -165,40 +181,68 @@ damage = {
     }
 
 gearInfo = {
-	#Sidearms
-	'F':{'id':UT_MOD_BERETTA['id'], 'name':'Beretta', 'damage':damage[UT_MOD_BERETTA['id']]},
-	'G':{'id':UT_MOD_DEAGLE['id'],'name':'Desert Eagle', 'damage':damage[UT_MOD_DEAGLE['id']]},
+    
+ #Sidearms
+    
+ 'F':{'id':UT_MOD_BERETTA['id'], 'name':'Beretta', 'damage':damage[UT_MOD_BERETTA['id']]},
+    
+ 'G':{'id':UT_MOD_DEAGLE['id'],'name':'Desert Eagle', 'damage':damage[UT_MOD_DEAGLE['id']]},
 
-	#Primary
-	'K':{'id':UT_MOD_HK69['id'], 'name':'HK69', 'damage': damage[UT_MOD_HK69['id']]},
-	'L':{'id':UT_MOD_LR300['id'], 'name':'LR300', 'damage': damage[UT_MOD_LR300['id']]},
-	'M':{'id':UT_MOD_G36['id'], 'name':'G36', 'damage': damage[UT_MOD_G36['id']]},
-	'N':{'id':UT_MOD_PSG1['id'], 'name':'PSG1','damage': damage[UT_MOD_PSG1['id']]},
-	'Z':{'id':UT_MOD_SR8['id'],'name':'SR8','damage': damage[UT_MOD_SR8['id']]},
-	'a':{'id':UT_MOD_AK103['id'],'name':'AK103','damage': damage[UT_MOD_AK103['id']]},
-	'c':{'id':UT_MOD_NEGEV['id'],'name':'Negav','damage': damage[UT_MOD_NEGEV['id']]},
-	'e':{'id':UT_MOD_M4['id'],'name':'M4','damage': damage[UT_MOD_M4['id']]},
+    
+ #Primary
+    
+ 'K':{'id':UT_MOD_HK69['id'], 'name':'HK69', 'damage': damage[UT_MOD_HK69['id']]},
+    
+ 'L':{'id':UT_MOD_LR300['id'], 'name':'LR300', 'damage': damage[UT_MOD_LR300['id']]},
+    
+ 'M':{'id':UT_MOD_G36['id'], 'name':'G36', 'damage': damage[UT_MOD_G36['id']]},
+    
+ 'N':{'id':UT_MOD_PSG1['id'], 'name':'PSG1','damage': damage[UT_MOD_PSG1['id']]},
+    
+ 'Z':{'id':UT_MOD_SR8['id'],'name':'SR8','damage': damage[UT_MOD_SR8['id']]},
+    
+ 'a':{'id':UT_MOD_AK103['id'],'name':'AK103','damage': damage[UT_MOD_AK103['id']]},
+    
+ 'c':{'id':UT_MOD_NEGEV['id'],'name':'Negav','damage': damage[UT_MOD_NEGEV['id']]},
+    
+ 'e':{'id':UT_MOD_M4['id'],'name':'M4','damage': damage[UT_MOD_M4['id']]},
 
-	#Primary and Secondary
-	'H':{'id':UT_MOD_SPAS['id'],'name':'Spas', 'damage': damage[UT_MOD_SPAS['id']]},
-	'I':{'id':UT_MOD_MP5K['id'],'name':'MP5k', 'damage': damage[UT_MOD_MP5K['id']]},
-	'J':{'id':UT_MOD_UMP45['id'],'name':'UMP45', 'damage': damage[UT_MOD_UMP45['id']]},
+    
+ #Primary and Secondary
+    
+ 'H':{'id':UT_MOD_SPAS['id'],'name':'Spas', 'damage': damage[UT_MOD_SPAS['id']]},
+    
+ 'I':{'id':UT_MOD_MP5K['id'],'name':'MP5k', 'damage': damage[UT_MOD_MP5K['id']]},
+    
+ 'J':{'id':UT_MOD_UMP45['id'],'name':'UMP45', 'damage': damage[UT_MOD_UMP45['id']]},
 
-	#Grenades
-	'O':{'id':UT_MOD_HEGRENADE['id'], 'name':'HE Grenade', 'damage': damage[UT_MOD_HEGRENADE['id']]},
-	'Q':{'name':'Smoke Grenade'}, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
+    
+ #Grenades
+    
+ 'O':{'id':UT_MOD_HEGRENADE['id'], 'name':'HE Grenade', 'damage': damage[UT_MOD_HEGRENADE['id']]},
+    
+ 'Q':{'name':'Smoke Grenade'}, #{'id':None,'name':'smoke grenade','damage': damage['PASSIVE']}, #Smoke nade
 
-	#Items
-	'R':{'name':'Kevlar Vest'}, #Kevlar vest
-	'S':{'name':'Tac Goggles'}, #TAC Goggles
-	'T':{'name':'Medkit'}, #Medkit
-	'Y':{'name':'Silencer'}, #Silencer
-	'V':{'name':'Laser Sight'}, #laser sight
-	'W':{'name':'Kevlar Helmet'}, #kevlar helmet
-	'X':{'name':'Extra Ammo'}, #extra ammo
+    
+ #Items
+    
+ 'R':{'name':'Kevlar Vest'}, #Kevlar vest
+    
+ 'S':{'name':'Tac Goggles'}, #TAC Goggles
+    
+ 'T':{'name':'Medkit'}, #Medkit
+    
+ 'Y':{'name':'Silencer'}, #Silencer
+    
+ 'V':{'name':'Laser Sight'}, #laser sight
+    
+ 'W':{'name':'Kevlar Helmet'}, #kevlar helmet
+    
+ 'X':{'name':'Extra Ammo'}, #extra ammo
 
     'U':None, #idk
-	'A':None #None :D
+    
+ 'A':None #None :D
 }
 
 def timeparse(timeStr): #CREDIT TO B3
@@ -234,7 +278,7 @@ class ConfigError(Exception): pass
 class UrbanTerrorError(Exception): pass
 
 def switchTeam(team):
-	x = {'blue':RED_TEAM, 'red':BLUE_TEAM}
+    x = {'blue':RED_TEAM, 'red':BLUE_TEAM}
     if team.shortName in x: return x[team.shortName]
     else: return UNK_TEAM
 
