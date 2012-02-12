@@ -5,7 +5,7 @@ config = None
 
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
-import const, database, auth, select, thread, events
+import const, database, select, thread, events, thread_handler
 from classes import Bot, API
 from wrapper import GameOutput
 from config_handler import ConfigFile
@@ -262,9 +262,9 @@ def parse(inp):
 
 def loadConfig(cfg):
     """Loads the bot config"""
-    global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode
+    global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode, config
     try:
-        botConfig = cfg.botConfig
+        botConfig = config.botConfig
         config_prefix = botConfig['prefix']
         config_rcon = botConfig['rcon']
         config_rconip = botConfig['rconip']
@@ -303,9 +303,9 @@ def loop():
 def Start():
     global BOT, proc, A, config_debugmode, db, config
     config = ConfigFile()
+    thread_handler.init()
     loadConfig(config)
     log = debug.init()
-    auth.load() #@TODO Take this out
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)
     A = API() #@TODO Fix this bullshit
     BOT.Startup()

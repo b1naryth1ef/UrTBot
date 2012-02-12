@@ -18,10 +18,11 @@ SOURCES = { #This table shows what actions should fire threads. You could mess a
 
 THREADS = []
 
-config_maxthreads = config.speed['max-threads']
-config_threading = config.speed['threading']
+def init():
+	config_maxthreads = config.speed['max-threads']
+	config_threading = config.speed['threading']
 
-if config_threading == 3: config_maxthreads = 500 #Yep! Its ridiculous!
+	if config_threading == 3: config_maxthreads = 500 #Yep! Its ridiculous!
 
 def fire(source, func, args, timeout=0):
     f = {}
