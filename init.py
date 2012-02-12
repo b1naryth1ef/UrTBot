@@ -5,12 +5,13 @@ config = None
 
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
-import const, database, select, thread, events, thread_handler
+import const, database, select, thread, events, thread_handler, debug
+from events import *
 from classes import Bot, API
 from wrapper import GameOutput
-from config_handler import ConfigFile
-from events import *
 from thread_handler import fire
+from config_handler import ConfigFile
+
 
 #--SETTRZ--#
 A = None
