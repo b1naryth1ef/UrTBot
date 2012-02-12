@@ -23,13 +23,19 @@ config_threading = config.speed['threading']
 
 if config_threading == 3: config_maxthreads = 500 #Yep! Its ridiculous!
 
-def fire(): pass
+def fire(source, func, args, timeout=0):
+	f = {}
+	global config_threading
+	if SOURCES[source] <= config_threading:
+		spawnThread(func, source, args, timeout)
+	else:
+		func(*args)
 
 def clearThreads():
 	for x, i in enumerate(THREADS):
 		del THREADS[x]
 
-def spawnThread(func, source, args, timeout=0):
+def spawnThread(func, source, args, timeout):
 	global THREADS
 	log.debug('Tring to spawn thread from source %s' % source)
 	if threading.activeCount() <= config_maxthreads:
