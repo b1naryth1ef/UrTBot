@@ -303,7 +303,7 @@ def loop():
 def Start():
     global BOT, proc, A, config_debugmode, db, config
     config = ConfigFile()
-    thread_handler.init()
+    thread_handler.init(config)
     loadConfig(config)
     log = debug.init()
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode)

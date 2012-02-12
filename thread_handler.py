@@ -1,5 +1,5 @@
 import threading, thread
-from init import config
+#from init import config
 from debug import log
 
 #0: low
@@ -18,7 +18,7 @@ SOURCES = { #This table shows what actions should fire threads. You could mess a
 
 THREADS = []
 
-def init():
+def init(config):
 	config_maxthreads = config.speed['max-threads']
 	config_threading = config.speed['threading']
 
