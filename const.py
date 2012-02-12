@@ -1,10 +1,6 @@
 import re, time
 
-teams = {
-1:'red',
-2:'blue',
-3:'spec'
-}
+
 
 flagtypes = {
 'team_CTF_redflag':1,
@@ -238,8 +234,10 @@ class ConfigError(Exception): pass
 class UrbanTerrorError(Exception): pass
 
 def switchTeam(team):
-	x = {'blue':'red', 'red':'blue', None:'spec', 'spectator':'spec'}
-	return x[team]
+	x = {'blue':RED_TEAM, 'red':BLUE_TEAM}
+    if team.shortName in x: return x[team.shortName]
+    else: return UNK_TEAM
+
 def getItemID(item): return globals()[item.upper()]['id']
 Glob = lambda: globals()
 
@@ -256,3 +254,32 @@ in this file to them.
 And credit to utstatsbot for sorting most of this out and collecting it together.
 http://utstatsbot.googlecode.com/svn-history/r2/trunk/ut.log.format.txt
 """
+
+class Team():
+    def __init__(self, nice, code, longn):
+        self.shortName = nice
+        self.abbrv = self.shortName[0]
+        self.id = code
+        self.longName = longn
+
+    def __eq__(self, other):
+        if isinstance(other, int):
+            if other == self.id: return True
+        elif isinstance(other, Team):
+            if other.id == self.id: return True
+        elif isinstance(other, str):
+            if len(other) == 1 and self.abbrv == other: return True
+            elif other == self.longName or other == self.shortName: return True
+        return False
+
+RED_TEAM = Team('red', 1, 'Red Team')
+BLUE_TEAM = Team('blue', 2, 'Blue Team')
+SPEC_TEAM = Team('spec', 3, 'Spectator')
+UNK_TEAM = Team('unk', -1, 'Unknown')
+
+teams = {
+1:RED_TEAM,
+2:BLUE_TEAM,
+3:SPEC_TEAM,
+-1:UNK_TEAM
+}

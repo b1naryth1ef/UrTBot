@@ -1,6 +1,5 @@
-import database
-import auth
-import time 
+import database, time, const
+from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
 
 class Player():
 	def __init__(self, cid, data, api):
@@ -61,8 +60,8 @@ class Player():
 		self.group = self.client.cgroup
 
 	def setData(self, data):
-		if 'name' in data.keys():
-			data['name'] = data['name'].lower()
+		if 'name' in data.keys(): data['name'] = data['name'].lower()
+		if 'team' in data.keys(): data['team'] = const.teams[int(data['team'])]
 		for i in data.keys(): #Strip line endings
 			data[i] = data[i].strip()
 		self.__dict__.update(data)
@@ -75,3 +74,8 @@ class Player():
 				print 'Fired change team from updateData'
 				self.api.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
 		self.setData(data)
+	
+	def die(self, meth):
+		if meth == 10:
+			if self.team == SPEC_TEAM: pass
+			else: self.team = const.switchTeam(self.team)

@@ -6,6 +6,7 @@ from classes import Bot, API
 from wrapper import GameOutput
 from config_handler import ConfigFile
 from events import *
+from thread_handler import fire
 
 #--SETTRZ--#
 A = None
@@ -75,11 +76,8 @@ def parseUserInfoChange(inp, varz={}, vary={}):
 	var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
 	for i in var:
 		varz[i[0]] = i[1]
-	if 't' in varz.keys(): vary['team'] = const.teams.get(int(varz['t']))
-	if 'n' in varz.keys(): 
-		vary['name'] = varz['n'].lower()
-		vary['nick'] = varz['n']
-	# probably should figure out what those other fields are?
+	if 't' in varz.keys(): vary['team'] = const.teams[int(varz['t'])]
+	if 'n' in varz.keys(): vary['name'] = varz['n'].lower()
 	return uid,vary
 
 def parseKill(inp):
@@ -92,12 +90,10 @@ def parseKill(inp):
 	victim = int(inp[1])
 	vicobj = BOT.Clients[victim]
 	method = int(inp[2][:-1])
-	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method})
-	elif method in [7, 6, 10, 31, 32]: 
+	if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
+	elif method in [7, 6, 10, 31, 32]: #Various suicides
 		BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
-		if method == 10 and atkobj.team != 'spec':
-			BOT.eventFire('CLIENT_SWITCHTEAM', {'client':attacker, 'fromteam':atkobj.team, 'toteam':None})
-			atkobj.team = const.switchTeam(atkobj.team)
+		vicobj.die(method)
 	elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
 	else:
 		BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
@@ -191,14 +187,13 @@ def parse(inp):
 
 	elif inp.startswith('ClientUserinfo:'):
 		uid, varz = parseUserInfo(inp)
-		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
+		if uid in BOT.Clients.keys(): fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
 		else:
 			BOT.Clients[uid] = player.Player(uid, varz, A)
-
 			if BOT.Clients[uid].cl_guid != None:
 				#BOT.pdb.playerUpdate(BOT.Clients[uid], True) WTF DOES THIS DO?
 				#db.tableSelect('penalties', 'userid')
-				print 'User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid)
+				log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid))
 				#en2 = db.rowFindAll(BOT.Clients[uid].cid)
 				# if en2 != None:
 				# 	for en in en2:
@@ -224,7 +219,7 @@ def parse(inp):
 	elif inp.startswith('ClientUserinfoChanged:'): 
 		# Different than ClientUserinfo because we don't add clients to the list or DB, just update
 		uid, varz = parseUserInfoChange(inp, {}, {})
-		if uid in BOT.Clients.keys(): BOT.Clients[uid].updateData(varz)
+		if uid in BOT.Clients.keys(): fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
 	elif inp.startswith('ClientDisconnect:'):
 		inp = int(inp.split(" ")[1])
 		BOT.eventFire('CLIENT_DISCONNECT', {'client':inp})
@@ -249,17 +244,17 @@ def parse(inp):
 		# 	del BOT.Clients[key]
 		# ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 	elif inp.startswith('InitGame:'): 
-		BOT.gameData.update(parseInitGame(inp))
+		fire('parse_initgame', BOT.gameData.update, (parseInitGame(inp),))
 		BOT.matchNew()
 	elif inp.startswith('InitRound:'): BOT.roundNew()
 	elif inp.startswith('SurvivorWinner:'): 
 		BOT.roundEnd()
 		if int(BOT.gameData['g_gametype']) in [4, 8]: BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
-		else: print 'Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?'
+		else: log.warning('Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?')
 	elif inp.startswith('InitRound:'): pass
 	elif inp.startswith('clientkick') or inp.startswith('kick'): #@DEV This needs to be fixed in beta
-		print 'Seems like a user was kicked...'
-		thread.start_new_thread(parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
+		log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
+		fire('parse_userkicked', parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
 	elif inp.startswith('Exit: Timelimit hit.'): parseTimeLimitHit(inp)
 
 def loadConfig(cfg):
@@ -286,7 +281,7 @@ def loadMods():
 		__import__('mods.'+i)
 		i = sys.modules['mods.'+i]
 		try: 
-			thread.start_new_thread(i.init, ())
+			fire('module_init', i.init, ())
 			log.info('Loaded mod %s' % i)
 		except Exception, e:
 			A.warning('Error loading mod %s [%s]' % (i, e))

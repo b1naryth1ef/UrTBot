@@ -35,7 +35,7 @@ default = {
 },
 
 'speed':{
-	'threading':0, #0: Normal, 1: Low (Less threads), 2: High (More threads), 3: Insane (Thread all the things!)
+	'threading':1, #1: Normal, 0: Low (Less threads), 2: High (More threads), 3: Insane (Thread all the things!)
 	'max-threads':20, #Probablly just leave this. If your on threading mode 3, this will be ignored!
 },
 
