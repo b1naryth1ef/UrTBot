@@ -107,7 +107,5 @@ def testConnection():
 	print [r for r in db]
 	close()
 
-init()
-
 if __name__ == '__main__':
 	testConnection()
