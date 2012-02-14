@@ -16,6 +16,7 @@ class EventList():
 		return self.eve[self.eve.index(at)]
 
 	def append(self, it):
+		print it
 		self.eve.append(it)
 		#return len(self.eve)-1 #Return the index of the item... just in case
 
