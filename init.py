@@ -303,7 +303,7 @@ def loop():
             parse(line)
 
 def Start():
-    global BOT, proc, A, config_debugmode, db, config
+    global BOT, proc, A, config_debugmode, db, config, log
     config = ConfigFile()
     thread_handler.init(config)
     loadConfig(config)
