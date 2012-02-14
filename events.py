@@ -8,10 +8,21 @@ class Event():
         self.updateData()
         self.__dict__.update(data)
 
+class EventList():
+	def __init__(self, evelist):
+		self.eve = evelist
+
+	def __getattr__(self, at):
+		return self.eve[self.eve.index(at)]
+
+	def append(self, it):
+		self.eve.append(it)
+		#return len(self.eve)-1 #Return the index of the item... just in case
+
 class EventCustom(Event): pass #Is the local version of events for plugins (other plugins should NOT be able to hook into it)
 class EventPlugin(Event): pass #Is the global version of events for plugins (use this if other plugins might want to hook into it)
 
-EVENTS = ['CLIENT_BEGIN',
+EVENTS = EventList(['CLIENT_BEGIN',
 'GAME_MATCH_START',
 'GENERIC',
 'GAME_ROUND_END',
@@ -43,7 +54,7 @@ EVENTS = ['CLIENT_BEGIN',
 'CLIENT_GENERICDEATH',
 'CLIENT_CONNECT',
 'GAME_FLAGRESET',
-'CLIENT_DISCONNECT']
+'CLIENT_DISCONNECT'])
 
-CUSTOM_EVENTS = []
-PLUGIN_EVENTS = []
+CUSTOM_EVENTS = EventList([])
+PLUGIN_EVENTS = EventList([])
