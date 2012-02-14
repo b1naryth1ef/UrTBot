@@ -1,5 +1,5 @@
 import sys, time
-from init import config
+#from init import config
 from buzhug import TS_Base #Thread safety anyone?
 from datetime import date, datetime
 
@@ -86,7 +86,7 @@ class Client():
             self.push(True) #Inserting, so assume all our data is correct/sterile
             self.pull()
 
-def init():
+def init(config):
     global db, pendb
     db = TS_Base(config.dbConfig['database']+'/client_database.db').create(('cgroup',int), ('nick',str), ('guid',str), ('password',str), ('ip',str), ('joincount',int), ('firstjoin',date), ('lastjoin', date), mode="open")
     #pendb = TS_Base('/tmp/urtbot/penaltiles.db')
