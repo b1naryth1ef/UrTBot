@@ -1,5 +1,5 @@
 import time
-from debug import log
+from init import log
 
 class Event():
     def __init__(self, Type, data):
