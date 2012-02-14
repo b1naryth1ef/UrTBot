@@ -69,7 +69,7 @@ class GameOutput():
 
 	def connect(self, usockname):
 		if self.usock: self.usock.close()
-		self.usock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+		self.usock = socket(socket.AF_UNIX, socket.SOCK_STREAM) #@NOTE Dont prefix this with socket. (Throws an odd exception)
 		self.usock.connect(usockname)
 
 	def checkAndRead(self):
