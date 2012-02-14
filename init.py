@@ -16,6 +16,7 @@ from config_handler import ConfigFile
 
 #--SETTRZ--#
 A = None
+log = None
 home = os.getcwd()
 lastsent = None
 keepLoop = True
