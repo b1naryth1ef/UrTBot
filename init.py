@@ -2,6 +2,7 @@
 
 #--HEADER GLOBALS--#
 config = None
+log = None
 
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
@@ -16,7 +17,6 @@ from config_handler import ConfigFile
 
 #--SETTRZ--#
 A = None
-log = None
 home = os.getcwd()
 lastsent = None
 keepLoop = True
