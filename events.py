@@ -1,4 +1,5 @@
 import time
+from debug import log
 
 class Event():
     def __init__(self, Type, data):
@@ -13,10 +14,11 @@ class EventList():
 		self.eve = evelist
 
 	def __getattr__(self, at):
+		log.debug('Getting event from EventList(): %s' % at)
 		return self.eve[self.eve.index(at)]
 
 	def append(self, it):
-		print it
+		log.debug('Adding event to EventList(): %s' % it)
 		self.eve.append(it)
 		#return len(self.eve)-1 #Return the index of the item... just in case
 
