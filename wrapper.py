@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # wrap iourtded so stdout is available on a unix socket
-from socket import *
+import socket
 import subprocess
 import select
 import os, sys
@@ -32,7 +32,7 @@ def launch():
 								stdout=subprocess.PIPE,
 								stderr=subprocess.STDOUT)
 	procfile = os.fdopen(proc.stdout.fileno())
-	server = socket(AF_UNIX, SOCK_STREAM)
+	server = socket.socket(AF_UNIX, SOCK_STREAM)
 	try: os.unlink(serversocket)
 	except: pass
 	server.bind(serversocket)
@@ -69,7 +69,7 @@ class GameOutput():
 
 	def connect(self, usockname):
 		if self.usock: self.usock.close()
-		self.usock = socket(socket.AF_UNIX, socket.SOCK_STREAM) #@NOTE Dont prefix this with socket. (Throws an odd exception)
+		self.usock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 		self.usock.connect(usockname)
 
 	def checkAndRead(self):
