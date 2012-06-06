@@ -13,7 +13,7 @@ from classes import Bot, API
 from wrapper import GameOutput
 from thread_handler import fire
 from config_handler import ConfigFile
-from database import core
+import database
 
 
 #--SETTRZ--#
@@ -310,13 +310,13 @@ def Start():
     thread_handler.init(config)
     loadConfig(config)
     log = debug.init(config)
-    BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config)
+    db = core.setup()
+    BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config, database=db)
     A = API() #@TODO Fix this bullshit
     BOT.Startup()
     loadMods()
     proc = GameOutput(config_serversocket)
     
-    db = core.setup()
     #db = database.init(config)
 
     x = os.uname()

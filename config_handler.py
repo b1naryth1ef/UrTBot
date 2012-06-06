@@ -25,7 +25,9 @@ default = {
 },
 
 'dbConfig':{
-    'database':'/tmp/urtbot_beta.db',
+    'connecter':'peewee',
+    'type':'sqlite',
+    'database':'/tmp/urtbot.db',
 },
 
 'developerConfig':{
@@ -61,11 +63,14 @@ class ConfigFile():
         self.fi = None
 
         self.check()
-        self.loadVars()
+        # self.loadVars()
 
-    def loadVars(self):
-        for key in self.config:
-            self.__dict__[key] = self.config[key]
+    def __getitem__(self, attr):
+        return self.config[key]
+
+    # def loadVars(self):
+    #     for key in self.config:
+    #         self.__dict__[key] = self.config[key]
 
     def writeDict(self, dicty):
         self.fi = open(self.configfile+'.py', 'w')

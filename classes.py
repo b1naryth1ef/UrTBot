@@ -3,13 +3,14 @@ import init, socket, select, time, player, re, thread, const, database, events
 from debug import log
 
 class Bot():
-    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None):
+    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None, database=None):
 
         self.prefix = prefix
         self.ip = ip
         self.rcon = rcon
         self.Q = RCON(self.ip, self.rcon)
-        self.clientDB = database.db
+        self.database = database
+        #self.clientDB = database.db
         self.status = 1 #1 is on, 0 is off
         self.debug = debug #False will hide messages, True will print them and log them to vars
         self.config = config
@@ -118,7 +119,7 @@ class Bot():
         return obj
 
     def Startup(self):
-        #print 'CALLED STARTUP'
+        log.info('CALLED STARTUP')
         self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
         
         # Get the PK3s/maps the server has loaded
@@ -132,18 +133,16 @@ class Bot():
         if status == []: return
 
         for i in status:
-            print i, i[0]
+            log.debug(i, i[0])
             uid = int(i[0])
             self.Clients[uid] = player.Player(uid, self.dumpUser(uid), init.A)
-            # if self.Clients[uid].cl_guid != None: @NOTE This is for the old db
-         #         self.pdb.playerUpdate(self.Clients[uid])
 
         self.updatePlayers() #Set team/score for players
         self.getGameType() #Set g_gametype in self.gamedata
         self.getCurrentMap() #set mapname in self.gamedata
 
         self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
-        print 'STARTUP DONE'
+        log.info('STARTUP DONE')
 
 class API():
     RED = '^1'
@@ -158,16 +157,6 @@ class API():
     def __init__(self, auth=None):
         self.B = init.BOT
         self.Q = init.BOT.Q
-    def debug(self, msg, plugin=None): #@TODO Take this out / dep this
-        if self.B.debug is True: 
-            if plugin is None:
-                print '[DEBUG]', msg
-                init.botDEBUGS.append((time.time(), msg))
-            else:
-                print '[DEBUG|%s] %s' % (plugin, msg)
-                init.pluginDEBUGS.append((time.time(), plugin, msg))
-    def canInt(self, i): return str(i).isdigit()
-    def tester(self): self.debug("TESTING! 1! 2! 3!")
     def say(self,msg): self.Q.rcon("say "+self.B.prefix+" ^3"+msg)
     def tell(self,uid,msg): self.Q.rcon("tell %s %s %s " % (uid, self.B.prefix, msg))
     def kick(self, uid): self.Q.rcon('kick %s' % uid)

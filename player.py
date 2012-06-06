@@ -1,4 +1,6 @@
-import database, time, const
+import sys, os, time
+import database, const
+from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
 
 class Player():
@@ -43,21 +45,23 @@ class Player():
         except Exception, e:
             print e
 
-        self.client = database.Client(nick=self.name, ip=self.ip, guid=self.cl_guid, db=database.db)
-        self.client.clientJoin()
-        self.cid = self.client.__id__
-        self.group = self.client.cgroup
-    
-    def changeGroup(self, group):
-        self.client.pullField('cgroup')
-        self.group = group
-        self.client.pushField('cgroup')
+        q1 = database.orm.get(nick=self.name, ip=self.ip, guid=self.cl_guid)
+        q2 = database.orm.get(ip=self.ip, guid=self.cl_guid)
 
-    def checkAuth(self): #@NOTE Everything seems okay here. Check back later?
-        self.client.push()
-        self.client.pull()
-        self.cid = self.client.__id__
-        self.group = self.client.cgroup
+        #This needs a revamp. Possibly leave it like this tell HD?
+        if len(q1) == 1:
+            self.client = q1[0]
+        elif len(q2) == 1:
+            self.client = q2[0]
+        else:
+            self.client = database.orm(nick=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0)
+
+        self.client.lastjoin = datetime.now()
+        self.client.joincount += 1
+        self.client.save()
+    
+    def changeGroup(self, group): pass
+    def checkAuth(self): pass
 
     def setData(self, data):
         if 'name' in data.keys(): data['name'] = data['name'].lower()
@@ -77,5 +81,5 @@ class Player():
     
     def die(self, meth):
         if meth == 10:
-            if self.team == SPEC_TEAM: pass
-            else: self.team = const.switchTeam(self.team)
+            if not self.team == SPEC_TEAM:
+                self.team = const.switchTeam(self.team)
