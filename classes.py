@@ -38,7 +38,7 @@ class Bot():
         self.loadingMap = False
         self.justChangedMap = True
     def matchEnd(self):
-        print 'Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore)
+        log.debug('Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore))
         self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     

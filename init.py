@@ -6,13 +6,14 @@ log = None
 
 #---IMPORTS---#
 import subprocess, time, os, sys, imp, player, string, re, socket
-import const, database, select, thread, events, thread_handler, debug
+import const, select, thread, events, thread_handler, debug
 from start import _version_
 from events import *
 from classes import Bot, API
 from wrapper import GameOutput
 from thread_handler import fire
 from config_handler import ConfigFile
+from database import core
 
 
 #--SETTRZ--#
@@ -315,7 +316,8 @@ def Start():
     loadMods()
     proc = GameOutput(config_serversocket)
     
-    db = database.init(config)
+    db = core.setup()
+    #db = database.init(config)
 
     x = os.uname()
     A.say('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
