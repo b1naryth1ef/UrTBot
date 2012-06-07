@@ -1,4 +1,4 @@
-#from debug import log
+from bot.debug import log
 import sys, os
 
 checkKeys = ['botConfig', 'dbConfig', 'developerConfig', 'speed', 'UrTConfig']
@@ -63,14 +63,12 @@ class ConfigFile():
         self.fi = None
 
         self.check()
-        # self.loadVars()
 
     def __getitem__(self, attr):
-        return self.config[key]
+        return self.config[attr]
 
-    # def loadVars(self):
-    #     for key in self.config:
-    #         self.__dict__[key] = self.config[key]
+    def __getattr__(self, attr):
+        return self.config[attr]
 
     def writeDict(self, dicty):
         self.fi = open(self.configfile+'.py', 'w')
@@ -82,11 +80,11 @@ class ConfigFile():
     def check(self):
         for key in default:
             if key not in self.config.keys():
-                print '%s not in!' % key
+                print '%s not in!' % key #@DEBUG
                 self.config[key] = default[key]
         for key in self.config:
             if key not in default:
-                print '%s in!' % key
+                print '%s in!' % key #@DEBUG
                 del self.config[key]
         self.writeDict(self.config)
 

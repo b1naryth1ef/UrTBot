@@ -63,7 +63,6 @@ class RCON:
 		self.lock.release()
 		return reply
 
-
 if __name__ == '__main__':
 	rcon = RCON()
 	count = 100

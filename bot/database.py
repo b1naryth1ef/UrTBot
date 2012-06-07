@@ -1,5 +1,5 @@
-from debug import log
-from init import config
+from bot.debug import log
+from bot.main import config
 
 class Database():
 	def __init__(self): pass
@@ -20,4 +20,5 @@ class User():
 	def clientQuit(self): pass
 
 def setup():
-    log.debug('Setup called!')
+    log.debug('SETUP: DATABASE')
+    log.debug('SETUP DONE: DATABASE')

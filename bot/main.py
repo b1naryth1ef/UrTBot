@@ -5,16 +5,11 @@ config = None
 log = None
 
 #---IMPORTS---#
-import subprocess, time, os, sys, imp, player, string, re, socket
-import const, select, thread, events, thread_handler, debug
-from start import _version_
-from events import *
-from classes import Bot, API
-from wrapper import GameOutput
-from thread_handler import fire
-from config_handler import ConfigFile
-import database
-
+import sys, time, os, subprocess, imp, re, socket, select, threading
+import const, player, debug, database, api
+from bot.classes import Bot
+from bot.wrapper import GameOutput
+from bot.config_handler import ConfigFile
 
 #--SETTRZ--#
 A = None
@@ -32,27 +27,6 @@ config_bootcommand = None
 config_groups = None
 config_plugins = None
 config_serversocket = None
-
-def canInt(i): return str(i).isdigit() #@DEV Just a depricated function... Replace for beta
-
-def command(cmd, desc='None', level=0, alias=[]): #WOOT! DECORATERS ARE THE SHIZ
-    def decorator(target):
-        if cmd in BOT.Commands.keys(): return None
-        BOT.Commands[cmd] = (target,desc,level)
-        for i in alias:
-            BOT.Aliases[i] = (target,desc,level,cmd)
-        return target
-    return decorator
-
-def listener(event): #WOOT! DECORATERS ARE THE SHIZ
-    def decorator(target):
-        if event in BOT.Listeners.keys():
-            if BOT.Listeners[event] != None: 
-                BOT.Listeners[event].append(target)
-                return target
-        BOT.Listeners[event] = [target]
-        return target
-    return decorator
 
 def parseInitGame(inp, varz={}):
     options = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
@@ -278,7 +252,7 @@ def loadConfig(cfg):
         config_serversocket = botConfig['serversocket']
         config_debugmode = botConfig['debug_mode']
     except Exception, e:
-        log.critical('Error loading main config... [%s]' % e)
+        print 'Error loading main config... [%s]' % e
         sys.exit()
 
 def loadMods():
@@ -304,15 +278,15 @@ def loop():
                 print line
             parse(line)
 
-def Start():
+def Start(_version_):
     global BOT, proc, A, config_debugmode, db, config, log
     config = ConfigFile()
-    thread_handler.init(config)
+    #thread_handler.init(config)
     loadConfig(config)
     log = debug.init(config)
-    db = core.setup()
+    db = database.setup()
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config, database=db)
-    A = API() #@TODO Fix this bullshit
+    #A = API() #@TODO Fix this bullshit
     BOT.Startup()
     loadMods()
     proc = GameOutput(config_serversocket)

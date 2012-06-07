@@ -2,7 +2,7 @@ import logging, sys
 import thread
 #from init import config
 
-log = None
+log = logging.getLogger('global')
 FH, SH = (None, None)
 logLevels = {
     'DEBUG':logging.DEBUG,
