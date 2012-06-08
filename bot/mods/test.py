@@ -1,9 +1,6 @@
-from init import A
+from bot.main import BOT
 
-def testr(obj, n0):
-	A.say('TESTING 1... 2... 3...')
-	print "Testing!"
+def init(B, A):
+	BOT.A.say('Testing...')
 
-A.addCmd('!t', testr, ':D', 0)
-
-def init(): pass
+def run(): pass

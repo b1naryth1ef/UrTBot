@@ -72,9 +72,10 @@ class ConfigFile():
         try:
             with open(self.configfile+'.cfg', 'r') as f:
                 return json.loads(''.join(f.readlines()))
-        except:
-           log.warning('Invalid or incorrect config file loaded, creating new!')
-           return default
+        except Exception, e:
+            log.debug('Config file loading failed because of %s' % e)
+            log.warning('Invalid or incorrect config file loaded, creating new!')
+            return default
 
     def save(self):
         s = json.dumps(self.config, sort_keys=True, indent=4)

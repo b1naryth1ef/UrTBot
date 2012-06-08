@@ -37,7 +37,6 @@ def launch():
 	except: pass
 	server.bind(serversocket)
 	server.listen(10)
-
 	while True:
 		rfd, wfd, xfd = select.select([proc.stdout, server], [], [], 1)
 		if proc.stdout in rfd: # we potentially block here if we don't have a whole line :|
@@ -53,11 +52,11 @@ def launch():
 		if server in rfd: # accept a new connection
 			client, _ = server.accept()
 			clients.append(client)
-
 def init():
 	signal.signal(signal.SIGINT, sigHandler)
 	loadConfig()
 	launch()
+		
 
 class GameOutput():
 	def __init__(self, usockname=None):

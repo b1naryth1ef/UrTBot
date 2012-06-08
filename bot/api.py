@@ -21,6 +21,13 @@ class API():
         self.aliases = {}
         self.events = {}
         self.listeners = {'cats':{}, 'eves':{}}
+        self.booted = False
+        self.listenActions = []
+
+    def finishBooting(self):
+        self.booted = True
+        for i in self.listenActions:
+            self.addListener(*i)
 
     def addCommand(self, cmd, func, desc='', level=0, alias=[]):
         if self.commands.get(cmd):
@@ -38,6 +45,7 @@ class API():
             self.listeners['cats'][n] = []
 
     def addListener(self, name, func):
+        if self.booted: self.listenActions.append((name, func))
         if name.contains('_'):
             n = name.split('_')
             self.listeners['cats']['_'.join(n[:-1])].append(func)
@@ -118,7 +126,7 @@ EVENTS = {
 'CLIENT_CONN_TIMEOUT':Event('CLIENT_CONN_TIMEOUT'),
 'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
-'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED')
+'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
 'CLIENT_INFO_CHANGE':Event('CLIENT_INFO_CHANGE'),
 'CLIENT_INFO_NAME':Event('CLIENT_INFO_NAME'),

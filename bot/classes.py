@@ -3,6 +3,7 @@ import bot, player, const, database, main
 from debug import log
 from rcon import RCON
 from collections import deque
+import sys, os, time
 
 class Bot():
     def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None, database=None):
@@ -121,7 +122,9 @@ class Bot():
     def Startup(self, API):
         self.A = API
         log.info('SETUP: BOT')
-        self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
+        if "No rconpassword set on the server." in self.Q.rcon("say "+self.prefix+" ^3"+"Starting up..."):
+            log.critical('The server does not have an rcon password check. Please check your server config.')
+            sys.exit()
         
         # Get the PK3s/maps the server has loaded
         #print self.Q.rcon("sv_pakNames").split('"')

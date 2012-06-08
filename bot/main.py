@@ -7,9 +7,10 @@ log = None
 #---IMPORTS---#
 import sys, time, os, subprocess, imp, re, socket, select, threading
 import const, player, debug, database, api
+import thread_handler as thread
 from datetime import datetime
 from bot.classes import Bot
-from bot.wrapper import GameOutput
+from wrapper import GameOutput
 from bot.config_handler import ConfigFile
 
 #--SETTRZ--#
@@ -125,7 +126,7 @@ def parseCommand(inp, cmd):
     log.info('User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group))
     if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
         obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
-        thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
+        #thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
     else:
         msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
         BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
@@ -232,16 +233,19 @@ def loadConfig(cfg):
         sys.exit()
 
 def loadMods():
-    global BOT, A
+    global BOT, A, config
     for i in config_plugins:
-        log.info('Loading plugin %s...' % i)
-        __import__('mods.'+i)
-        i = sys.modules['mods.'+i]
+        log.info('Trying to load plugin %s...' % i)
+        __import__('bot.mods.'+i)
+        i = sys.modules['bot.mods.'+i]
         try: 
-            fire('module_init', i.init, ())
-            log.info('Loaded mod %s' % i)
+            if hasattr(i, 'init'): thread.fireThread(i.init, BOT, config)
+            if hasattr(i, 'registerLoops'): thread.fireThread(i.registerLoops)
+            if hasattr(i, 'run'): thread.fireThread(i.run)
+            else: log.warning('Module %s does not have run method!' % i.__name__)
+            log.info('Loaded mod %s' % i.__name__)
         except Exception, e:
-            A.warning('Error loading mod %s [%s]' % (i, e))
+            log.warning('Error loading mod %s [%s]' % (i, e))
 
 def loop():
     """Round and round in circles we go!"""
@@ -258,6 +262,7 @@ def loop():
 def Start(_version_):
     global BOT, proc, A, config_debugmode, db, config, log
     config = ConfigFile()
+    thread.gcthread = thread.fireGC()
     #thread_handler.init(config)
     loadConfig(config)
     log = debug.init(config)
@@ -273,9 +278,11 @@ def Start(_version_):
 
     x = os.uname()
     log.info('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
-
-    loop()
-
+    try:
+        loop()
+    except:
+        thread.exit()
+        sys.exit()
 def Exit(): sys.exit()
 
 if __name__ == "__main__":
