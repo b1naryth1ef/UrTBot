@@ -7,6 +7,7 @@ log = None
 #---IMPORTS---#
 import sys, time, os, subprocess, imp, re, socket, select, threading
 import const, player, debug, database, api
+from datetime import datetime
 from bot.classes import Bot
 from bot.wrapper import GameOutput
 from bot.config_handler import ConfigFile
@@ -97,11 +98,11 @@ def parseItem(inp):
     if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
     else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':client})
 
-def parsePlayerBegin(inp):
+def parsePlayerBegin(inp): pass
     #ClientBegin: 0
-    inp = inp.split(' ')
-    client = int(inp[1])
-    BOT.eventFire('CLIENT_BEGIN', {'client':client})
+    #inp = inp.split(' ')
+    #client = int(inp[1])
+    #BOT.eventFire('CLIENT_BEGIN', {'client':client})
 
 def parseFlag(inp):
     #Flag: 0 2: team_CTF_redflag
@@ -140,70 +141,45 @@ def parseUserKicked(inp):
 
 def parse(inp):
     global BOT
-    if inp.startswith("say:"):
-        #say: 0 [WoC]*B1naryth1ef: blah blah
-        inp = inp.split(" ", 3)
-        inp.pop(0)
-        inp[1] = inp[1].strip(':')
-        if inp[2].startswith('!'):
-            inp[2] = inp[2].lower()
-            BOT.eventFire('CLIENT_COMMAND', {'event':'CHAT_MESSAGE', 'name':inp[1].lower(), 'sender':inp[0], 'msg':inp[2]}) #@FIX ffs dont fire chat_message fire command!
-            cmd = inp[2].rstrip().split(' ')[0]
-            if cmd in BOT.Commands.keys(): parseCommand(inp, cmd)
-            if cmd in BOT.Aliases.keys(): parseCommand(BOT.Aliases[inp][3])
-        BOT.eventFire('CHAT_MESSAGE', {'event':'CHAT_MESSAGE', 'sender':inp[1], 'gid':inp[0], 'msg':inp[2]})
+    if inp.startswith("say:"): #say: 0 [WoC]*B1naryth1ef: blah blah
+        inp = inp.split(' ', 3)[1:]
+        dic = {'name':inp[1][:-1], 'cid':BOT.getPlayer(int(inp[0])), 'msg':inp[2]}
+        if dic[msg].startswith(config.botConfig['cmd_prefix']):
+            api.A.fireEvent('CLIENT_SAY_CMD', dic)
+            api.A.fireCommand(inp[2].rstrip().split(' ')[0], dic)
+        api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
 
-    elif inp.startswith('ClientConnect:'):
-        #ClientConnect: 0
+    elif inp.startswith('ClientConnect:'): #ClientConnect: 0
         inp = int(inp.split(" ")[1])
-        if inp in BOT.Clients.keys():
-            #'til we find ways to work around the missing ClientDisconnect messages... this won't be fatal. 
-            #raise const.UrTBotError('Client #%s is already connected... Something is wrong.' % (inp))
+        if inp in BOT.Clients.keys(): #Disconnect messages MAY be missed!
             if BOT.loadingMap is False and BOT.justChangedMap is False:
-                print const.UrTBotError('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
+                log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
                 del BOT.Clients[inp]
             else:
                 BOT.justChangedMap = False
-        if inp >= 0: BOT.eventFire('CLIENT_CONNECT', {'client':inp})
+        api.A.fireEvent('CLIENT_CONN_CONNECT', {client:inp})
 
     elif inp.startswith('ClientUserinfo:'):
-        uid, varz = parseUserInfo(inp)
-        if uid in BOT.Clients.keys(): fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
+        cid, varz = parseUserInfo(inp)
+        if cid in BOT.Clients.keys(): pass #fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
         else:
-            BOT.Clients[uid] = player.Player(uid, varz, A)
-            if BOT.Clients[uid].cl_guid != None:
-                #BOT.pdb.playerUpdate(BOT.Clients[uid], True) WTF DOES THIS DO?
-                #db.tableSelect('penalties', 'userid')
-                log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[uid].name, BOT.Clients[uid].uid, BOT.Clients[uid].cid))
-                #en2 = db.rowFindAll(BOT.Clients[uid].cid)
-                # if en2 != None:
-                #     for en in en2:
-                #         if en != None:
-                #             if en['type'] == 'ban' and en['status'] == 1:
-                #                 print 'Disconnecting user because he/she has been banned'
-                #                 return BOT.Q.rcon('kick %s' % uid)
-                #             elif en['type'] == 'tempban' and en['status'] == 1:
-                #                 #print float(time.time())-float(en['expiration'])
-                #                 if float(time.time())-float(en['expiration']) < 0:
-                #                     print 'Disconnecting user because he/she has been tempbanned'
-                #                     return BOT.Q.rcon('kick %s' % uid)
-                #                 else:
-                #                     print 'Setting tempban unactive'
-                #                     db2 = database.DB()
-                #                     db2.tableSelect('penalties')
-                #                     enx = db2.rowFind(en['id'])
-                #                     enx['status'] = 0
-                #                     db2.rowUpdate(enx)
-                #                     db2.commit()
-            BOT.eventFire('CLIENT_CONNECTED', {'client':uid})
+            BOT.Clients[cid] = player.Player(cid, varz, A)
+            if BOT.Clients[cid].cl_guid != None:
+                log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
+                bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
+                if len(bq):
+                    for ban in bq:
+                        if datetime.now() < ban.until and ban.active:
+                            log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                            return BOT.Q.rcon('kick %s' % cid)
+            api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':cid})
 
     elif inp.startswith('ClientUserinfoChanged:'): 
-        # Different than ClientUserinfo because we don't add clients to the list or DB, just update
         uid, varz = parseUserInfoChange(inp, {}, {})
-        if uid in BOT.Clients.keys(): fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
+        if uid in BOT.Clients.keys(): pass # fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
     elif inp.startswith('ClientDisconnect:'):
         inp = int(inp.split(" ")[1])
-        BOT.eventFire('CLIENT_DISCONNECT', {'client':inp})
+        api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':inp})
         if inp in BOT.Clients.keys(): del BOT.Clients[inp]
     elif inp.startswith('Kill:'): parseKill(inp)
     elif inp.startswith('Hit:'): parseHit(inp)
@@ -212,7 +188,7 @@ def parse(inp):
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'):
-        BOT.eventFire('GAME_SHUTDOWN', {})
+        api.A.fireEvent('GAME_SHUTDOWN', {})
         BOT.matchEnd()
         # We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
         # when the mapcycle changes maps? hrmph. investigate.
@@ -225,7 +201,7 @@ def parse(inp):
         #     del BOT.Clients[key]
         # ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
     elif inp.startswith('InitGame:'): 
-        fire('parse_initgame', BOT.gameData.update, (parseInitGame(inp),))
+        #fire('parse_initgame', BOT.gameData.update, (parseInitGame(inp),))
         BOT.matchNew()
     elif inp.startswith('InitRound:'): BOT.roundNew()
     elif inp.startswith('SurvivorWinner:'): 
@@ -285,7 +261,7 @@ def Start(_version_):
     #thread_handler.init(config)
     loadConfig(config)
     log = debug.init(config)
-    db = database.setup()
+    db = database.setup(config, log)
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config, database=db)
     #A = API() #@TODO Fix this bullshit
     api.setup(BOT)

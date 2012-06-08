@@ -1,24 +1,43 @@
-from bot.debug import log
-from bot.main import config
+from peewee import *
+from datetime import datetime
+import sys, os, time
 
-class Database():
-	def __init__(self): pass
+dbs = {
+    'sqlite':SqliteDatabase,
+}
 
-class User():
-	def __init__(self, name=None, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None):
-		self.name = name
-		self.guid = guid
-		self.ip = ip
-		self.group = group
-		self.password = password
-		self.joincount = joincount
-		self.firstjoin = firstjoin
-		self.lastjoin = lastjoin	
+database = None
+config = None
+log = None
 
-	def save(self): pass
-	def clientJoin(self): pass
-	def clientQuit(self): pass
+#name=None, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None
+class User(Model):
+    name = CharField()
+    guid = CharField()
+    ip = CharField()
+    group = IntegerField()
+    password = CharField()
+    joincount = IntegerField()
+    firstjoin = DateTimeField()
+    lastjoin = DateTimeField()
 
-def setup():
+class Ban(Model):
+    uid = ForeignKeyField(User) #Bannie
+    by = ForeignKeyField(User) #Banner
+    reason = CharField() #Ban reason
+    created = DateTimeField() #Ban start
+    until = DateTimeField() #Ban end
+    active = BooleanField()
+
+def setup(config, log):
+    global database
     log.debug('SETUP: DATABASE')
+    cfg = config.dbConfig
+    database = dbs[cfg['type']](cfg['database'], threadlocals=True)
+    database.connect()
+    try:
+        User.create_table()
+        Ban.create_table()
+    except: pass
     log.debug('SETUP DONE: DATABASE')
+    return database, User

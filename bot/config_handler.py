@@ -15,6 +15,7 @@ import pprint, json
 default = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]:",
+    'cmd_prefix':'!',
     'mode':0,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",

@@ -100,23 +100,23 @@ class Bot():
         self.gameData['mapname'] = r.group(1)
         return r.group(1)
 
-    def eventFire(self, event, data): 
-        obj = events.EVENTS[event](data)
-        if event in init.events.EVENTS:
-            obj = events.Event(event, data)
-        elif event in init.events.CUSTOM_EVENTS:
-            obj = events.EventCustom(event, data)
-        elif event in init.events.PLUGIN_EVENTS:
-            obj = events.EventPlugin(event, data)
-        else:
-            return log.warning('Unknown/Unregistered event was fired!')
+    def eventFire(self, event, data): pass
+        # obj = events.EVENTS[event](data)
+        # if event in init.events.EVENTS:
+        #     obj = events.Event(event, data)
+        # elif event in init.events.CUSTOM_EVENTS:
+        #     obj = events.EventCustom(event, data)
+        # elif event in init.events.PLUGIN_EVENTS:
+        #     obj = events.EventPlugin(event, data)
+        # else:
+        #     return log.warning('Unknown/Unregistered event was fired!')
             
-        for i in self.Listeners.keys():
-            if i == event:
-                for listener in self.Listeners[i]:
-                    thread.start_new_thread(listener, (obj, time.time()))
-                break
-        return obj
+        # for i in self.Listeners.keys():
+        #     if i == event:
+        #         for listener in self.Listeners[i]:
+        #             thread.start_new_thread(listener, (obj, time.time()))
+        #         break
+        # return obj
 
     def Startup(self, API):
         self.A = API
@@ -135,15 +135,16 @@ class Bot():
         if status == []: return
 
         for i in status:
-            log.debug(i, i[0])
+            log.debug('Add User: %s, %s' % (i, i[0]))
             uid = int(i[0])
-            self.Clients[uid] = player.Player(uid, self.dumpUser(uid), init.A)
+            self.Clients[uid] = player.Player(uid, self.dumpUser(uid), None)
 
         self.updatePlayers() #Set team/score for players
         self.getGameType() #Set g_gametype in self.gamedata
         self.getCurrentMap() #set mapname in self.gamedata
 
         self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+        self.Q.rcon('tell 0 test')
         log.info('SETUP DONE: BOT')
 
     def parse(self, line):

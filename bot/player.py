@@ -46,10 +46,10 @@ class Player():
         except Exception, e:
             print e
 
-        q1 = database.orm.get(nick=self.name, ip=self.ip, guid=self.cl_guid)
-        q2 = database.orm.get(ip=self.ip, guid=self.cl_guid)
-        q3 = database.orm.get(guid=self.cl_guid)
-        
+        q1 = [i for i in database.User.select().where(name=self.name, ip=self.ip, guid=self.cl_guid)]
+        q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
+        q3 = [i for i in database.User.select().where(guid=self.cl_guid)]
+
         if len(q1) or len(q2) or len(q3):
             q = []
             for cli in [i[0] for i in [q1, q2, q3] if len(i)]:
@@ -57,11 +57,13 @@ class Player():
                     q.append(cli)
                 if len(q) == 1: self.client = q[0]
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
-        else: self.client = database.orm(nick=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0)
+        else: self.client = database.User(name=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
 
         self.client.lastjoin = datetime.now()
         self.client.joincount += 1
         self.client.save()
+
+        self.uid = self.client.id
     
     def changeGroup(self, group): pass
     def checkAuth(self): pass
