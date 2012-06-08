@@ -47,5 +47,5 @@ def init(config):
     if status is True:
         log.addHandler(SH)
         log.addHandler(FH)
-    log.info('Logging sub-system started')
+    log.info('SETUP DONE: Logging')
     return log

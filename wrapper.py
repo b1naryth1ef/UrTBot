@@ -16,7 +16,7 @@ def sigHandler(signum, frame):
 	sys.exit()
 
 def loadConfig():
-	from config_handler import ConfigFile
+	from bot.config_handler import ConfigFile
 	global serverexe, serversocket
 	botConfig = ConfigFile().botConfig
 	serverexe = botConfig['servercommand']
@@ -32,7 +32,7 @@ def launch():
 								stdout=subprocess.PIPE,
 								stderr=subprocess.STDOUT)
 	procfile = os.fdopen(proc.stdout.fileno())
-	server = socket.socket(AF_UNIX, SOCK_STREAM)
+	server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	try: os.unlink(serversocket)
 	except: pass
 	server.bind(serversocket)
@@ -43,6 +43,7 @@ def launch():
 		if proc.stdout in rfd: # we potentially block here if we don't have a whole line :|
 			data = procfile.readline()
 			print data.rstrip()
+			if not data: break
 			for client in clients:
 				try:
 					client.send(data)

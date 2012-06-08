@@ -34,7 +34,7 @@ class RCON:
 		self.socket.settimeout(0.75)
 
 	def send(self, data):
-		self.socket.send('\xFF\xFF\xFF\xFF' + data)
+		self.socket.send('\xFF\xFF\xFF\xFF' + str(data))
 
 	def recv(self):
 		data = None

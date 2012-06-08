@@ -2,8 +2,8 @@
 .*.swp
 *.pyc
 *.DS_Store
+*.log
 *~
-config.py
-
+config.*
 urtbot
 build/

@@ -269,14 +269,15 @@ def loadMods():
 
 def loop():
     """Round and round in circles we go!"""
-    global proc, keepLoop
+    global proc, keepLoop, BOT
     while True:
         proc.checkAndRead()
         while proc.hasLine():
             line = proc.getLine()
             if line != '^1Error: weapon number out of range':
                 print line
-            parse(line)
+            BOT.parse(line)
+            #parse(line)
 
 def Start(_version_):
     global BOT, proc, A, config_debugmode, db, config, log
@@ -287,14 +288,15 @@ def Start(_version_):
     db = database.setup()
     BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config, database=db)
     #A = API() #@TODO Fix this bullshit
-    BOT.Startup()
+    api.setup(BOT)
+    BOT.Startup(api.API)
     loadMods()
     proc = GameOutput(config_serversocket)
     
     #db = database.init(config)
 
     x = os.uname()
-    A.say('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
+    log.info('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
 
     loop()
 

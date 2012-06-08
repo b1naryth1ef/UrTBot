@@ -1,11 +1,11 @@
 import socket, select, time, re, thread
-import bot, player, const, database
+import bot, player, const, database, main
 from debug import log
 from rcon import RCON
+from collections import deque
 
 class Bot():
     def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None, database=None):
-
         self.prefix = prefix
         self.ip = ip
         self.rcon = rcon
@@ -15,6 +15,7 @@ class Bot():
         self.status = 1 #1 is on, 0 is off
         self.debug = debug #False will hide messages, True will print them and log them to vars
         self.config = config
+        self.logback = deque()
         
         self.maplist = self.config.UrTConfig['maps']
         self.currentMap = None
@@ -36,9 +37,11 @@ class Bot():
         
     def roundNew(self): pass
     def roundEnd(self): pass
+
     def matchNew(self):
         self.loadingMap = False
         self.justChangedMap = True
+
     def matchEnd(self):
         log.debug('Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore))
         self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
@@ -59,8 +62,7 @@ class Bot():
     
     def updatePlayers(self):
         #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
-        r = self.Q.rcon('players')
-        r = r.split('\n')
+        r = self.Q.rcon('players').split('\n')
         self.setScores(r[3])
         for i in r[4:]:
             if i != '':
@@ -74,8 +76,7 @@ class Bot():
     def dumpUser(self, uid):
         vz = []
         varz = {}
-        r = self.Q.rcon('dumpuser %s' % uid)
-        r = r.split('\n')
+        r = self.Q.rcon('dumpuser %s' % uid).split('\n')
         for i in r[3:]:
             if i != '':
                 vz.append([j for j in i.split(' ') if j != ''])
@@ -85,8 +86,7 @@ class Bot():
          
     def getStatus(self):
         varz = []
-        r = self.Q.rcon('status')
-        r = r.split('\n')[4:]
+        r = self.Q.rcon('status').split('\n')[4:]
         for i in r:
             if i != '':
                 i = i.split(' ')
@@ -95,8 +95,7 @@ class Bot():
         return varz
 
     def getCurrentMap(self):
-        r = self.Q.rcon('mapname')
-        r = const.rconCurrentMap.search(r)
+        r = const.rconCurrentMap.search(self.Q.rcon('mapname'))
         self.currentMap = r.group(1)
         self.gameData['mapname'] = r.group(1)
         return r.group(1)
@@ -119,16 +118,18 @@ class Bot():
                 break
         return obj
 
-    def Startup(self):
+    def Startup(self, API):
+        self.A = API
         log.info('SETUP: BOT')
         self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
         
         # Get the PK3s/maps the server has loaded
+        #print self.Q.rcon("sv_pakNames").split('"')
         pk3s = self.Q.rcon("sv_pakNames").split('"')[3].split()
         for ignore in self.config.UrTConfig['ignoremaps']:
             if ignore in pk3s: pk3s.remove(ignore)
         self.maplist += pk3s
-        print self.maplist
+        log.debug('MAPLIST: %s' % self.maplist)
 
         status = self.getStatus()
         if status == []: return
@@ -144,6 +145,11 @@ class Bot():
 
         self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
         log.info('SETUP DONE: BOT')
+
+    def parse(self, line):
+        if len(self.logback): self.logback.popleft()
+        self.logback.append(line)
+        main.parse(line)
 
 # class API():
 #     RED = '^1'

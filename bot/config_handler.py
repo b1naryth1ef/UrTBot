@@ -1,13 +1,21 @@
-from bot.debug import log
-import sys, os
+try: from bot.debug import log
+except: 
+    class LawlLog():
+        def _p(self, msg): print msg
+        debug = _p
+        warning = _p
+        info = _p
+        error = _p
+        critical = _p
+    log = LawlLog()
+import sys, os, time
+import pprint, json
 
-checkKeys = ['botConfig', 'dbConfig', 'developerConfig', 'speed', 'UrTConfig']
 
-header = 'config = '
-footer = ''
 default = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]:",
+    'mode':0,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",
     'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
@@ -36,11 +44,6 @@ default = {
     'loglevel':'debug'
 },
 
-'speed':{
-    'threading':1, #1: Normal, 0: Low (Less threads), 2: High (More threads), 3: Insane (Thread all the things!)
-    'max-threads':20, #Probablly just leave this. If your on threading mode 3, this will be ignored!
-},
-
 'UrTConfig':{
     # Maps that don't have their own PK3
     'maps' : [ 'ut4_abbey','ut4_abbeyctf','ut4_algiers','ut4_ambush',
@@ -59,41 +62,39 @@ default = {
 class ConfigFile():
     def __init__(self, configfile='config'):
         self.configfile = configfile
-        self.config = self.open()
-        self.fi = None
+        self.config = self.load()
 
         self.check()
+        self.save()
 
-    def __getitem__(self, attr):
-        return self.config[attr]
+    def load(self):
+        try:
+            with open(self.configfile+'.cfg', 'r') as f:
+                return json.loads(''.join(f.readlines()))
+        except:
+           log.warning('Invalid or incorrect config file loaded, creating new!')
+           return default
 
-    def __getattr__(self, attr):
-        return self.config[attr]
-
-    def writeDict(self, dicty):
-        self.fi = open(self.configfile+'.py', 'w')
-        self.fi.write(header)
-        self.fi.write(dicty.__str__())
-        self.fi.write(footer)
-        self.fi.close()
+    def save(self):
+        s = json.dumps(self.config, sort_keys=True, indent=4)
+        with open(self.configfile+'.cfg', 'w') as f:
+            f.write(s)
 
     def check(self):
         for key in default:
             if key not in self.config.keys():
-                print '%s not in!' % key #@DEBUG
+                log.warning('Could not find %s key! Adding to config...')
                 self.config[key] = default[key]
         for key in self.config:
             if key not in default:
-                print '%s in!' % key #@DEBUG
+                log.warning('Found key %s which is no longer needed! Removing...')
                 del self.config[key]
-        self.writeDict(self.config)
 
-    def open(self):
-        try: 
-            return getattr(__import__(self.configfile), 'config')
-        except ImportError, e:
-            self.createDefaultConfig()
-            return self.open()        
-
-    def createDefaultConfig(self): self.writeDict(default)
+    def __getitem__(self, attr):
+        return self.config[attr]
+   
+    def __getattr__(self, attr):
+        if attr in self.config.keys():
+            return self.config[attr]
+        return self.__dict__[attr]
 

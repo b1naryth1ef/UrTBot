@@ -1,5 +1,6 @@
 import sys, os, time
 import database, const
+from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
 
@@ -47,14 +48,16 @@ class Player():
 
         q1 = database.orm.get(nick=self.name, ip=self.ip, guid=self.cl_guid)
         q2 = database.orm.get(ip=self.ip, guid=self.cl_guid)
-
-        #This needs a revamp. Possibly leave it like this tell HD?
-        if len(q1) == 1:
-            self.client = q1[0]
-        elif len(q2) == 1:
-            self.client = q2[0]
-        else:
-            self.client = database.orm(nick=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0)
+        q3 = database.orm.get(guid=self.cl_guid)
+        
+        if len(q1) or len(q2) or len(q3):
+            q = []
+            for cli in [i[0] for i in [q1, q2, q3] if len(i)]:
+                if cli not in q:
+                    q.append(cli)
+                if len(q) == 1: self.client = q[0]
+                else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
+        else: self.client = database.orm(nick=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0)
 
         self.client.lastjoin = datetime.now()
         self.client.joincount += 1
