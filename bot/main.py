@@ -144,10 +144,11 @@ def parse(inp):
     global BOT
     if inp.startswith("say:"): #say: 0 [WoC]*B1naryth1ef: blah blah
         inp = inp.split(' ', 3)[1:]
+        #print inp[2].startswith(config.botConfig['cmd_prefix']), inp[2][0]
         dic = {'name':inp[1][:-1], 'cid':BOT.getPlayer(int(inp[0])), 'msg':inp[2]}
-        if dic[msg].startswith(config.botConfig['cmd_prefix']):
+        if inp[2].startswith(config.botConfig['cmd_prefix']):
             api.A.fireEvent('CLIENT_SAY_CMD', dic)
-            api.A.fireCommand(inp[2].rstrip().split(' ')[0], dic)
+            api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
         api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
 
     elif inp.startswith('ClientConnect:'): #ClientConnect: 0
@@ -272,17 +273,20 @@ def Start(_version_):
     api.setup(BOT)
     BOT.Startup(api.API)
     loadMods()
+    api.A.finishBooting()
     proc = GameOutput(config_serversocket)
     
     #db = database.init(config)
 
     x = os.uname()
     log.info('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
-    try:
-        loop()
-    except:
-        thread.exit()
-        sys.exit()
+    if True:
+        try:
+            loop()
+        except:
+            thread.exit()
+            sys.exit()
+    else: loop()
 def Exit(): sys.exit()
 
 if __name__ == "__main__":

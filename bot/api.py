@@ -1,6 +1,7 @@
 from debug import log
 from player import Player
 import sys, os, time
+import thread_handler as thread
 
 class Q3API():
     def __init__(self, bot):
@@ -26,6 +27,7 @@ class API():
 
     def finishBooting(self):
         self.booted = True
+        print 'Running fin'
         for i in self.listenActions:
             self.addListener(*i)
 
@@ -43,26 +45,31 @@ class API():
         n = '_'.join(name[:-1])
         if not self.listeners['cats'].get(n):
             self.listeners['cats'][n] = []
+        log.debug('Event %s has been registered!' % '_'.join(name))
 
     def addListener(self, name, func):
-        if self.booted: self.listenActions.append((name, func))
-        if name.contains('_'):
-            n = name.split('_')
-            self.listeners['cats']['_'.join(n[:-1])].append(func)
-        if self.listeners['eves'].get(name):
-            self.listeners['eves'][name].append(func)
-        else:
-            log.warning("Event %s has not been registered!" % (name))
+        if not self.booted: 
+            self.listenActions.append((name, func))
+            return
+        if name in self.listeners['cats']:
+            return self.listeners['cats'][name].append(func)
+        if name in self.listeners['eves'].keys():
+            return self.listeners['eves'][name].append(func)
+        log.warning("Event %s has not been registered!" % (name))
 
-    def fireEvent(self, name, data):
+    def fireEvent(self, name, data={}, obj=None):
         log.debug('Firing event %s' % name)
-        obj = self.events['eves'][name].fire(data)
-        self.listeners['eves'][name](obj)
-        if obj.cat:
-            for i in self.listeners['cats'][obj.cat]:
-                i(obj)
+        if not obj: obj = self.events['eves'][name].getObj(data)
+        [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
+        if obj.cats:
+            [thread.fireThread(i, obj) for i in self.listeners['cats'][obj.cats]]
 
-    def fireCommand(self, cmd, data): pass
+    def fireCommand(self, cmd, data):
+        print cmd
+        if cmd in self.commands.keys():
+            thread.fireThread(self.commands.get(cmd), data)
+            return True
+        else: return False
 
 A = API()
 
@@ -78,12 +85,6 @@ def listener(event):
         return target
     return decorator
 
-def event(event):
-    def decorator(target):
-        A.addEvent(event)
-        return target
-    return decorator
-
 class FiredEvent():
     def __init__(self, name, data, cats=[]):
         self.name = name
@@ -93,13 +94,17 @@ class FiredEvent():
 
 class Event():
     def __init__(self, name):
+        name = name.upper()
         self.n = name.split('_')
-        self.name = self.n[-1]
+        self.name = name
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
 
-    def fire(self, data):
+    def getObj(self, data={}):
         return FiredEvent(self.name, data, self.cats)
+
+    def fire(self, data={}):
+        A.fireEvent(self.name, obj=self.getObj(data))
 
 EVENTS = {
 'CLIENT_BEGIN':Event('CLIENT_BEGIN'),
