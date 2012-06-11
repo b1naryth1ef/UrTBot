@@ -15,6 +15,8 @@ import time
 import thread
 import re
 
+split = lambda s, l: [s[i:i+l] for i in range(0, len(s), l)]
+
 class RCON:
 	def __init__(self, server='localhost', password='password', port=27960):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -56,6 +58,12 @@ class RCON:
 			retries -= 1
 
 		return data[4:] if data != None else data
+
+	def format(self, string):
+		new = None
+		for i in split(string, 69):
+			new = i if not new else new + '%s' % re.findall('(\^[0-9a-z])', new)[-1] + i
+		return new
 
 	def rcon(self, cmd):
 		self.lock.acquire(1)
