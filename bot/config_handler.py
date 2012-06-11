@@ -36,7 +36,7 @@ default = {
 'dbConfig':{
     'connecter':'peewee',
     'type':'sqlite',
-    'database':'/tmp/urtbot.db',
+    'database':'urtbot.db',
 },
 
 'developerConfig':{
