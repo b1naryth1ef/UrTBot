@@ -42,9 +42,9 @@ class API():
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
         self.events['_'.join(name)] = func
         self.listeners['eves']['_'.join(name)] = []
-        n = '_'.join(name[:-1])
-        if not self.listeners['cats'].get(n):
-            self.listeners['cats'][n] = []
+        for i in name[:-1]:
+            if not self.listeners['cats'].get(i):
+                self.listeners['cats'][i] = []
         log.debug('Event %s has been registered!' % '_'.join(name))
 
     def addListener(self, name, func):
@@ -59,10 +59,11 @@ class API():
 
     def fireEvent(self, name, data={}, obj=None):
         log.debug('Firing event %s' % name)
-        if not obj: obj = self.events['eves'][name].getObj(data)
+        if not obj: obj = self.events[name].getObj(data)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
-            [thread.fireThread(i, obj) for i in self.listeners['cats'][obj.cats]]
+            for cat in obj.cats.split('_'):
+                [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
     def fireCommand(self, cmd, data):
         print cmd

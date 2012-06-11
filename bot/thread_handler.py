@@ -1,14 +1,16 @@
 import threading, thread
-from main import log
+from debug import log
 
 threads = []
 gcthread = None
 
 def exit():
+	log.debug('Exit called')
 	for thr in threads:
 		thr._Thread__stop()
 
 def fireThread(target, *args, **kwargs):
+	log.debug('Firing thread to %s...' % target)
 	t = threading.Thread(target=target, args=args, kwargs=kwargs)
 	t.start()
 	threads.append(t)

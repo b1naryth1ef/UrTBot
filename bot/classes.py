@@ -36,30 +36,38 @@ class Bot():
         self.Clients = {} #AKA players
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
         
-    def roundNew(self): pass
-    def roundEnd(self): pass
+    def roundNew(self):
+        log.debug('New round starting!')
+        self.eventFire('GAME_ROUND_START', {})
+
+    def roundEnd(self):
+        log.debug('Round over!')
+        self.eventFire('GAME_ROUND_END', {})
 
     def matchNew(self):
+        log.debug('New match starting!')
+        self.eventFire('GAME_MATCH_START', {})
         self.loadingMap = False
         self.justChangedMap = True
 
     def matchEnd(self):
-        log.debug('Match over... RED: %s BLUE: %s' % (self.redScore, self.blueScore))
+        log.debug('Match over! RED: %s BLUE: %s' % (self.redScore, self.blueScore))
         self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
     def getClient(self, uid): return self.Clients[uid]
+
     def getGameType(self):
         r = self.Q.rcon('g_gametype')
         r = re.findall(const.rconGameType, r)
-        self.gameData['g_gametype'] = r[0][0]
-        return r[0][0]
+        self.gameData['g_gametype'] = int(r[0][0])
+        return self.gameData['g_gametype']
 
     def setScores(self, line):
         #Scores: R:11 B:9
-        line = line.split(':')
-        self.redScore = int(line[2].strip(' B'))
-        self.blueScore = int(line[3])
+        line = re.findall('.*?(\\d+)', line)
+        self.redScore = int(line[0])
+        self.blueScore = int(line[1])
     
     def updatePlayers(self):
         #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
@@ -99,59 +107,40 @@ class Bot():
         r = const.rconCurrentMap.search(self.Q.rcon('mapname'))
         self.currentMap = r.group(1)
         self.gameData['mapname'] = r.group(1)
-        return r.group(1)
+        return self.gameData['mapname']
 
     def eventFire(self, event, data): pass
-        # obj = events.EVENTS[event](data)
-        # if event in init.events.EVENTS:
-        #     obj = events.Event(event, data)
-        # elif event in init.events.CUSTOM_EVENTS:
-        #     obj = events.EventCustom(event, data)
-        # elif event in init.events.PLUGIN_EVENTS:
-        #     obj = events.EventPlugin(event, data)
-        # else:
-        #     return log.warning('Unknown/Unregistered event was fired!')
-            
-        # for i in self.Listeners.keys():
-        #     if i == event:
-        #         for listener in self.Listeners[i]:
-        #             thread.start_new_thread(listener, (obj, time.time()))
-        #         break
-        # return obj
 
     def Startup(self, API):
         self.A = API
         log.info('SETUP: BOT')
-        if "No rconpassword set on the server." in self.Q.rcon("say "+self.prefix+" ^3"+"Starting up..."):
-            log.critical('The server does not have an rcon password check. Please check your server config.')
+        resp = self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
+        if "No rconpassword set on the server." in resp:
+            log.critical('The server does not have an rcon password check. Please check your server config and try again.')
+            sys.exit()
+        elif 'Bad rconpassword.' in resp:
+            log.critical('The rcon password you provided was incorrect. Please double check it and try again.')
             sys.exit()
         
-        # Get the PK3s/maps the server has loaded
-        #print self.Q.rcon("sv_pakNames").split('"')
-        pk3s = self.Q.rcon("sv_pakNames").split('"')[3].split()
-        for ignore in self.config.UrTConfig['ignoremaps']:
-            if ignore in pk3s: pk3s.remove(ignore)
-        self.maplist += pk3s
+        self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
         log.debug('MAPLIST: %s' % self.maplist)
 
-        status = self.getStatus()
-        if status == []: return
-
-        for i in status:
-            log.debug('Add User: %s, %s' % (i, i[0]))
-            uid = int(i[0])
-            self.Clients[uid] = player.Player(uid, self.dumpUser(uid), None)
-
-        self.updatePlayers() #Set team/score for players
         self.getGameType() #Set g_gametype in self.gamedata
         self.getCurrentMap() #set mapname in self.gamedata
 
-        self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
-        self.Q.rcon('tell 0 test')
-        log.info('SETUP DONE: BOT')
+        status = self.getStatus()
+        if status != []:
+            for i in status:
+                log.debug('Add User: %s, %s' % (i, i[0]))
+                uid = int(i[0])
+                self.Clients[uid] = player.Player(uid, self.dumpUser(uid), None)
+            self.updatePlayers() #Set team/score for players
 
+        self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+        log.info('SETUP DONE: BOT')
+        
     def parse(self, line):
-        if len(self.logback): self.logback.popleft()
+        if 0 < len(self.logback) > 5: self.logback.popleft()
         self.logback.append(line)
         main.parse(line)
 

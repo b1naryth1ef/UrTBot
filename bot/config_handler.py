@@ -42,7 +42,8 @@ default = {
 'developerConfig':{
     'logging':True,
     'logfile':'debug.log',
-    'loglevel':'debug'
+    'loglevel':'debug',
+    'enabled':True,
 },
 
 'UrTConfig':{
@@ -72,10 +73,9 @@ class ConfigFile():
         try:
             with open(self.configfile+'.cfg', 'r') as f:
                 return json.loads(''.join(f.readlines()))
-        except Exception, e:
-            log.debug('Config file loading failed because of %s' % e)
-            log.warning('Invalid or incorrect config file loaded, creating new!')
-            return default
+        except:
+           log.warning('Invalid or incorrect config file loaded, creating new!')
+           return default
 
     def save(self):
         s = json.dumps(self.config, sort_keys=True, indent=4)
@@ -87,10 +87,20 @@ class ConfigFile():
             if key not in self.config.keys():
                 log.warning('Could not find %s key! Adding to config...')
                 self.config[key] = default[key]
+            if type(default[key]) is dict:
+                for _key in default[key].keys():
+                    if _key not in self.config[key].keys():
+                        log.warning('Could not find subkey %s of %s. Adding...' % (key, _key))
+                        self.config[key][_key] = default[key][_key]
         for key in self.config:
             if key not in default:
                 log.warning('Found key %s which is no longer needed! Removing...')
                 del self.config[key]
+            if type(default[key]) is dict:
+                for _key in self.config[key].keys():
+                    if _key not in default[key].keys():
+                        log.warning('Extra subkey %s of %s. Removing...' % (key, _key))
+                        del self.config[key][_key]
 
     def __getitem__(self, attr):
         return self.config[attr]

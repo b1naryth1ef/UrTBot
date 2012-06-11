@@ -191,7 +191,9 @@ def parse(inp):
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'):
         api.A.fireEvent('GAME_SHUTDOWN', {})
-        BOT.matchEnd()
+        if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
+        else: log.debug('Sounds like server is going down...')
+        log.debug('SHUTDOWN WITH %s' % BOT.logback[0])
         # We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
         # when the mapcycle changes maps? hrmph. investigate.
         # In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
@@ -280,13 +282,14 @@ def Start(_version_):
 
     x = os.uname()
     log.info('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
-    if True:
+    if not config.developerConfig['enabled']:
         try:
             loop()
         except:
             thread.exit()
             sys.exit()
     else: loop()
+
 def Exit(): sys.exit()
 
 if __name__ == "__main__":

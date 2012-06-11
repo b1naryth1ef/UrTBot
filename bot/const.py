@@ -11,8 +11,15 @@ flagactions = {
 0:'drop',
 1:'return',
 2:'score'    
- 
 }
+
+GAMETYPE_FFA = 0
+GAMETYPE_TDM = 3
+GAMETYPE_TS = 4
+GAMETYPE_FTL = 5
+GAMETYPE_CAH = 6
+GAMETYPE_CTF = 7
+GAMETYPE_BM = 8
 
 gametypes = {
 0: 'ffa', #free for all
