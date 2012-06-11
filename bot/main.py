@@ -30,17 +30,8 @@ config_groups = None
 config_plugins = None
 config_serversocket = None
 
-def parseInitGame(inp, varz={}):
-    options = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
-    for o in options:
-        varz[o[0]] = o[1]
-    return varz
-      
-def parseTimeLimitHit(inp):
-    BOT.updatePlayers()
-    BOT.matchEnd()
-
-def parseUserInfo(inp, varz={}):
+#--RENDERING ACTIONS--#
+def renderUserInfo(inp, varz={}):
     inp2 = inp.split(' ', 2)
     uid = int(inp2[1])
     var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
@@ -51,7 +42,7 @@ def parseUserInfo(inp, varz={}):
         varz['name'] = varz['name'].lower()
     return uid,varz
     
-def parseUserInfoChange(inp, varz={}, vary={}):
+def renderUserInfoChange(inp, varz={}, vary={}):
     #r is race, n is name, t is team
     #ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
     inp2 = inp.split(' ', 2)
@@ -63,10 +54,56 @@ def parseUserInfoChange(inp, varz={}, vary={}):
     if 'n' in varz.keys(): vary['name'] = varz['n'].lower()
     return uid,vary
 
-def parseKill(inp):
+#--PARSING ACTIONS--#
+def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
+    inp = inp.split(' ', 3)[1:]
+    dic = {'name':inp[1][:-1], 'cid':BOT.getPlayer(int(inp[0])), 'msg':inp[2]}
+    if inp[2].startswith(config.botConfig['cmd_prefix']):
+        api.A.fireEvent('CLIENT_SAY_CMD', dic)
+        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
+    api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
+
+def parseClientConnect(inp): #ClientConnect: 0
+    cid = int(re.findall('ClientConnect\: ([0-9a-z])', s))
+    if cid in BOT.Clients.keys(): #Disconnect messages MAY be missed!
+        if BOT.loadingMap is False and BOT.justChangedMap is False:
+            log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
+            del BOT.Clients[inp]
+        else:
+            BOT.justChangedMap = False
+    api.A.fireEvent('CLIENT_CONN_CONNECT', {client:inp})
+
+def parseClientUserInfo(inp):
+    cid, varz = parseUserInfo(inp)
+    f = {'client':cid, 'info':varz}
+    if cid in BOT.Clients.keys():
+        api.A.fireEvent('CLIENT_INFO_UPDATE')
+        thread.fireThread(BOT.Clients[cid].updateData, f)
+    else:
+        BOT.Clients[cid] = player.Player(cid, varz, A)
+        if BOT.Clients[cid].cl_guid != None:
+            log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
+            bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
+            if len(bq) and len([i for i in bq if datetime.now() < ban.until and ban.active]):
+                log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                return BOT.Q.rcon('kick %s' % cid)
+        api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
+        api.A.fireEvent('CLIENT_INFO_SET', f)
+
+def parseClientUserInfoChanged(inp):
+    cid, varz = parseUserInfoChange(inp, {}, {})
+    if uid in BOT.Clients.keys(): 
+        thread.fireThread(BOT.Clients[uid].updateData, {'client': cid, 'info':varz})
+        api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': cid, 'info':varz})
+
+def parseClientDisconnect(inp): #ClientDisconnect: 0
+    cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp))
+    api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':inp})
+    if inp in BOT.Clients.keys(): del BOT.Clients[inp]
+
+def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
-    inp = inp.split(" ")
-    inp.pop(0)
+    inp = inp.split(" ")[1:]
     attacker = int(inp[0])
     if attacker == 1022: atkobj = None #We're world. Setting this None might break shit (but hopefully not)
     else: atkobj = BOT.Clients[attacker] #We're a player
@@ -85,19 +122,30 @@ def parseKill(inp):
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
     inp = inp.split(' ')
-    attacker = inp[1]
-    victim = inp[2]
-    hitloc = inp[3]
-    method = inp[4]
+    attacker = int(inp[1])
+    victim = int(inp[2])
+    hitloc = int(inp[3])
+    method = int(inp[4])
     BOT.eventFire('CLIENT_HIT', {'atk':attacker, 'vic':victim, 'loc':hitloc, 'meth':method})
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
     inp = inp.split(' ')
     item = inp[2].strip()
-    client = inp[1]
+    client = int(inp[1])
     if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
     else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':client})
+
+def parseFlag(inp):
+    #Flag: 0 2: team_CTF_redflag
+    inp = inp.strip().replace(':', '').split(' ', 3)
+    actionid = int(inp[2])
+    data = {'client':int(inp[1]), 'actionid':actionid, 'action':const.flagactions[action], 'flag':inp[3], 'flagid':const.flagtypes[flag]}
+    api.A.fireEvent(['GAME_FLAG_DROP', 'GAME_FLAG_RETURN', 'GAME_FLAG_CAPTURE'][actionid], {'client':cid, 'actionid':action, 'action':actionid, 'flag':flag, 'flagid':flagid})
+
+def parseFlagReturn(inp):
+    inp = inp.strip().split(' ', 3)
+    api.A.fireEvent('GAME_FLAG_RESET', {'flag':inp[2], 'flagid':const.flagtypes[inp[2]]})
 
 def parsePlayerBegin(inp): pass
     #ClientBegin: 0
@@ -105,117 +153,65 @@ def parsePlayerBegin(inp): pass
     #client = int(inp[1])
     #BOT.eventFire('CLIENT_BEGIN', {'client':client})
 
-def parseFlag(inp):
-    #Flag: 0 2: team_CTF_redflag
-    inp = inp.split(' ', 3)
-    cid = inp[1]
-    action = int(inp[2].strip(':'))
-    flag = inp[3].strip()
-    flagid = const.flagtypes[flag]
-    if action == 0: BOT.eventFire('GAME_FLAGDROP', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #drop
-    elif action == 1: BOT.eventFire('GAME_FLAGRETURN', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #return
-    elif action == 2: BOT.eventFire('GAME_FLAGCAPTURE', {'client':cid, 'actionid':action, 'action':const.flagactions[action], 'flag':flag, 'flagid':flagid}) #score
+def parseShutdownGame(inp):
+    api.A.fireEvent('GAME_SHUTDOWN', {})
+    if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
+    else: log.debug('Sounds like server is going down...')
+    log.debug('SHUTDOWN WITH %s' % BOT.logback[0])
+    # We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
+    # when the mapcycle changes maps? hrmph. investigate.
+    # In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
+    # rcon from 127.0.0.1:
+    # map
+    # That should work ye?
+    # for key in BOT.Clients.keys():
+    #     BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
+    #     del BOT.Clients[key]
+    # ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 
-def parseFlagReturn(inp):
-    inp = inp.split(' ', 3)
-    flag = inp[2].strip()
-    BOT.eventFire('GAME_FLAGRESET', {'flag':flag, 'flagid':const.flagtypes[flag]})
+def parseInitGame(inp):
+    BOT.matchNew(dict(re.findall(r'\\([^\\]+)\\([^\\]+)', inp)))
+    
+def parseInitRound(inp):
+    BOT.roundNew()
 
-def parseCommand(inp, cmd):
-    uid = int(inp[0])
-    log.info('User %s sent command %s with level %s' % (BOT.Clients[uid].name, cmd, BOT.Clients[uid].group))
-    if BOT.getClient(uid).group >= BOT.Commands[cmd][2]:
-        obj = BOT.eventFire('CLIENT_COMMAND', {'sender':inp[0], 'sendersplit':inp[0].split(' '), 'msg':inp[2], 'msgsplit':inp[2].split(' '), 'cmd':cmd})
-        #thread.start_new_thread(BOT.Commands[cmd][0], (obj, time.time())) 
-    else:
-        msg = "You lack sufficient access to use %s [%s]" % (cmd, BOT.Clients[uid].group)
-        BOT.Q.rcon("tell %s %s %s " % (inp[0], BOT.prefix, msg))
+def parseSurvivorWinner(inp):
+    if int(BOT.gameData['g_gametype']) in [const.GAMETYPE_TS, const.GAMETYPE_BM, const.GAMETYPE_FTL]: 
+        BOT.roundEnd()
+    else: log.warning('Wait... Got SurvivorWinner but we\'re not playing TS, BM, or FTL?')
 
-def parseUserKicked(inp):
-    time.sleep(5)
-    cur = BOT.curClients()
-    for i in BOT.Clients.keys():
-        print i, cur
-        if i not in cur:
-            print 'SENDING CLIENT_KICKED'
-            BOT.eventFire('CLIENT_KICKED', {'client':i})
+def parseClientKick(inp):
+    def _user_kicked(inp):  
+        time.sleep(5)
+        cur = BOT.curClients()
+        for i in BOT.Clients.keys():
+            if i not in cur:
+                BOT.eventFire('CLIENT_KICKED', {'client':i})
+    log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
+    thread.fireThread(_user_kicked, inp)
+    
+def parseTimeLimitHit(inp):
+    BOT.updatePlayers()
+    BOT.matchEnd()
 
 def parse(inp):
     global BOT
-    if inp.startswith("say:"): #say: 0 [WoC]*B1naryth1ef: blah blah
-        inp = inp.split(' ', 3)[1:]
-        #print inp[2].startswith(config.botConfig['cmd_prefix']), inp[2][0]
-        dic = {'name':inp[1][:-1], 'cid':BOT.getPlayer(int(inp[0])), 'msg':inp[2]}
-        if inp[2].startswith(config.botConfig['cmd_prefix']):
-            api.A.fireEvent('CLIENT_SAY_CMD', dic)
-            api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
-        api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
-
-    elif inp.startswith('ClientConnect:'): #ClientConnect: 0
-        inp = int(inp.split(" ")[1])
-        if inp in BOT.Clients.keys(): #Disconnect messages MAY be missed!
-            if BOT.loadingMap is False and BOT.justChangedMap is False:
-                log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
-                del BOT.Clients[inp]
-            else:
-                BOT.justChangedMap = False
-        api.A.fireEvent('CLIENT_CONN_CONNECT', {client:inp})
-
-    elif inp.startswith('ClientUserinfo:'):
-        cid, varz = parseUserInfo(inp)
-        if cid in BOT.Clients.keys(): pass #fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
-        else:
-            BOT.Clients[cid] = player.Player(cid, varz, A)
-            if BOT.Clients[cid].cl_guid != None:
-                log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
-                bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
-                if len(bq):
-                    for ban in bq:
-                        if datetime.now() < ban.until and ban.active:
-                            log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-                            return BOT.Q.rcon('kick %s' % cid)
-            api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':cid})
-
-    elif inp.startswith('ClientUserinfoChanged:'): 
-        uid, varz = parseUserInfoChange(inp, {}, {})
-        if uid in BOT.Clients.keys(): pass # fire('update_clientinfo', BOT.Clients[uid].updateData, (varz,))
-    elif inp.startswith('ClientDisconnect:'):
-        inp = int(inp.split(" ")[1])
-        api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':inp})
-        if inp in BOT.Clients.keys(): del BOT.Clients[inp]
+    if inp.startswith("say:"): parseSay(inp)
+    elif inp.startswith('ClientConnect:'): parseClientConnect(inp)
+    elif inp.startswith('ClientUserinfo:'): parseClientUserInfo(inp)
+    elif inp.startswith('ClientUserinfoChanged:'): parseClientUserInfoChanged(inp)
+    elif inp.startswith('ClientDisconnect:'): parseClientDisconnect(inp)
     elif inp.startswith('Kill:'): parseKill(inp)
     elif inp.startswith('Hit:'): parseHit(inp)
     elif inp.startswith('Item'): parseItem(inp)
     elif inp.startswith('Flag:'): parseFlag(inp)
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
-    elif inp.startswith('ShutdownGame:'):
-        api.A.fireEvent('GAME_SHUTDOWN', {})
-        if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
-        else: log.debug('Sounds like server is going down...')
-        log.debug('SHUTDOWN WITH %s' % BOT.logback[0])
-        # We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
-        # when the mapcycle changes maps? hrmph. investigate.
-        # In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
-        # rcon from 127.0.0.1:
-        # map
-        # That should work ye?
-        # for key in BOT.Clients.keys():
-        #     BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
-        #     del BOT.Clients[key]
-        # ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
-    elif inp.startswith('InitGame:'): 
-        #fire('parse_initgame', BOT.gameData.update, (parseInitGame(inp),))
-        BOT.matchNew()
-    elif inp.startswith('InitRound:'): BOT.roundNew()
-    elif inp.startswith('SurvivorWinner:'): 
-        BOT.roundEnd()
-        if int(BOT.gameData['g_gametype']) in [4, 8]: BOT.eventFire('GAME_ROUND_END', {}) #<<< Will this work?
-        else: log.warning('Wait... Got SurvivorWinner but we\'re not playing Team Surivivor or bomb?')
-    elif inp.startswith('InitRound:'): pass
-    elif inp.startswith('clientkick') or inp.startswith('kick'): #@DEV This needs to be fixed in beta
-        log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
-        fire('parse_userkicked', parseUserKicked, (inp,)) #Threaded because we have to delay sending out CLIENT_KICKED events slightly
+    elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
+    elif inp.startswith('InitGame:'): parseInitGame(inp)
+    elif inp.startswith('InitRound:'): parseInitRound(inp)
+    elif inp.startswith('SurvivorWinner:'): parseSurvivorWinner(inp)
+    elif inp.startswith('clientkick') or inp.startswith('kick'): parseClientKick(inp)#@DEV This needs to be fixed in beta
     elif inp.startswith('Exit: Timelimit hit.'): parseTimeLimitHit(inp)
 
 def loadConfig(cfg):
@@ -276,6 +272,8 @@ def Start(_version_):
     BOT.Startup(api.API)
     loadMods()
     api.A.finishBooting()
+    api.A.B = BOT
+    api.A.config = config
     proc = GameOutput(config_serversocket)
     
     #db = database.init(config)

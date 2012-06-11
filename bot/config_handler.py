@@ -22,14 +22,14 @@ default = {
     'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
     'serversocket': "/tmp/quake3_27961",
     'plugins':[],
-    'groups':{
-        'unsub':0,
-        'user':1,
-        'member':2,
-        'mod':3,
-        'admin':4,
-        'uberadmin':5
-    },
+    'groups':[
+        {'name':'guest', 'minlevel':0, 'maxlevel':1},
+        {'name':'user', 'minlevel':1, 'maxlevel':2},
+        {'name':'member', 'minlevel':1, 'maxlevel':3},
+        {'name':'mod', 'minlevel':1, 'maxlevel':4},
+        {'name':'admin', 'minlevel':1, 'maxlevel':5},
+        {'name':'uberadmin', 'minlevel':1, 'maxlevel':6}
+    ],
     'debug_mode':True
 },
 

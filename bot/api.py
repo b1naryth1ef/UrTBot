@@ -11,10 +11,10 @@ class Q3API():
 
     def tell(self, plyr, msg):
         if isinstance(plyr, Player): plyr = plyr.cid
-        self.R("tell %s %s" % (plyr, msg))
+        self.R("tell %s ^3%s" % (plyr, msg)) #@DEV check if R.format() works on tell
 
     def say(self, msg):
-        self.R("say %s" % msg)
+        self.R("say %s" % self.R.format('^3'+msg))
 
 class API():
     def __init__(self):
@@ -24,6 +24,8 @@ class API():
         self.listeners = {'cats':{}, 'eves':{}}
         self.booted = False
         self.listenActions = []
+        self.B = None
+        self.config = None
 
     def finishBooting(self):
         self.booted = True
@@ -33,9 +35,9 @@ class API():
     def addCommand(self, cmd, func, desc='', level=0, alias=[]):
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
-        self.commands[cmd] = (func,desc,level)
+        self.commands[cmd] = {'exec':func, 'desc':desc, 'level':level}
         for i in alias:
-            self.aliases[i] = (func,desc,level,cmd)
+            self.aliases[i] = cmd
 
     def addEvent(self, name, func):
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
@@ -65,11 +67,16 @@ class API():
                 [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
     def fireCommand(self, cmd, data):
-        print cmd
-        if cmd in self.commands.keys():
+        user = self.B.getClient(data['cid'])
+        _min = self.config.botConfig['groups'][user.group]['minlevel']
+        _max =  self.config.botConfig['groups'][user.group]['maxlevel']
+        if cmd in self.commands.keys(): obj = self.commands.get(key)
+        elif cmd in self.aliases.keys(): obj = self.aliases.get(key)
+
+        if _min <= obj['level'] <= _max:
             thread.fireThread(self.commands.get(cmd), data)
-            return True
-        else: return False
+        else:
+            API.tell(user, 'You do not have sufficient access to use that command!')
 
 A = API()
 
@@ -107,14 +114,11 @@ class Event():
         A.fireEvent(self.name, obj=self.getObj(data))
 
 EVENTS = {
-'CLIENT_BEGIN':Event('CLIENT_BEGIN'),
-'CLIENT_KICKED':Event('CLIENT_KICKED'),
-'CLIENT_SUICIDE':Event('CLIENT_SUICIDE'),
-'CLIENT_CHANGE_LOADOUT':Event('CLIENT_CHANGE_LOADOUT'),
 'CLIENT_HIT_DO':Event('CLIENT_HIT_DO'),
 'CLIENT_HIT_GET':Event('CLIENT_HIT_GET'),
 'CLIENT_DIE_TK':Event('CLIENT_DIE_TK'),
 'CLIENT_DIE_WORLD':Event('CLIENT_DIE_WORLD'),
+'CLIENT_DIE_SUICIDE':Event('CLIENT_DIE_SUICIDE'),
 'CLIENT_DIE_GEN':Event('CLIENT_DIE_GEN'),
 'CLIENT_KILL_TK':Event('CLIENT_KILL_TK'),
 'CLIENT_KILL_GEN':Event('CLIENT_KILL_GEN'),
@@ -132,9 +136,11 @@ EVENTS = {
 'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
 'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
+'CLIENT_CONN_KICKED':Event('CLIENT_CONN_KICKED'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
 'CLIENT_INFO_CHANGE':Event('CLIENT_INFO_CHANGE'),
 'CLIENT_INFO_NAME':Event('CLIENT_INFO_NAME'),
+'CLIENT_INFO_UPDATE':Event('CLIENT_INFO_UPDATE'),
 'GAME_MATCH_START':Event('GAME_MATCH_START'),
 'GAME_ROUND_START':Event('GAME_ROUND_START'),
 'GAME_ROUND_END':Event('GAME_ROUND_END'),

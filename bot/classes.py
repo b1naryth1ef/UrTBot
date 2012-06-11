@@ -44,9 +44,9 @@ class Bot():
         log.debug('Round over!')
         self.eventFire('GAME_ROUND_END', {})
 
-    def matchNew(self):
+    def matchNew(self, data):
         log.debug('New match starting!')
-        self.eventFire('GAME_MATCH_START', {})
+        self.eventFire('GAME_MATCH_START', {'data':data})
         self.loadingMap = False
         self.justChangedMap = True
 
@@ -138,7 +138,7 @@ class Bot():
 
         self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
         log.info('SETUP DONE: BOT')
-        
+
     def parse(self, line):
         if 0 < len(self.logback) > 5: self.logback.popleft()
         self.logback.append(line)
