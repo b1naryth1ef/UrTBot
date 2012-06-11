@@ -238,17 +238,17 @@ def loadConfig(cfg):
 def loadMods():
     global BOT, A, config
     for i in config_plugins:
-        log.info('Trying to load plugin %s...' % i)
+        log.info('Loading plugin %s' % i)
         __import__('bot.mods.'+i)
         i = sys.modules['bot.mods.'+i]
         try: 
             if hasattr(i, 'init'): thread.fireThread(i.init, BOT, config)
             if hasattr(i, 'registerLoops'): thread.fireThread(i.registerLoops)
             if hasattr(i, 'run'): thread.fireThread(i.run)
-            else: log.warning('Module %s does not have run method!' % i.__name__)
-            log.info('Loaded mod %s' % i.__name__)
+            else: log.warning('Plugin %s does not have run method!' % i.__name__)
+            log.info('Loaded plugin %s' % i.__name__)
         except Exception, e:
-            log.warning('Error loading mod %s [%s]' % (i, e))
+            log.warning('Error loading plugin %s [%s]' % (i, e))
 
 def loop():
     """Round and round in circles we go!"""
@@ -288,7 +288,11 @@ def Start(_version_):
         except:
             thread.exit()
             sys.exit()
-    else: loop()
+    else: 
+        try: loop()
+        except KeyboardInterrupt:
+            thread.exit()
+            sys.exit()
 
 def Exit(): sys.exit()
 

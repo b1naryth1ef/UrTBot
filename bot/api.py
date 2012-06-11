@@ -27,7 +27,6 @@ class API():
 
     def finishBooting(self):
         self.booted = True
-        print 'Running fin'
         for i in self.listenActions:
             self.addListener(*i)
 

@@ -9,12 +9,7 @@ def testListener(obj): pass
 
 @command('test')
 def testCommand(obj):
-	print 'BOOYAH!'
-	BOT.A.say('^1it works!')
+	BOT.A.say('^1Testing command works!')
 
-def init(B, A):
-	BOT.A.say('Testing...')
-
-def run():
-	time.sleep(5)
-	testEvent.fire()
+def init(B, A): pass
+def run(): pass
