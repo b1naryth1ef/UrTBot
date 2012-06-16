@@ -57,11 +57,15 @@ def renderUserInfoChange(inp, varz={}, vary={}):
 #--PARSING ACTIONS--#
 def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
     inp = inp.split(' ', 3)[1:]
-    dic = {'name':inp[1][:-1], 'cid':BOT.getClient(int(inp[0])), 'msg':inp[2]}
+    dic = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
     if inp[2].startswith(config.botConfig['cmd_prefix']):
         api.A.fireEvent('CLIENT_SAY_CMD', dic)
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
     api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
+
+def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
+    inp = inp.split(' ', 3)[1:]
+    dic = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
 
 def parseClientConnect(inp): #ClientConnect: 0
     cid = int(re.findall('ClientConnect\: ([0-9a-z])', s))
@@ -71,16 +75,16 @@ def parseClientConnect(inp): #ClientConnect: 0
             del BOT.Clients[inp]
         else:
             BOT.justChangedMap = False
-    api.A.fireEvent('CLIENT_CONN_CONNECT', {client:inp})
+    api.A.fireEvent('CLIENT_CONN_CONNECT', {"client":BOT.getClient(cid)})
 
 def parseClientUserInfo(inp):
-    cid, varz = parseUserInfo(inp)
-    f = {'client':cid, 'info':varz}
+    cid, varz = renderUserInfo(inp)
+    f = {'client':BOT.getClient(cid), 'info':varz}
     if cid in BOT.Clients.keys():
         api.A.fireEvent('CLIENT_INFO_UPDATE')
         thread.fireThread(BOT.Clients[cid].updateData, f)
     else:
-        BOT.Clients[cid] = player.Player(cid, varz, A)
+        BOT.Clients[cid] = player.Player(cid, varz, api.A)
         if BOT.Clients[cid].cl_guid != None:
             log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
             bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
@@ -91,15 +95,15 @@ def parseClientUserInfo(inp):
         api.A.fireEvent('CLIENT_INFO_SET', f)
 
 def parseClientUserInfoChanged(inp):
-    cid, varz = parseUserInfoChange(inp, {}, {})
+    cid, varz = renderUserInfoChange(inp, {}, {})
     if uid in BOT.Clients.keys(): 
-        thread.fireThread(BOT.Clients[uid].updateData, {'client': cid, 'info':varz})
-        api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': cid, 'info':varz})
+        thread.fireThread(BOT.Clients[uid].updateData, {'client': BOT.getClient(cid), 'info':varz})
+        api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp))
-    api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':inp})
-    if inp in BOT.Clients.keys(): del BOT.Clients[inp]
+    api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
+    if inp in BOT.Clients.keys(): del BOT.Clients[cid]
 
 def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
@@ -126,22 +130,22 @@ def parseHit(inp):
     victim = int(inp[2])
     hitloc = int(inp[3])
     method = int(inp[4])
-    BOT.eventFire('CLIENT_HIT', {'atk':attacker, 'vic':victim, 'loc':hitloc, 'meth':method})
+    BOT.eventFire('CLIENT_HIT', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
     inp = inp.split(' ')
     item = inp[2].strip()
     client = int(inp[1])
-    if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':client, 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-    else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':client})
+    if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':BOT.getClient(client), 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
+    else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':BOT.getClient(client)})
 
 def parseFlag(inp):
     #Flag: 0 2: team_CTF_redflag
     inp = inp.strip().replace(':', '').split(' ', 3)
     actionid = int(inp[2])
-    data = {'client':int(inp[1]), 'actionid':actionid, 'action':const.flagactions[action], 'flag':inp[3], 'flagid':const.flagtypes[flag]}
-    api.A.fireEvent(['GAME_FLAG_DROP', 'GAME_FLAG_RETURN', 'GAME_FLAG_CAPTURE'][actionid], {'client':cid, 'actionid':action, 'action':actionid, 'flag':flag, 'flagid':flagid})
+    data = {'client':BOT.getClient(int(inp[1])), 'actionid':actionid, 'action':const.flagactions[action], 'flag':inp[3], 'flagid':const.flagtypes[flag]}
+    api.A.fireEvent(['GAME_FLAG_DROP', 'GAME_FLAG_RETURN', 'GAME_FLAG_CAPTURE'][actionid], {'client':BOT.getClient(int(inp[1])), 'actionid':action, 'action':actionid, 'flag':flag, 'flagid':flagid})
 
 def parseFlagReturn(inp):
     inp = inp.strip().split(' ', 3)
@@ -197,6 +201,7 @@ def parseTimeLimitHit(inp):
 def parse(inp):
     global BOT
     if inp.startswith("say:"): parseSay(inp)
+    elif inp.startswith("sayteam:"): parseSayTeam(inp)
     elif inp.startswith('ClientConnect:'): parseClientConnect(inp)
     elif inp.startswith('ClientUserinfo:'): parseClientUserInfo(inp)
     elif inp.startswith('ClientUserinfoChanged:'): parseClientUserInfoChanged(inp)

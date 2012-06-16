@@ -82,11 +82,10 @@ class Player():
             data['name'] = data['name'].lower()
         if 'team' in data.keys():
             if data['team'] != self.team:
-                print 'Fired change team from updateData'
-                self.api.B.eventFire('CLIENT_SWITCHTEAM', {'client':self.uid, 'toteam':data['team'], 'fromteam':self.team})
+                log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
+                self.api.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                self.team = const.teams(int(data['team']))
         self.setData(data)
     
     def die(self, meth):
-        if meth == 10:
-            if not self.team == SPEC_TEAM:
-                self.team = const.switchTeam(self.team)
+        if meth == 10: log.debug('DIE w/ METH_10: %s' % self.team)
