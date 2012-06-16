@@ -9,7 +9,7 @@ class Player():
         self.uid = -1 #User ID which is gotten from the DATABASE
         self.cid = int(cid) #Client ID which is gotten from the GAME
         self.data = data
-        self.group = -1
+        #self.group = -1
         self.status = None
         self.score = [0,0]
 
