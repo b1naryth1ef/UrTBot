@@ -14,7 +14,7 @@ class Q3API():
         self.R("tell %s ^3%s" % (plyr, msg)) #@DEV check if R.format() works on tell
 
     def say(self, msg):
-        self.R("say %s" % self.R.format('^3'+msg))
+        self.R("say %s" % self.Q.format('^3'+msg))
 
 class API():
     def __init__(self):
