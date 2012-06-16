@@ -73,8 +73,8 @@ class API():
         user = data['client']
         _min = self.config.botConfig['groups'][user.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.group]['maxlevel']
-        if cmd in self.commands.keys(): obj = self.commands.get(key)
-        elif cmd in self.aliases.keys(): obj = self.aliases.get(key)
+        if cmd in self.commands.keys(): obj = self.commands.get(cmd)
+        elif cmd in self.aliases.keys(): obj = self.aliases.get(cmd)
         else: return API.tell(user, '^1No such command ^3%s^1!' % cmd)
         if _min <= obj['level'] <= _max:
             thread.fireThread(self.commands.get(cmd), data)
