@@ -76,7 +76,7 @@ def parseClientConnect(inp): #ClientConnect: 0
     if cid in BOT.Clients.keys(): #Disconnect messages MAY be missed!
         if BOT.loadingMap is False and BOT.justChangedMap is False:
             log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
-            del BOT.Clients[inp]
+            del BOT.Clients[cid]
         else:
             BOT.justChangedMap = False
     api.A.fireEvent('CLIENT_CONN_CONNECT', {"cid":cid})
