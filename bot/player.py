@@ -69,6 +69,7 @@ class Player():
     def checkAuth(self): pass
 
     def setData(self, data):
+        log.debug('Data: %s' % data)
         data = data['info']
         if 'name' in data.keys(): data['name'] = data['name'].lower()
         if 'team' in data.keys(): data['team'] = const.teams[int(data['team'])]
@@ -83,7 +84,7 @@ class Player():
         if 'team' in data.keys():
             if data['team'] != self.team:
                 log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
-                self.api.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                self.api.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
                 self.team = const.teams(int(data['team']))
         self.setData(data)
     

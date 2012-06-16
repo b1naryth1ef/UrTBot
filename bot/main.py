@@ -87,7 +87,7 @@ def parseClientUserInfo(inp):
         api.A.fireEvent('CLIENT_INFO_UPDATE')
         thread.fireThread(BOT.Clients[cid].updateData, {'client':BOT.getClient(cid), 'info':varz})
     else:
-        BOT.Clients[cid] = player.Player(cid, varz, api.A)
+        BOT.Clients[cid] = player.Player(cid, varz, api)
         if BOT.Clients[cid].cl_guid != None:
             log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
             bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
