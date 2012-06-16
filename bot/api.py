@@ -67,16 +67,16 @@ class API():
                 [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
     def fireCommand(self, cmd, data):
-        user = self.B.getClient(data['cid'])
+        user = data['client']
         _min = self.config.botConfig['groups'][user.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.group]['maxlevel']
         if cmd in self.commands.keys(): obj = self.commands.get(key)
         elif cmd in self.aliases.keys(): obj = self.aliases.get(key)
-
+        else: API.tell(user, '^1No such command "^3%s^1"!' % cmd)
         if _min <= obj['level'] <= _max:
             thread.fireThread(self.commands.get(cmd), data)
         else:
-            API.tell(user, 'You do not have sufficient access to use that command!')
+            API.tell(user, '^1You do not have sufficient access to use "^3%s^1"!' % cmd)
 
 A = API()
 
