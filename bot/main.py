@@ -83,10 +83,9 @@ def parseClientConnect(inp): #ClientConnect: 0
 
 def parseClientUserInfo(inp):
     cid, varz = renderUserInfo(inp)
-    f = {'client':BOT.getClient(cid), 'info':varz}
     if cid in BOT.Clients.keys():
         api.A.fireEvent('CLIENT_INFO_UPDATE')
-        thread.fireThread(BOT.Clients[cid].updateData, f)
+        thread.fireThread(BOT.Clients[cid].updateData, {'client':BOT.getClient(cid), 'info':varz})
     else:
         BOT.Clients[cid] = player.Player(cid, varz, api.A)
         if BOT.Clients[cid].cl_guid != None:
@@ -95,6 +94,7 @@ def parseClientUserInfo(inp):
             if len(bq) and len([i for i in bq if datetime.now() < ban.until and ban.active]):
                 log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
                 return BOT.Q.rcon('kick %s' % cid)
+        f = {'client':BOT.getClient(cid), 'info':varz}
         api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
 
