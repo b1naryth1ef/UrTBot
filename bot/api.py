@@ -78,7 +78,7 @@ class API():
         elif cmd in self.aliases.keys(): obj = self.aliases.get(cmd)
         else: return API.tell(user, '^1No such command ^3%s^1!' % cmd)
         if _min <= obj['level'] <= _max:
-            thread.fireThread(self.commands.get(cmd), data)
+            thread.fireThread(self.commands.get(cmd)['exec'], data)
         else:
             log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
             API.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
