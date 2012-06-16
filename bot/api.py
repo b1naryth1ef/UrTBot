@@ -72,11 +72,11 @@ class API():
         _max =  self.config.botConfig['groups'][user.group]['maxlevel']
         if cmd in self.commands.keys(): obj = self.commands.get(key)
         elif cmd in self.aliases.keys(): obj = self.aliases.get(key)
-        else: API.tell(user, '^1No such command "^3%s^1"!' % cmd)
+        else: return API.tell(user, '^1No such command ^3%s^1!' % cmd)
         if _min <= obj['level'] <= _max:
             thread.fireThread(self.commands.get(cmd), data)
         else:
-            API.tell(user, '^1You do not have sufficient access to use "^3%s^1"!' % cmd)
+            API.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
 

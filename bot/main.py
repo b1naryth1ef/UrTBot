@@ -79,7 +79,7 @@ def parseClientConnect(inp): #ClientConnect: 0
             del BOT.Clients[inp]
         else:
             BOT.justChangedMap = False
-    api.A.fireEvent('CLIENT_CONN_CONNECT', {"client":BOT.getClient(cid)})
+    api.A.fireEvent('CLIENT_CONN_CONNECT', {"cid":cid})
 
 def parseClientUserInfo(inp):
     cid, varz = renderUserInfo(inp)
@@ -105,7 +105,7 @@ def parseClientUserInfoChanged(inp):
         api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
-    cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp))
+    cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
     api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
     if inp in BOT.Clients.keys(): del BOT.Clients[cid]
 
