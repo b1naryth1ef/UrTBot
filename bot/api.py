@@ -79,6 +79,7 @@ class API():
         if _min <= obj['level'] <= _max:
             thread.fireThread(self.commands.get(cmd), data)
         else:
+            log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
             API.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
