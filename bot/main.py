@@ -66,9 +66,13 @@ def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
 def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
     inp = inp.split(' ', 3)[1:]
     dic = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
+    if inp[2].startswith(config.botConfig['cmd_prefix']) and config.botConfig['cmd_on_team_say'] is True:
+        api.A.fireEvent('CLIENT_SAY_CMD', dic)
+        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
+    api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
 
 def parseClientConnect(inp): #ClientConnect: 0
-    cid = int(re.findall('ClientConnect\: ([0-9a-z])', s))
+    cid = int(re.findall('ClientConnect\: ([0-9a-z])', inp))
     if cid in BOT.Clients.keys(): #Disconnect messages MAY be missed!
         if BOT.loadingMap is False and BOT.justChangedMap is False:
             log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))

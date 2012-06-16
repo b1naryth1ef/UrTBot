@@ -16,6 +16,7 @@ default = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]:",
     'cmd_prefix':'!',
+    'cmd_on_team_say':True,
     'mode':0,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",
