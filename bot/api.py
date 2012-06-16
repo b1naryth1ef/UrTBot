@@ -71,6 +71,8 @@ class API():
 
     def fireCommand(self, cmd, data):
         user = data['client']
+        log.debug('Group: %s' % user.group)
+        log.debug('Groups: %s' % self.config.botConfig['groups'])
         _min = self.config.botConfig['groups'][user.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.group]['maxlevel']
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
