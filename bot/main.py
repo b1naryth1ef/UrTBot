@@ -57,7 +57,7 @@ def renderUserInfoChange(inp, varz={}, vary={}):
 #--PARSING ACTIONS--#
 def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
     inp = inp.split(' ', 3)[1:]
-    dic = {'name':inp[1][:-1], 'cid':BOT.getPlayer(int(inp[0])), 'msg':inp[2]}
+    dic = {'name':inp[1][:-1], 'cid':BOT.getClient(int(inp[0])), 'msg':inp[2]}
     if inp[2].startswith(config.botConfig['cmd_prefix']):
         api.A.fireEvent('CLIENT_SAY_CMD', dic)
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
