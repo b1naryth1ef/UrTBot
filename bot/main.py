@@ -100,8 +100,8 @@ def parseClientUserInfo(inp):
 
 def parseClientUserInfoChanged(inp):
     cid, varz = renderUserInfoChange(inp, {}, {})
-    if uid in BOT.Clients.keys(): 
-        thread.fireThread(BOT.Clients[uid].updateData, {'client': BOT.getClient(cid), 'info':varz})
+    if cid in BOT.Clients.keys(): 
+        thread.fireThread(BOT.Clients[cid].updateData, {'client': BOT.getClient(cid), 'info':varz})
         api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
