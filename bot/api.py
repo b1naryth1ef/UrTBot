@@ -60,7 +60,10 @@ class API():
 
     def fireEvent(self, name, data={}, obj=None):
         log.debug('Firing event %s' % name)
-        if not obj: obj = self.events[name].getObj(data)
+        if not obj: 
+            try: obj = self.events[name].getObj(data)
+            except:
+                return log.debug('Cannot find event %s!' % name)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
             for cat in obj.cats.split('_'):
@@ -131,10 +134,10 @@ EVENTS = {
 'CLIENT_TEAM_QUIT':Event('CLIENT_TEAM_QUIT'),
 'CLIENT_ITEM_PICKUP':Event('CLIENT_ITEM_PICKUP'),
 'CLIENT_CONN_JOIN':Event('CLIENT_CONN_JOIN'),
-'CLIENT_CONN_QUIT':Event('CLIENT_CONN_QUIT'),
 'CLIENT_CONN_TIMEOUT':Event('CLIENT_CONN_TIMEOUT'),
 'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
+'CLIENT_CONN_DISCONNECT':Event('CLIENT_CONN_DISCONNECT'),
 'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
 'CLIENT_CONN_KICKED':Event('CLIENT_CONN_KICKED'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
