@@ -69,7 +69,7 @@ class Player():
     def checkAuth(self): pass
 
     def setData(self, data):
-        log.debug('Data: %s' % data)
+        log.debug('Data (set): %s' % data)
         data = data['info']
         if 'name' in data.keys(): data['name'] = data['name'].lower()
         if 'team' in data.keys(): data['team'] = const.teams[int(data['team'])]
@@ -78,6 +78,7 @@ class Player():
         self.__dict__.update(data)
     
     def updateData(self, data): #@TODO Move this shit out of the class
+        log.debug('Data (update): %s' % data)
         data = data['info']
         if 'name' in data.keys():
             data['name'] = data['name'].lower()
