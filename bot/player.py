@@ -3,6 +3,7 @@ import database, const
 from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
+from api import A
 
 class Player():
     def __init__(self, cid, data, api):
@@ -13,7 +14,6 @@ class Player():
         self.score = [0,0]
 
         log.debug('Player Init API: %s' % api)
-        self.api = api
 
         try:
             self.name = None
@@ -85,7 +85,7 @@ class Player():
         if 'team' in data.keys():
             if data['team'] != self.team:
                 log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
-                self.api.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
                 self.team = const.teams(int(data['team']))
         self.setData(data)
     
