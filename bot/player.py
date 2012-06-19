@@ -8,6 +8,7 @@ A = None
 
 class Player():
     def __init__(self, cid, data, api):
+        global A
         self.uid = -1 #User ID which is gotten from the DATABASE
         self.cid = int(cid) #Client ID which is gotten from the GAME
         self.data = data
