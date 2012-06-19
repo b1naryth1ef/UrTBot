@@ -3,7 +3,8 @@ import database, const
 from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
-from api import A
+
+A = None
 
 class Player():
     def __init__(self, cid, data, api):
@@ -12,8 +13,11 @@ class Player():
         self.data = data
         self.status = None
         self.score = [0,0]
-
         log.debug('Player Init API: %s' % api)
+        
+        if not A: #@DEV Fix this eventually
+            import api
+            A = api.A
 
         try:
             self.name = None
