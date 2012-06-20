@@ -133,7 +133,7 @@ def parseHit(inp):
     attacker = int(inp[1])
     victim = int(inp[2])
     hitloc = int(inp[3])
-    method = int(inp[4])
+    method = int(inp[4][:-1])
     BOT.eventFire('CLIENT_HIT', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
 
 def parseItem(inp):
