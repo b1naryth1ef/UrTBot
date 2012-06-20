@@ -76,6 +76,7 @@ class Bot():
             if i != '':
                 i = i.split(' ')
                 cid = int(i[0].strip(':'))
+                log.debug('Trying to load client #%s w/ clientlist %s' % (cid, self.Clients))
                 obj = self.Clients[cid]
                 obj.team = i[2].lower()
                 obj.score[0] = i[3].strip('k:')
