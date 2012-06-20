@@ -15,6 +15,7 @@ import pprint, json
 default = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]:",
+    'version':4.1,
     'cmd_prefix':'!',
     'cmd_on_team_say':True,
     'mode':0,
@@ -31,7 +32,6 @@ default = {
         {'name':'admin', 'minlevel':1, 'maxlevel':5},
         {'name':'uberadmin', 'minlevel':1, 'maxlevel':6}
     ],
-    'debug_mode':True
 },
 
 'dbConfig':{

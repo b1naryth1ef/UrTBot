@@ -84,13 +84,14 @@ class Player():
     
     def updateData(self, data): #@TODO Move this shit out of the class
         log.debug('Data (update): %s' % data)
-        data = data['info']
+        #data = data['info']
         if 'name' in data.keys():
             data['name'] = data['name'].lower()
         if 'team' in data.keys():
             if data['team'] != self.team:
                 log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
                 A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                log.debug('@Updatedata team: %s' % data['team'])
                 self.team = const.teams(int(data['team']))
         self.setData(data)
     

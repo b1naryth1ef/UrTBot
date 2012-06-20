@@ -6,7 +6,7 @@ from collections import deque
 import sys, os, time
 
 class Bot():
-    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", debug=False, config=None, database=None):
+    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", config=None, database=None):
         self.prefix = prefix
         self.ip = ip
         self.rcon = rcon
@@ -14,7 +14,6 @@ class Bot():
         self.database = database
         #self.clientDB = database.db
         self.status = 1 #1 is on, 0 is off
-        self.debug = debug #False will hide messages, True will print them and log them to vars
         self.config = config
         self.logback = deque()
         

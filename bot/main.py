@@ -225,7 +225,7 @@ def parse(inp):
 
 def loadConfig(cfg):
     """Loads the bot config"""
-    global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config_debugmode, config
+    global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config
     try:
         botConfig = config.botConfig
         config_prefix = botConfig['prefix']
@@ -235,7 +235,6 @@ def loadConfig(cfg):
         config_plugins = botConfig['plugins']
         config_groups = botConfig['groups']
         config_serversocket = botConfig['serversocket']
-        config_debugmode = botConfig['debug_mode']
     except Exception, e:
         print 'Error loading main config... [%s]' % e
         sys.exit()
@@ -275,7 +274,7 @@ def Start(_version_):
     loadConfig(config)
     log = debug.init(config)
     db = database.setup(config, log)
-    BOT = Bot(config_prefix, config_rconip, config_rcon, config_debugmode, config=config, database=db)
+    BOT = Bot(config_prefix, config_rconip, config_rcon, config=config, database=db)
     #A = API() #@TODO Fix this bullshit
     api.setup(BOT)
     BOT.Startup(api.API)
