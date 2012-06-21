@@ -5,7 +5,7 @@ import thread_handler as thread
 
 class DataHolder():
     def __init__(self, d):
-        self.__dict__.update(d)
+        self.__dict__.update(dw)
 
     def __getitem__(self, i):
         if i in self.__dict__.keys():
@@ -81,7 +81,6 @@ class API():
         log.warning("Event %s has not been registered!" % (name))
 
     def fireEvent(self, name, data={}, obj=None):
-        data = DataHolder(data)
         log.debug('Firing event %s' % name)
         if not obj: 
             try: obj = self.events[name].getObj(data)
