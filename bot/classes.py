@@ -6,12 +6,13 @@ from collections import deque
 import sys, os, time
 
 class Bot():
-    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", config=None, database=None):
+    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", config=None, database=None, api=None):
         self.prefix = prefix
         self.ip = ip
         self.rcon = rcon
         self.Q = RCON(self.ip, self.rcon)
         self.database = database
+        self.api = api
 
         self.enabled = True
         self.config = config
@@ -40,21 +41,21 @@ class Bot():
         
     def roundNew(self):
         log.debug('New round starting!')
-        self.eventFire('GAME_ROUND_START', {})
+        self.api.eventFire('GAME_ROUND_START', {})
 
     def roundEnd(self):
         log.debug('Round over!')
-        self.eventFire('GAME_ROUND_END', {})
+        self.api.eventFire('GAME_ROUND_END', {})
 
     def matchNew(self, data):
         log.debug('New match starting!')
-        self.eventFire('GAME_MATCH_START', {'data':data})
+        self.api.eventFire('GAME_MATCH_START', {'data':data})
         self.loadingMap = False
         self.justChangedMap = True
 
     def matchEnd(self):
         log.debug('Match over! RED: %s BLUE: %s' % (self.redScore, self.blueScore))
-        self.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
+        self.api.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
     def getClient(self, uid): return self.Clients[uid]
@@ -156,7 +157,7 @@ class Bot():
             for i in status:
                 log.debug('Add User: %s, %s' % (i, i[0]))
                 uid = int(i[0])
-                self.Clients[uid] = player.Player(uid, self.dumpUser(uid), None)
+                self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
             self.updatePlayers() #Set team/score for players
 
     def parse(self, line):
