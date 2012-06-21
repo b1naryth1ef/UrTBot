@@ -14,11 +14,10 @@ import pprint, json
 
 default = {
 'botConfig':{
-    'prefix': "^1[^2BOT^1]:",
-    'version':4.1,
+    'prefix': "^1[^2BOT^1]: ",
     'cmd_prefix':'!',
     'cmd_on_team_say':True,
-    'mode':0,
+    'modded':False,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",
     'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
