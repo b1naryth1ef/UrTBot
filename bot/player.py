@@ -47,7 +47,7 @@ class Player():
 
         q1 = [i for i in database.User.select().where(name=self.name, ip=self.ip, guid=self.cl_guid)]
         q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
-        q3 = [i for i in database.user.select().where(ip=self.ip, name=self.name)]
+        q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name)]
         q4 = [i for i in database.User.select().where(guid=self.cl_guid)]
 
         if len(q1) or len(q2) or len(q3) or len(q4):
