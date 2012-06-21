@@ -118,14 +118,14 @@ def parseKill(inp): #@DEV change to re eventually
     victim = int(inp[1])
     vicobj = BOT.Clients[victim]
     method = int(inp[2][:-1])
-    if method in [1, 3, 9, 39]: BOT.eventFire('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
+    if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        BOT.eventFire('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
         vicobj.die(method)
-    elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: BOT.eventFire('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
+    elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: api.A.fireEvent('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
     else:
-        BOT.eventFire('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
-        BOT.eventFire('CLIENT_GENERICDEATH', {'vic':victim})
+        api.A.fireEvent('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_GENERICDEATH', {'vic':victim})
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
@@ -134,15 +134,15 @@ def parseHit(inp):
     victim = int(inp[2])
     hitloc = int(inp[3])
     method = int(inp[4][:-1])
-    BOT.eventFire('CLIENT_HIT', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
+    api.A.fireEvent('CLIENT_HIT', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
     inp = inp.split(' ')
     item = inp[2].strip()
     client = int(inp[1])
-    if item in const.flagtypes.keys(): BOT.eventFire('GAME_FLAGPICKUP', {'client':BOT.getClient(client), 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-    else: BOT.eventFire('CLIENT_PICKUPITEM', {'item':item, 'client':BOT.getClient(client)})
+    if item in const.flagtypes.keys(): api.A.fireEvent('GAME_FLAGPICKUP', {'client':BOT.getClient(client), 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
+    else: api.A.fireEvent('CLIENT_PICKUPITEM', {'item':item, 'client':BOT.getClient(client)})
 
 def parseFlag(inp):
     #Flag: 0 2: team_CTF_redflag
@@ -159,7 +159,7 @@ def parsePlayerBegin(inp): pass
     #ClientBegin: 0
     #inp = inp.split(' ')
     #client = int(inp[1])
-    #BOT.eventFire('CLIENT_BEGIN', {'client':client})
+    #api.A.fireEvent('CLIENT_BEGIN', {'client':client})
 
 def parseShutdownGame(inp):
     api.A.fireEvent('GAME_SHUTDOWN', {})
@@ -173,7 +173,7 @@ def parseShutdownGame(inp):
     # map
     # That should work ye?
     # for key in BOT.Clients.keys():
-    #     BOT.eventFire('CLIENT_DISCONNECT', {'client':key})
+    #     api.A.fireEvent('CLIENT_DISCONNECT', {'client':key})
     #     del BOT.Clients[key]
     # ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 
@@ -194,7 +194,7 @@ def parseClientKick(inp):
         cur = BOT.curClients()
         for i in BOT.Clients.keys():
             if i not in cur:
-                BOT.eventFire('CLIENT_KICKED', {'client':i})
+                api.A.fireEvent('CLIENT_KICKED', {'client':i})
     log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
     thread.fireThread(_user_kicked, inp)
     
