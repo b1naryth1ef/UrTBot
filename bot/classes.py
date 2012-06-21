@@ -41,21 +41,21 @@ class Bot():
         
     def roundNew(self):
         log.debug('New round starting!')
-        self.api.A.eventFire('GAME_ROUND_START', {})
+        self.api.A.fireEvent('GAME_ROUND_START', {})
 
     def roundEnd(self):
         log.debug('Round over!')
-        self.api.A.eventFire('GAME_ROUND_END', {})
+        self.api.A.fireEvent('GAME_ROUND_END', {})
 
     def matchNew(self, data):
         log.debug('New match starting!')
-        self.api.A.eventFire('GAME_MATCH_START', {'data':data})
+        self.api.fireEvent('GAME_MATCH_START', {'data':data})
         self.loadingMap = False
         self.justChangedMap = True
 
     def matchEnd(self):
         log.debug('Match over! RED: %s BLUE: %s' % (self.redScore, self.blueScore))
-        self.api.A.eventFire('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
+        self.api.A.fireEvent('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
     def getClient(self, uid): return self.Clients[uid]
@@ -112,7 +112,7 @@ class Bot():
         self.gameData['mapname'] = r.group(1)
         return self.gameData['mapname']
 
-    def eventFire(self, event, data): pass
+    def fireEvent(self, event, data): pass
 
     def Startup(self, API):
         self.A = API
