@@ -25,6 +25,7 @@ class API():
         self.booted = False
         self.listenActions = []
         self.B = None
+        self.Q3 = None
         self.config = None
 
     def finishBooting(self):
@@ -160,5 +161,6 @@ EVENTS = {
 }
 
 def setup(BOT):
-    global API
+    global API, A
     API = Q3API(BOT)
+    A.Q3 = API

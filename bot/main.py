@@ -284,7 +284,7 @@ def Start(_version_):
     api.A.finishBooting()
     api.A.B = BOT
     api.A.config = config
-    BOT.api = api.A
+    BOT.api = api
     proc = GameOutput(config_serversocket)
     
     #db = database.init(config)

@@ -4,8 +4,6 @@ from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
 
-A = None
-
 class Player():
     def __init__(self, cid, data, api):
         global A
@@ -15,10 +13,7 @@ class Player():
         self.status = None
         self.score = [0,0]
         log.debug('Player Init API: %s' % api)
-        
-        if not A: #@DEV Fix this eventually
-            import api
-            A = api.A
+    
 
         try:
             self.name = None
@@ -70,6 +65,9 @@ class Player():
 
         self.uid = self.client.id
     
+    def tell(self, msg):
+        self.api.Q3.tell(self, msg)
+
     def changeGroup(self, group): pass
     def checkAuth(self): pass
 
@@ -90,7 +88,7 @@ class Player():
         if 'team' in data.keys():
             if data['team'] != self.team:
                 log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
-                A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                self.api.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
                 log.debug('@Updatedata team: %s' % data['team'])
                 self.team = const.teams(int(data['team']))
         self.setData(data)
