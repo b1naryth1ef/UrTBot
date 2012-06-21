@@ -156,8 +156,8 @@ class Bot():
         self.logback.append(line)
         main.parse(line)
 
-    def findByName(self, name):
+    def findByName(self, name, approx=False):
         for client in [i for i in self.Clients.values() if i is not None]:
-            if client.name != None and name in client.name:
-                return client
-        return None
+            if client.name == None: return
+            if approx and name in client.name: return client
+            if client.name == name: return client

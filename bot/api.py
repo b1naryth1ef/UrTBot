@@ -3,6 +3,14 @@ from player import Player
 import sys, os, time
 import thread_handler as thread
 
+class DataHolder():
+    def __init__(self, d):
+        self.__dict__.update(d)
+
+    def __getitem__(self, i):
+        if i in self.__dict__.keys():
+            return self.__dict__[i]
+
 class Q3API():
     def __init__(self, bot):
         self.B = bot
@@ -12,9 +20,15 @@ class Q3API():
         self.prefix = self.B.prefix if not self.B.hasPrefix else ''
         self.length = 80-len(self.B.prefix) if self.B.hasPrefix else 69
 
-    def tell(self, plyr, msg):
+    def _rendplyr(self, plyr):
         if isinstance(plyr, Player): plyr = plyr.cid
-        return self.R("tell %s %s%s" % (plyr, self.prefix, '^3'+msg)) #@DEV check if R.format() works on tell
+        else: return plyr
+
+    def tell(self, plyr, msg):
+        return self.R("tell %s %s%s" % (self._rendplyr(plyr), self.prefix, '^3'+msg)) #@DEV check if R.format() works on tell
+
+    def kick(self, plyr, reason):
+        return self.R('kick %s %s' % (self._rendplyr(plyr), reason))
 
     def say(self, msg):
         return self.R("say %s%s" % (self.prefix, self.Q.format('^3'+msg, self.length)))
@@ -65,6 +79,7 @@ class API():
         log.warning("Event %s has not been registered!" % (name))
 
     def fireEvent(self, name, data={}, obj=None):
+        data = DataHolder(data)
         log.debug('Firing event %s' % name)
         if not obj: 
             try: obj = self.events[name].getObj(data)
@@ -76,6 +91,7 @@ class API():
                 [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
     def fireCommand(self, cmd, data):
+        data = DataHolder(data)
         user = data['client']
         log.debug('Group: %s' % user.client.group)
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
