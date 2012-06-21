@@ -9,7 +9,7 @@ def testListener(obj): pass
 
 @command('test')
 def testCommand(obj):
-	BOT.A.say('^1Testing command works!')
+	BOT.Q3.say('^1Testing command works!')
 
 def init(B, A): pass
 def run(): pass

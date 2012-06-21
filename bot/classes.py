@@ -133,6 +133,7 @@ class Bot():
             self.moddedSetup()
  
         self.Q3.say("^3Startup complete.")
+        log.debug('EVENTS: %s' % self.A.events)
         log.info('SETUP DONE: BOT')
 
     def moddedSetup(self):
