@@ -1,6 +1,7 @@
 from bot.config_handler import ConfigFile
 from bot.main import BOT
 from bot.api import listener, Event, command
+from bot.debug import log
 import sys, os, time
 
 events = {

@@ -118,7 +118,7 @@ class Bot():
         self.A = API
         log.info('SETUP: BOT')
 
-        resp = self.Q.rcon("say "+self.prefix+" ^3"+"Starting up...")
+        resp = self.Q.rcon("say ^3"+"Starting up...")
         if "No rconpassword set on the server." in resp:
             log.critical('The server does not have an rcon password check. Please check your server config and try again.')
             sys.exit()
@@ -141,7 +141,7 @@ class Bot():
                 self.hasDemo = True
             self.moddedSetup()
 
-        self.Q.rcon("say "+self.prefix+" ^3"+"Startup complete.")
+        self.Q.rcon("say ^3Startup complete.")
         log.info('SETUP DONE: BOT')
 
     def moddedSetup(self):
