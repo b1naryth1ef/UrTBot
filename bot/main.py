@@ -118,14 +118,16 @@ def parseKill(inp): #@DEV change to re eventually
     victim = int(inp[1])
     vicobj = BOT.Clients[victim]
     method = int(inp[2][:-1])
-    if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_WORLDDEATH', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
+    if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_DIE_WORLD', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        api.A.fireEvent('CLIENT_SUICIDE', {'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_DIE_SUICIDE', {'vic':victim, 'meth':method})
         vicobj.die(method)
-    elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: api.A.fireEvent('CLIENT_TEAMKILL', {'atk':attacker, 'vic':victim, 'meth':method})
+    elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: 
+        api.A.fireEvent('CLIENT_KILL_TK', {'atk':attacker, 'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_DIE_TK', {'atk':attacker, 'vic':victim, 'meth':method})
     else:
-        api.A.fireEvent('CLIENT_KILL', {'atk':attacker, 'vic':victim, 'meth':method})
-        api.A.fireEvent('CLIENT_GENERICDEATH', {'vic':victim})
+        api.A.fireEvent('CLIENT_KILL_GEN', {'atk':attacker, 'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_DIE_GEN', {'vic':victim})
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
@@ -134,15 +136,15 @@ def parseHit(inp):
     victim = int(inp[2])
     hitloc = int(inp[3])
     method = int(inp[4][:-1])
-    api.A.fireEvent('CLIENT_HIT', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
+    api.A.fireEvent('CLIENT_HIT_DO', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
     inp = inp.split(' ')
     item = inp[2].strip()
     client = int(inp[1])
-    if item in const.flagtypes.keys(): api.A.fireEvent('GAME_FLAGPICKUP', {'client':BOT.getClient(client), 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
-    else: api.A.fireEvent('CLIENT_PICKUPITEM', {'item':item, 'client':BOT.getClient(client)})
+    if item in const.flagtypes.keys(): api.A.fireEvent('GAME_FLAG_PICKUP', {'client':BOT.getClient(client), 'flag':item, 'team':const.flagtypes[item], 'flagid':const.flagtypes[item]})
+    else: api.A.fireEvent('CLIENT_ITEM_PICKUP', {'item':item, 'client':BOT.getClient(client)})
 
 def parseFlag(inp):
     #Flag: 0 2: team_CTF_redflag
