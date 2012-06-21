@@ -69,6 +69,8 @@ class API():
         log.debug('Event %s has been registered!' % '_'.join(name))
 
     def addListener(self, name, func):
+        if isinstance(name, Event):
+            name = name.name
         if not self.booted: 
             self.listenActions.append((name, func))
             return
