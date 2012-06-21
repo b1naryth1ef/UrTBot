@@ -33,7 +33,7 @@ def kickCmd(obj): #@DEV Clean this shit up!
     else:
         obj.client.tell('Usage: ^1!kick ^3<cid/name> [reason]')
 
-@command('ban', 'Permaban a user.', level=5, ['b'])
+@command('ban', 'Permaban a user.', 5, ['b'])
 def banCmd(obj): pass
 
 def init(B, A): pass
