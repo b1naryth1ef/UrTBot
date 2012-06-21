@@ -165,7 +165,7 @@ class Bot():
         main.parse(line)
 
     def findByName(self, name):
-        for client in self.Clients.values():
+        for client in [i for i in self.Clients.values() if i is not None]:
             if name in client.name:
                 return client
         return None
