@@ -5,7 +5,7 @@ import thread_handler as thread
 
 class DataHolder():
     def __init__(self, d):
-        self.__dict__.update(dw)
+        self.__dict__.update(d)
 
     def __getitem__(self, i):
         if i in self.__dict__.keys():
