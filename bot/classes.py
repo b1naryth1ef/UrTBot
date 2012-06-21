@@ -6,20 +6,18 @@ from collections import deque
 import sys, os, time
 
 class Bot():
-    def __init__(self, prefix="^1[^3Boteh^1]:", ip='localhost:27960', rcon="", config=None, database=None, api=None):
-        self.prefix = prefix
-        self.ip = ip
-        self.rcon = rcon
-        self.Q = RCON(self.ip, self.rcon)
+    def __init__(self, config=None, database=None):
+        self.prefix = config.botConfig['prefix']
+        self.Q = RCON(config.botConfig['rconip'], config.botConfig['rcon'])
         self.database = database
+        self.config = config
 
         self.enabled = True
-        self.config = config
         self.logback = deque()
         
         self.maplist = self.config.UrTConfig['maps']
-        self.currentMap = None
         self.gameData = {}
+        self.currentMap = None
         self.loadingMap = False
         self.justChangedMap = False
 
@@ -29,32 +27,26 @@ class Bot():
         self.redScore = 0
         self.blueScore = 0
 
-        self.Modules = {} #Plugins
-        self.Listeners = {} #Plugins waiting for Triggers
-        self.Triggers = {} #Possible Triggers (Events)
-        self.Commands = {} #Commands
-        self.Aliases = {} #aliases BIATCH
-
         self.Clients = {} #AKA players
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
         
     def roundNew(self):
         log.debug('New round starting!')
-        self.api.A.fireEvent('GAME_ROUND_START', {})
+        self.A.fireEvent('GAME_ROUND_START', {})
 
     def roundEnd(self):
         log.debug('Round over!')
-        self.api.A.fireEvent('GAME_ROUND_END', {})
+        self.A.fireEvent('GAME_ROUND_END', {})
 
     def matchNew(self, data):
         log.debug('New match starting!')
-        self.api.A.fireEvent('GAME_MATCH_START', {'data':data})
+        self.A.fireEvent('GAME_MATCH_START', {'data':data})
         self.loadingMap = False
         self.justChangedMap = True
 
     def matchEnd(self):
         log.debug('Match over! RED: %s BLUE: %s' % (self.redScore, self.blueScore))
-        self.api.A.fireEvent('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
+        self.A.fireEvent('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
     def getClient(self, uid): return self.Clients[uid]
@@ -81,8 +73,6 @@ class Bot():
                 obj.team = i[2].lower()
                 obj.score[0] = i[3].strip('k:')
                 obj.score[1] = i[4].strip('d:')
-            else:
-                log.debug('Could not find player for updating players: %s' % i[1])
 
     def dumpUser(self, uid):
         vz = []
@@ -114,10 +104,12 @@ class Bot():
     def fireEvent(self, event, data): pass
 
     def Startup(self, API):
-        self.A = API
+        self.api = API
+        self.A = self.api.A
+        self.Q3 = self.A.Q3
         log.info('SETUP: BOT')
 
-        resp = self.Q.rcon("say ^3"+"Starting up...")
+        resp = self.Q3.say("^3Starting up...")
         if "No rconpassword set on the server." in resp:
             log.critical('The server does not have an rcon password check. Please check your server config and try again.')
             sys.exit()
@@ -139,8 +131,8 @@ class Bot():
             if 'broadcast:' not in self.Q.rcon("sv_demonotice"):
                 self.hasDemo = True
             self.moddedSetup()
-
-        self.Q.rcon("say ^3Startup complete.")
+ 
+        self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
 
     def moddedSetup(self):
@@ -166,7 +158,6 @@ class Bot():
 
     def findByName(self, name):
         for client in [i for i in self.Clients.values() if i is not None]:
-            log.debug('Name: %s, cname: %s' % (name, client.name))
             if client.name != None and name in client.name:
                 return client
         return None

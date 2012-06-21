@@ -6,15 +6,14 @@ from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
 
 class Player():
     def __init__(self, cid, data, api):
-        global A
         self.uid = -1 #User ID which is gotten from the DATABASE
         self.cid = int(cid) #Client ID which is gotten from the GAME
         self.data = data
         self.status = None
         self.score = [0,0]
-        log.debug('Player Init API: %s' % api)
+        self.api = api
+        self.A = self.api.A
     
-
         try:
             self.name = None
             self.ip = None
@@ -48,11 +47,12 @@ class Player():
 
         q1 = [i for i in database.User.select().where(name=self.name, ip=self.ip, guid=self.cl_guid)]
         q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
-        q3 = [i for i in database.User.select().where(guid=self.cl_guid)]
+        q3 = [i for i in database.user.select().where(ip=self.ip, name=self.name)]
+        q4 = [i for i in database.User.select().where(guid=self.cl_guid)]
 
-        if len(q1) or len(q2) or len(q3):
+        if len(q1) or len(q2) or len(q3) or len(q4):
             q = []
-            for cli in [i[0] for i in [q1, q2, q3] if len(i)]:
+            for cli in [i[0] for i in [q1, q2, q3, q4] if len(i)]:
                 if cli not in q:
                     q.append(cli)
                 if len(q) == 1: self.client = q[0]
@@ -72,7 +72,6 @@ class Player():
     def checkAuth(self): pass
 
     def setData(self, data):
-        log.debug('Data (set): %s' % data)
         data = data['info']
         if 'name' in data.keys(): data['name'] = data['name'].lower()
         if 'team' in data.keys(): data['team'] = const.teams[int(data['team'])]
@@ -80,15 +79,13 @@ class Player():
             data[i] = data[i].strip()
         self.__dict__.update(data)
     
-    def updateData(self, data): #@TODO Move this shit out of the class
-        log.debug('Data (update): %s' % data)
-        #data = data['info']
+    def updateData(self, data):
         if 'name' in data.keys():
             data['name'] = data['name'].lower()
         if 'team' in data.keys():
             if data['team'] != self.team:
                 log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
-                self.api.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+                self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
                 log.debug('@Updatedata team: %s' % data['team'])
                 self.team = const.teams(int(data['team']))
         self.setData(data)

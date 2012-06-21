@@ -9,12 +9,15 @@ class Q3API():
         self.Q = bot.Q
         self.R = bot.Q.rcon
 
+        self.prefix = self.B.prefix if not self.B.hasPrefix else ''
+        self.length = 80-len(self.B.prefix) if self.B.hasPrefix else 69
+
     def tell(self, plyr, msg):
         if isinstance(plyr, Player): plyr = plyr.cid
-        self.R("tell %s ^3%s" % (plyr, msg)) #@DEV check if R.format() works on tell
+        return self.R("tell %s %s%s" % (plyr, self.prefix, '^3'+msg)) #@DEV check if R.format() works on tell
 
     def say(self, msg):
-        self.R("say %s" % self.Q.format('^3'+msg))
+        return self.R("say %s%s" % (self.prefix, self.Q.format('^3'+msg, self.length)))
 
 class API():
     def __init__(self):
@@ -23,13 +26,15 @@ class API():
         self.events = {}
         self.listeners = {'cats':{}, 'eves':{}}
         self.booted = False
-        self.listenActions = []
+        self.listenActions = [] #Buffer
         self.B = None
         self.Q3 = None
         self.config = None
 
-    def finishBooting(self):
+    def finishBooting(self, bot, config):
         self.booted = True
+        self.B = bot
+        self.config = config
         for i in self.listenActions:
             self.addListener(*i)
 
@@ -75,14 +80,15 @@ class API():
         log.debug('Group: %s' % user.client.group)
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
+        _etc = self.config.botConfig['groups'][user.client.group]['levels']
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
         elif cmd in self.aliases.keys(): obj = self.aliases.get(cmd)
-        else: return API.tell(user, '^1No such command ^3%s^1!' % cmd)
-        if _min <= obj['level'] <= _max:
+        else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
+        if _min <= obj['level'] <= _max or obj['level'] in _etc:
             thread.fireThread(self.commands.get(cmd)['exec'], data)
         else:
             log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
-            API.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
+            Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
 
@@ -161,6 +167,6 @@ EVENTS = {
 }
 
 def setup(BOT):
-    global API, A
-    API = Q3API(BOT)
-    A.Q3 = API
+    global Q3, A
+    Q3 = Q3API(BOT)
+    A.Q3 = Q3

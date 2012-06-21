@@ -24,12 +24,12 @@ default = {
     'serversocket': "/tmp/quake3_27961",
     'plugins':[],
     'groups':[
-        {'name':'guest', 'minlevel':0, 'maxlevel':1},
-        {'name':'user', 'minlevel':1, 'maxlevel':2},
-        {'name':'member', 'minlevel':1, 'maxlevel':3},
-        {'name':'mod', 'minlevel':1, 'maxlevel':4},
-        {'name':'admin', 'minlevel':1, 'maxlevel':5},
-        {'name':'uberadmin', 'minlevel':1, 'maxlevel':6}
+        {'name':'guest', 'minlevel':0, 'maxlevel':1, 'levels':[]},
+        {'name':'user', 'minlevel':1, 'maxlevel':2, 'levels':[]},
+        {'name':'member', 'minlevel':1, 'maxlevel':3, 'levels':[]},
+        {'name':'mod', 'minlevel':1, 'maxlevel':4, 'levels':[]},
+        {'name':'admin', 'minlevel':1, 'maxlevel':5, 'levels':[]},
+        {'name':'uberadmin', 'minlevel':1, 'maxlevel':6, 'levels':[]}
     ],
 },
 
@@ -63,7 +63,7 @@ default = {
 
 class ConfigFile():
     def __init__(self, configfile='config'):
-        self.configfile = configfile
+        self.configfile = configfile.replace('.cfg', '')
         self.config = self.load()
 
         self.check()

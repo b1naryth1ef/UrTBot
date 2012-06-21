@@ -268,29 +268,22 @@ def loop():
             BOT.parse(line)
             #parse(line)
 
-def Start(_version_):
+def Start(_version_, cfgfile):
     global BOT, proc, A, config_debugmode, db, config, log
-    config = ConfigFile()
-    thread.gcthread = thread.fireGC()
-    #thread_handler.init(config)
+    config = ConfigFile(cfgfile)
     loadConfig(config)
     log = debug.init(config)
     db = database.setup(config, log)
-    BOT = Bot(config_prefix, config_rconip, config_rcon, config=config, database=db)
-    #A = API() #@TODO Fix this bullshit
+    BOT = Bot(config=config, database=db)
+
     api.setup(BOT)
-    BOT.Startup(api.API)
+    BOT.Startup(api)
     loadMods()
-    api.A.finishBooting()
-    api.A.B = BOT
-    api.A.config = config
-    BOT.api = api
+    api.A.finishBooting(BOT, config)
     proc = GameOutput(config_serversocket)
     
-    #db = database.init(config)
-
     x = os.uname()
-    log.info('UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
+    api.Q3.say('^3UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
     if not config.developerConfig['enabled']:
         try:
             loop()

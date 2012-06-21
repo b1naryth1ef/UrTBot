@@ -59,9 +59,9 @@ class RCON:
 
 		return data[4:] if data != None else data
 
-	def format(self, string):
+	def format(self, string, length):
 		new = None
-		for i in split(string, 69):
+		for i in split(string, length):
 			new = i if not new else new + '%s' % re.findall('(\^[0-9a-z])', new)[-1] + i
 		return new
 
