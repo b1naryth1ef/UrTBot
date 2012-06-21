@@ -167,6 +167,7 @@ class Bot():
 
     def findByName(self, name):
         for client in [i for i in self.Clients.values() if i is not None]:
+            log.debug('Name: %s, cname: %s' % (name, client.name))
             if name in client.name:
                 return client
         return None
