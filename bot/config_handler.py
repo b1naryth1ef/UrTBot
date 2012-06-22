@@ -33,14 +33,14 @@ default = {
         {'name':'uberadmin', 'minlevel':1, 'maxlevel':6, 'levels':[]}
     ],
     'permissions':{
-        'info':0,
     },
 },
 
 'dbConfig':{
     'connecter':'peewee',
     'type':'sqlite',
-    'database':'urtbot.db',
+    'name':'urtbot.db',
+    'args':{},
 },
 
 'developerConfig':{

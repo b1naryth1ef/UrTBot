@@ -153,7 +153,8 @@ def infoCmd(obj):
         [obj.client.tell(i) for i in out.split('\n')]
     else:
         obj.usage()
-def init(blah, blaski):
+
+def init(blah, blaski): pass
+def run():
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
         A.removeCommand(leetCmd)
-def run(): pass
