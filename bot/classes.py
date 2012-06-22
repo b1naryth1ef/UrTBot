@@ -131,7 +131,7 @@ class Bot():
             s = self.Q.rcon('kick').split('\n')[1]
             if s.split(' ')[-1] == "<reason>":
                 self.hasKickMsg = True
-            log.debug('kickmsg: ' % str(s))
+            log.debug(s)
 
             self.moddedSetup()
 
