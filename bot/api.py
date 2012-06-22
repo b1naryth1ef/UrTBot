@@ -35,7 +35,7 @@ class Q3API():
 
     def getObj(self, txt, reply=None):
         if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
-        elif txt.isdigit(): u = self.B.Clients[int(txt)]
+        elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
         else: u = self.B.findByName(txt, approx=True)
         if not u and reply:
             reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
