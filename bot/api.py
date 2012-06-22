@@ -17,21 +17,40 @@ class Q3API():
         self.Q = bot.Q
         self.R = bot.Q.rcon
 
-        self.prefix = self.B.prefix if not self.B.hasPrefix else ''
-        self.length = 80-len(self.B.prefix) if self.B.hasPrefix else 69
+        if not self.B.hasPrefix:
+            self.prefix = self.B.prefix
+            self.saylength = 69
+            self.telllength = 64 
+        else:
+            self.saylength = 80-len(self.B.prefix)
+            self.telllength = 76-len(self.B.prefix) #[PM]
+            self.prefix = ""
 
     def _rendplyr(self, plyr):
-        if isinstance(plyr, Player): plyr = plyr.cid
+        if isinstance(plyr, Player): return plyr.cid
         else: return plyr
 
     def tell(self, plyr, msg):
-        return self.R("tell %s %s%s" % (self._rendplyr(plyr), self.prefix, '^3'+msg)) #@DEV check if R.format() works on tell
+        return self.R("tell %s \"%s\"" % (self._rendplyr(plyr), self.Q.format(self.prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
 
     def kick(self, plyr, reason):
-        return self.R('kick %s %s' % (self._rendplyr(plyr), reason))
+        if not self.B.hasKickMsg: reason = ""
+        return self.R('kick "%s"' % (self._rendplyr(plyr))+reason)
 
     def say(self, msg):
-        return self.R("say %s%s" % (self.prefix, self.Q.format('^3'+msg, self.length)))
+        return self.R("say %s%s" % (self.prefix, self.Q.format('^3'+msg, self.saylength)))
+
+    def getObj(self, txt):
+        if txt.startswith('@'):
+            return self.B.findByName(txt[1:], approx=True)
+        elif txt.isdigit():
+            return self.B.Clients[int(txt)]
+        else:
+            return self.B.findByName(txt, approx=True)
+        
+
+
+
 
 class API():
     def __init__(self):
@@ -58,6 +77,13 @@ class API():
         self.commands[cmd] = {'exec':func, 'desc':desc, 'level':level}
         for i in alias:
             self.aliases[i] = cmd
+
+    def removeCommand(self, cmd):
+        if hasattr(cmd, '_cmd'):
+            cmd = cmd._cmd
+        if self.commands.get(cmd):
+            del self.commands[cmd] #@TODO Eventually move to new dict?
+        log.warning('Command %s is not registered so we can remove it!' % cmd)
 
     def addEvent(self, name, func):
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
@@ -112,6 +138,7 @@ A = API()
 def command(cmd, desc='None', level=0, alias=[]):
     def decorator(target):
         A.addCommand(cmd, target, desc, level, alias)
+        target._cmd = cmd
         return target
     return decorator
 

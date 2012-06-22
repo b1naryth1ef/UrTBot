@@ -23,6 +23,7 @@ class Bot():
 
         self.hasPrefix = False
         self.hasDemo = False
+        self.hasKickMsg = False
 
         self.redScore = 0
         self.blueScore = 0
@@ -130,10 +131,12 @@ class Bot():
                 self.hasPrefix = True
             if 'broadcast:' not in self.Q.rcon("sv_demonotice"):
                 self.hasDemo = True
+            #add hasKickMsg statement here plz
             self.moddedSetup()
- 
+
         self.Q3.say("^3Startup complete.")
         log.debug('EVENTS: %s' % self.A.events)
+        log.debug('GROUPS: %s' % self.config.botConfig['groups'])
         log.info('SETUP DONE: BOT')
 
     def moddedSetup(self):
@@ -151,6 +154,8 @@ class Bot():
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
             self.updatePlayers() #Set team/score for players
+
+    def getClientTeam(self): pass
 
     def parse(self, line):
         if 0 < len(self.logback) > 5: self.logback.popleft()

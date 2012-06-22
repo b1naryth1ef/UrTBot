@@ -283,6 +283,12 @@ class Team():
             elif other == self.longName or other == self.shortName: return True
         return False
 
+    def __int__(self):
+        return self.id
+
+    def __repr__(self):
+        return '<%s (%s)>' % (self.longName, self.id)
+
 RED_TEAM = Team('red', 1, 'Red Team')
 BLUE_TEAM = Team('blue', 2, 'Blue Team')
 SPEC_TEAM = Team('spec', 3, 'Spectator')

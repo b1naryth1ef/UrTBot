@@ -68,15 +68,19 @@ class Player():
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
 
+    def kick(self, msg="Kicked!"):
+        self.api.Q3.kick(self, msg)
+
     def changeGroup(self, group): pass
     def checkAuth(self): pass
 
     def setData(self, data):
         data = data['info']
         if 'name' in data.keys(): data['name'] = data['name'].lower()
-        if 'team' in data.keys(): data['team'] = const.teams[int(data['team'])]
-        for i in data.keys(): #Strip line endings
-            data[i] = data[i].strip()
+        # if 'team' in data.keys(): 
+        #     log.debug('@SETDATA team: "%s"' % data['team'])
+        #     data['team'] = const.teams[int(data['team'])]
+        data = dict([(k, v.strip()) for k, v in enumerate(data) if k != 'team'])
         self.__dict__.update(data)
     
     def updateData(self, data):
@@ -91,4 +95,5 @@ class Player():
         self.setData(data)
     
     def die(self, meth):
+       # self.team = const.teams[s]
         if meth == 10: log.debug('DIE w/ METH_10: %s' % self.team)

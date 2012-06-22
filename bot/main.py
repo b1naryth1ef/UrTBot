@@ -196,7 +196,8 @@ def parseClientKick(inp):
         cur = BOT.curClients()
         for i in BOT.Clients.keys():
             if i not in cur:
-                api.A.fireEvent('CLIENT_KICKED', {'client':i})
+                api.A.fireEvent('CLIENT_CONN_KICKED', {'client':i})
+                log.debug('User was indeed kicked!')
     log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
     thread.fireThread(_user_kicked, inp)
     
