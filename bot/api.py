@@ -27,6 +27,7 @@ class Q3API():
 
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
+        del self.B.Clients[plyr.cid] #@DEV Seems shady...
         return self.R('kick "%s"' % (self._rendplyr(plyr))+reason)
 
     def say(self, msg):

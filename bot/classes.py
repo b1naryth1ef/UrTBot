@@ -50,7 +50,9 @@ class Bot():
         self.A.fireEvent('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
-    def getClient(self, uid): return self.Clients[uid]
+    def getClient(self, uid): 
+        if uid in self.Clients.keys():
+            return self.Clients[uid]
 
     def getGameType(self):
         r = self.Q.rcon('g_gametype')
