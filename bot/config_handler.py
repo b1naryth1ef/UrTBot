@@ -68,18 +68,21 @@ default = {
 class ConfigFile():
     def __init__(self, configfile='config', default=default):
         self.configfile = configfile.replace('.cfg', '')
-        self.config = self.load()
+        self.config = self.load(default)
         self.default = default
 
         self.check()
         self.save()
 
-    def load(self):
+    def load(self, default):
         try:
             with open(self.configfile+'.cfg', 'r') as f:
                 return json.loads(''.join(f.readlines()))
+        except IOError:
+            log.info('Creating config file!')
+            return default
         except:
-           raise Exception('Invalid config file! Please check your JSON formatting!')
+            raise Exception('Invalid config file! Please check your JSON formatting!')
 
     def save(self):
         s = json.dumps(self.config, sort_keys=True, indent=4)

@@ -1,33 +1,53 @@
-from init import A
-import time
+from bot.main import BOT
+from bot.api import listener, Event, command, A, Q3
+from bot.config_handler import ConfigFile
+from datetime import datetime
+import sys, os, time
 
-_name = "Adverts"
+adEvent = Event('PLUGIN_ADS_SPAM')
+default_config = {
+	'delay':80,
+	'messages':[
+	'Online Admins: ^1{admins}',
+	'Time: ^1{time}',
+	'Checkout UrTBot on github to peak into it\'s open-source goodness!',
+	'Want help? Thats what googles for!',
+	'Post bugs on github plz/ty!',
+	]
+}
 
-default_messages = [
-'Checkout the UrTBot, an open source project, on github!',
-'Type ^1!help^3 in chat for more commands!',
-'Type ^1!about^3 in chat for more information!',
-'W^100^3t! This servers on ^1fire^3!']
-default_length = 80
+config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adsconfig.cfg'), default=default_config)
+enabled = False
 
-try:
-	from config import adsconfig
-	msg = adsconfig.messages
-	leng = adsconfig.time_delay #@NOTE This should be a integer
-	A.debug('Loaded config correctly...', _name)
-except:
-	A.debug('Was not able to load config... using default messages', _name)
-	print "Cannot find 'adsconfig.py' in mods/config/... using default messages." #<<<< This is just for users not using debug
-	msg = default_messages
-	leng = default_length
+@command('adpause', 'Pause the adverts.', level=4)
+def cmdPause(obj):
+	enabled = False
+	obj.client.tell('Adverts have been paused! Resume with adplay!')
 
-def init(x=0):
-	A.debug('ads.init() was called... looping', _name)
+@command('adplay', 'Play the adverts.', level=4)
+def cmdPlay(obj):
+	enabled = True
+	obj.client.tell('Adverts have been resumed! Pause with adpause!')
+
+def registerLoops():
+	x = 0
 	while True:
-		time.sleep(leng)
-		if len(A.B.Clients) > 1: #Only print ads
-			A.say(msg[x])
-			x+=1
-			if x >= len(msg): x = 0
-		
+		if len(A.B.Clients) and enabled:
+			varz = {
+			'admins':'^3, ^1'.join([i.name for i in A.B.Clients.values() if i.client.group == A.config.botConfig['leetlevel']]),
+			'time':datetime.now()
+			}
+			Q3.say(config['messages'][x].format(**varz))
+			x += 1
+			if x >= len(config['messages']): x=0
+		time.sleep(config['delay'])
+
+def init(B, Abc): pass
+	# global A
+	# A = B.A
+
+def run():
+	global enabled
+	enabled = True
+
 

@@ -8,8 +8,9 @@ def exit():
 
 def fireThread(target, *args, **kwargs):
 	log.debug('Firing thread to %s...' % target)
-	t = threading.Thread(target=target, args=args, kwargs=kwargs)
-	t.start()
+	t = thread.start_new_thread(target, args, kwargs)
+	#t = threading.Thread(target=target, args=args, kwargs=kwargs)
+	#t.start()
 	return t
 
 def fireTimer(target, delay, *args, **kwargs):
