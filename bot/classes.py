@@ -122,11 +122,21 @@ class Bot():
         self.addPlayers()
 
         if self.config.botConfig['modded']:
-            if 'broadcast:' not in self.Q.rcon("sv_sayprefix"):
+            s = self.Q.rcon("sv_sayprefix")
+            log.debug('sv_sayprefix: %s' % s)
+            if 'broadcast:' not in s:
                 self.hasPrefix = True
-            if 'broadcast:' not in self.Q.rcon("sv_demonotice"):
+
+            s = self.Q.rcon("sv_demonotice")
+            log.debug('sv_tellprefix: %s' % s)
+            if 'broadcast:' not in s:
                 self.hasDemo = True
-            #add hasKickMsg statement here plz
+
+            s = self.Q.rcon('kick').split('\n')[1]
+            if s.split(' ')[-1] == "<reason>":
+                self.hasKickMsg = True
+            log.debug('kickmsg: ' % s)
+            
             self.moddedSetup()
 
         self.Q3.say("^3Startup complete.")
