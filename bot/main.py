@@ -282,6 +282,7 @@ def Start(_version_, cfgfile):
 
     api.setup(BOT)
     BOT.Startup(api)
+    api.A.B = BOT
     loadMods()
     api.A.finishBooting(BOT, config)
     proc = GameOutput(config_serversocket)

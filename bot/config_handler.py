@@ -32,6 +32,9 @@ default = {
         {'name':'admin', 'minlevel':1, 'maxlevel':5, 'levels':[]},
         {'name':'uberadmin', 'minlevel':1, 'maxlevel':6, 'levels':[]}
     ],
+    'permissions':{
+        'info':0,
+    },
 },
 
 'dbConfig':{

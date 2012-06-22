@@ -63,6 +63,7 @@ class API():
     def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
+        level = self.B.config.botConfig['permissions'].get(cmd, level)
         self.commands[cmd] = {'exec':func, 'desc':desc, 'usage':usage, 'level':level}
         for i in alias:
             self.aliases[i] = cmd
