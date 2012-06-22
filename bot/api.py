@@ -14,8 +14,8 @@ class Q3API():
             self.saylength = 69
             self.telllength = 64 
         else:
-            self.saylength = 80-len(self.B.prefix)
-            self.telllength = 76-len(self.B.prefix) #[PM]
+            self.saylength = 79-len(self.B.prefix)
+            self.telllength = 75-len(self.B.prefix) #[PM]
             self.prefix = ""
 
     def _rendplyr(self, plyr):
@@ -29,7 +29,7 @@ class Q3API():
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
         del self.B.Clients[plyr.cid] #@DEV Seems shady...
-        return self.R('kick "%s"' % (self._rendplyr(plyr))+reason)
+        return self.R('kick %s "%s"' % (self._rendplyr(plyr)), reason)
 
     def say(self, msg):
         prefix = self.B.prefix if not self.B.hasPrefix else ""
@@ -38,7 +38,15 @@ class Q3API():
     def getObj(self, txt, reply=None):
         if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
-        else: u = self.B.findByName(txt, approx=True)
+        else: 
+            res = []
+            for i in self.B.Clients:
+                if txt in i.name:res.append(i)
+            if len(i):
+                if len(res) == 1: u = res[0]
+                elif len(res) > 1:
+                    reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
+                    u = None
         if not u and reply:
             reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
         return u

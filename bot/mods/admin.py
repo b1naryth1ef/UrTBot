@@ -14,6 +14,22 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+@command('setgroup', 'Set a users group!', '<{user}> <group>', level=4)
+def setgroupCmd(obj):
+    m = obj.msg.split(' ', 2)
+    if len(m) == 3:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        lc = []
+        for l, g in enuemerate(A.B.config.botConfig['groups']):
+            if m[2] in g['name']: lc.append(l)
+        if len(lc) == 0: return obj.client.tell('No group %s' % m[2])
+        elif len(lc) > 2: return obj.client.tell('More than one group!')
+        else: 
+            o.client.group = lc[0]
+            o.client.save()
+    else: obj.usage()
+
 @command('force', 'Use the force broski!', '<{user}> <team>', level=4, alias=['f'])
 def forceCmd(obj):
     m = obj.msg.split(' ', 2)

@@ -205,7 +205,7 @@ def parseClientKick(inp):
     thread.fireThread(_user_kicked, inp)
     
 def parseTimeLimitHit(inp):
-    BOT.updatePlayers()
+    BOT.getPlayers()
     BOT.matchEnd()
 
 def parse(inp):
