@@ -267,7 +267,8 @@ http://utstatsbot.googlecode.com/svn-history/r2/trunk/ut.log.format.txt
 """
 
 class Team():
-    def __init__(self, nice, code, longn):
+    def __init__(self, nice, code, longn, color="^3"):
+        self.color = color
         self.shortName = nice
         self.abbrv = self.shortName[0]
         self.id = code
@@ -287,12 +288,18 @@ class Team():
         return self.id
 
     def __repr__(self):
-        return '<%s (%s)>' % (self.longName, self.id)
+        return '%s%s' % (self.color, self.longName)
 
-RED_TEAM = Team('red', 1, 'Red Team')
-BLUE_TEAM = Team('blue', 2, 'Blue Team')
-SPEC_TEAM = Team('spec', 3, 'Spectator')
+RED_TEAM = Team('red', 1, 'Red Team', '^1')
+BLUE_TEAM = Team('blue', 2, 'Blue Team', '^4')
+SPEC_TEAM = Team('spec', 3, 'Spectator', '^7')
 UNK_TEAM = Team('unk', -1, 'Unknown')
+
+teams_text = {
+    'spectator':3,
+    'blue':2,
+    'red':1,
+}
 
 teams = {
 1:RED_TEAM,

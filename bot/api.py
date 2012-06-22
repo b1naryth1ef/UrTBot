@@ -3,14 +3,6 @@ from player import Player
 import sys, os, time
 import thread_handler as thread
 
-class DataHolder():
-    def __init__(self, d):
-        self.__dict__.update(d)
-
-    def __getitem__(self, i):
-        if i in self.__dict__.keys():
-            return self.__dict__[i]
-
 class Q3API():
     def __init__(self, bot):
         self.B = bot
@@ -31,26 +23,22 @@ class Q3API():
         else: return plyr
 
     def tell(self, plyr, msg):
-        return self.R("tell %s \"%s\"" % (self._rendplyr(plyr), self.Q.format(self.prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
+        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format(self.prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
 
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
         return self.R('kick "%s"' % (self._rendplyr(plyr))+reason)
 
     def say(self, msg):
-        return self.R("say %s%s" % (self.prefix, self.Q.format('^3'+msg, self.saylength)))
+        return self.R('say "%s%s"' % (self.prefix, self.Q.format('^3'+msg, self.saylength)))
 
-    def getObj(self, txt):
-        if txt.startswith('@'):
-            return self.B.findByName(txt[1:], approx=True)
-        elif txt.isdigit():
-            return self.B.Clients[int(txt)]
-        else:
-            return self.B.findByName(txt, approx=True)
-        
-
-
-
+    def getObj(self, txt, reply=None):
+        if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
+        elif txt.isdigit(): u = self.B.Clients[int(txt)]
+        else: u = self.B.findByName(txt, approx=True)
+        if not u and reply:
+            reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
+        return u
 
 class API():
     def __init__(self):
@@ -71,19 +59,23 @@ class API():
         for i in self.listenActions:
             self.addListener(*i)
 
-    def addCommand(self, cmd, func, desc='', level=0, alias=[]):
+    def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
-        self.commands[cmd] = {'exec':func, 'desc':desc, 'level':level}
+        self.commands[cmd] = {'exec':func, 'desc':desc, 'usage':usage, 'level':level}
         for i in alias:
             self.aliases[i] = cmd
 
     def removeCommand(self, cmd):
-        if hasattr(cmd, '_cmd'):
-            cmd = cmd._cmd
-        if self.commands.get(cmd):
+        if hasattr(cmd, '_cmd'): cmd = cmd._cmd
+        if hasattr(cmd, '_alias'):
+            for i in cmd._alias:
+                if i in self.aliases.keys():
+                    del self.aliases[i]
+        if cmd in self.commands.keys():
             del self.commands[cmd] #@TODO Eventually move to new dict?
-        log.warning('Command %s is not registered so we can remove it!' % cmd)
+        else:
+            log.warning('Command %s is not registered so we cant remove it!' % cmd)
 
     def addEvent(self, name, func):
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
@@ -118,27 +110,28 @@ class API():
                 [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
     def fireCommand(self, cmd, data):
-        data = DataHolder(data)
+        cmd = cmd.lower()
         user = data['client']
         log.debug('Group: %s' % user.client.group)
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
         _etc = self.config.botConfig['groups'][user.client.group]['levels']
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
-        elif cmd in self.aliases.keys(): obj = self.aliases.get(cmd)
+        elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
         else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
         if _min <= obj['level'] <= _max or obj['level'] in _etc:
-            thread.fireThread(self.commands.get(cmd)['exec'], data)
+            thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
         else:
             log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
             Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
 
-def command(cmd, desc='None', level=0, alias=[]):
+def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
     def decorator(target):
-        A.addCommand(cmd, target, desc, level, alias)
+        A.addCommand(cmd, target, desc, usage, level, alias)
         target._cmd = cmd
+        target._alias = alias
         return target
     return decorator
 
@@ -147,6 +140,18 @@ def listener(event):
         A.addListener(event, target)
         return target
     return decorator
+
+class FiredCommand():
+    def __init__(self, cmd, data, usage):
+        self._cmd = cmd
+        self._usage = usage
+        self.__dict__.update(data)
+
+    def usage(self, obj=None): #cleanup?
+        obj = obj or self.client
+        s = "Usage: {prefix}{cmd} "+self._usage
+        d = {'cmd':self._cmd, 'user':'cid/name/@name', 'prefix':Q3.B.config.botConfig['cmd_prefix']}
+        Q3.tell(obj, s.format(**d))
 
 class FiredEvent():
     def __init__(self, name, data, cats=[]):

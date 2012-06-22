@@ -3,7 +3,7 @@ from bot.main import Start
 from distutils.version import StrictVersion
 import sys, os, time
 
-_version_ = StrictVersion('0.1')
+_version_ = StrictVersion('0.2')
 
 if __name__ == '__main__':
 	print 'Booting UrTBot V%s' % _version_

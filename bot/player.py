@@ -53,8 +53,7 @@ class Player():
         if len(q1) or len(q2) or len(q3) or len(q4):
             q = []
             for cli in [i[0] for i in [q1, q2, q3, q4] if len(i)]:
-                if cli not in q:
-                    q.append(cli)
+                if cli not in q: q.append(cli)
                 if len(q) == 1: self.client = q[0]
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
         else: self.client = database.User(name=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
@@ -62,9 +61,8 @@ class Player():
         self.client.lastjoin = datetime.now()
         self.client.joincount += 1
         self.client.save()
-
         self.uid = self.client.id
-    
+
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
 
@@ -75,25 +73,8 @@ class Player():
     def checkAuth(self): pass
 
     def setData(self, data):
-        data = data['info']
-        if 'name' in data.keys(): data['name'] = data['name'].lower()
-        # if 'team' in data.keys(): 
-        #     log.debug('@SETDATA team: "%s"' % data['team'])
-        #     data['team'] = const.teams[int(data['team'])]
-        data = dict([(k, v.strip()) for k, v in enumerate(data) if k != 'team'])
+        if 'name' in data.keys(): self.name = data['name']
+        if 'team' in data.keys() and self.team != data['team']:
+            self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+            self.team = data['team']
         self.__dict__.update(data)
-    
-    def updateData(self, data):
-        if 'name' in data.keys():
-            data['name'] = data['name'].lower()
-        if 'team' in data.keys():
-            if data['team'] != self.team:
-                log.debug('Seems the players team has changed! %s >> %s' % (self.team, data['team']))
-                self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
-                log.debug('@Updatedata team: %s' % data['team'])
-                self.team = const.teams(int(data['team']))
-        self.setData(data)
-    
-    def die(self, meth):
-       # self.team = const.teams[s]
-        if meth == 10: log.debug('DIE w/ METH_10: %s' % self.team)

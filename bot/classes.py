@@ -63,37 +63,33 @@ class Bot():
         line = re.findall('.*?(\\d+)', line)
         self.redScore = int(line[0])
         self.blueScore = int(line[1])
-    
-    def updatePlayers(self): #This may not be acurate at all times
-        #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
+
+    def getPlayers(self): #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
         r = self.Q.rcon('players').split('\n')
         self.setScores(r[3])
-        for i in [i for i in r[4:] if i != ""]:
+        for player in self.Clients.values():
+            player.setData(self.dumpUser(player.cid))
+        for i in [i.split(' ') for i in r[4:] if i != ""]:
             obj = self.findByName(i[1])
             if obj:
-                obj.team = i[2].lower()
+                obj.team = const.teams[const.teams_text[i[2].lower()]]
                 obj.score[0] = i[3].strip('k:')
                 obj.score[1] = i[4].strip('d:')
-
+        
     def dumpUser(self, uid):
-        vz = []
-        varz = {}
-        r = self.Q.rcon('dumpuser %s' % uid).split('\n')
-        for i in r[3:]:
-            if i != '':
-                vz.append([j for j in i.split(' ') if j != ''])
-        for i in vz:
-            varz[i[0]] = i[1]
-        return varz
-         
+        data = self.Q.rcon('dumpuser %s' % uid)
+        if data.startswith('print'):
+            data = data.split('\n')
+            li = [[y for y in x.split(' ') if y != ''] for x in data[3:]]
+            return dict([(x[0], ' '.join(x[1:])) for x in li if x and x[0] != 'team'])
+            
     def getStatus(self):
         varz = []
-        r = self.Q.rcon('status').split('\n')[4:]
-        for i in r:
+        r = self.Q.rcon('status').split('\n')
+        self.currentMap = r[1][5:]
+        for i in r[4:]:
             if i != '':
-                i = i.split(' ')
-                i = [o for o in i if o != '']
-                varz.append(i)
+                varz.append([o for o in i.split(' ') if o != ''])
         return varz
 
     def getCurrentMap(self):
@@ -101,8 +97,6 @@ class Bot():
         self.currentMap = r.group(1)
         self.gameData['mapname'] = r.group(1)
         return self.gameData['mapname']
-
-    def fireEvent(self, event, data): pass
 
     def Startup(self, API):
         self.api = API
@@ -119,7 +113,6 @@ class Bot():
             sys.exit()
         
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
-        log.debug('MAPLIST: %s' % self.maplist)
 
         self.getGameType() #Set g_gametype in self.gamedata
         self.getCurrentMap() #set mapname in self.gamedata
@@ -135,8 +128,6 @@ class Bot():
             self.moddedSetup()
 
         self.Q3.say("^3Startup complete.")
-        log.debug('EVENTS: %s' % self.A.events)
-        log.debug('GROUPS: %s' % self.config.botConfig['groups'])
         log.info('SETUP DONE: BOT')
 
     def moddedSetup(self):
@@ -153,7 +144,7 @@ class Bot():
                 log.debug('Add User: %s, %s' % (i, i[0]))
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
-            self.updatePlayers() #Set team/score for players
+            self.getPlayers() #Set team/score for players
 
     def getClientTeam(self): pass
 

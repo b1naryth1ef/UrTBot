@@ -22,7 +22,7 @@ class User(Model):
     lastjoin = DateTimeField()
 
 class Ban(Model):
-    uid = ForeignKeyField(User) #Bannie
+    uid = IntegerField() #Bannie
     by = ForeignKeyField(User) #Banner
     reason = CharField() #Ban reason
     created = DateTimeField() #Ban start

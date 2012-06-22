@@ -83,17 +83,21 @@ def parseClientConnect(inp): #ClientConnect: 0
 
 def parseClientUserInfo(inp):
     cid, varz = renderUserInfo(inp)
+    log.debug('Clients: %s' % BOT.Clients.keys())
     if cid in BOT.Clients.keys():
         api.A.fireEvent('CLIENT_INFO_UPDATE')
-        thread.fireThread(BOT.Clients[cid].updateData, {'client':BOT.getClient(cid), 'info':varz})
+        thread.fireThread(BOT.Clients[cid].setData, varz)
     else:
         BOT.Clients[cid] = player.Player(cid, varz, api)
+        BOT.Clients[cid].setData(BOT.dumpUser(cid))
         if BOT.Clients[cid].cl_guid != None:
             log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
             bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
-            if len(bq) and len([i for i in bq if datetime.now() < ban.until and ban.active]):
-                log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-                return BOT.Q.rcon('kick %s' % cid)
+            if len(bq):
+                for ban in bq:
+                    if datetime.now() < ban.until and ban.active:
+                        log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                        BOT.Clients[cid].kick(ban.reason)
         f = {'client':BOT.getClient(cid), 'info':varz}
         api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
@@ -101,7 +105,7 @@ def parseClientUserInfo(inp):
 def parseClientUserInfoChanged(inp):
     cid, varz = renderUserInfoChange(inp, {}, {})
     if cid in BOT.Clients.keys(): 
-        thread.fireThread(BOT.Clients[cid].updateData, {'client': BOT.getClient(cid), 'info':varz})
+        thread.fireThread(BOT.Clients[cid].setData, varz)
         api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
@@ -121,7 +125,6 @@ def parseKill(inp): #@DEV change to re eventually
     if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_DIE_WORLD', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
         api.A.fireEvent('CLIENT_DIE_SUICIDE', {'vic':victim, 'meth':method})
-        vicobj.die(method)
     elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: 
         api.A.fireEvent('CLIENT_KILL_TK', {'atk':attacker, 'vic':victim, 'meth':method})
         api.A.fireEvent('CLIENT_DIE_TK', {'atk':attacker, 'vic':victim, 'meth':method})
@@ -285,7 +288,7 @@ def Start(_version_, cfgfile):
     
     x = os.uname()
     api.Q3.say('^3UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
-    if not config.developerConfig['enabled']:
+    if not config.developerConfig['enabled']: #@DEV Fix this
         try:
             loop()
         except:
