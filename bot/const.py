@@ -252,12 +252,13 @@ http://utstatsbot.googlecode.com/svn-history/r2/trunk/ut.log.format.txt
 """
 
 class Team():
-    def __init__(self, nice, code, longn, color="^3"):
+    def __init__(self, nice, code, longn, urt, color="^3"):
         self.color = color
         self.shortName = nice
         self.abbrv = self.shortName[0]
         self.id = code
         self.longName = longn
+        self.urt = urt
 
     def __eq__(self, other):
         if isinstance(other, int):
@@ -275,10 +276,10 @@ class Team():
     def __repr__(self):
         return '%s%s' % (self.color, self.longName)
 
-RED_TEAM = Team('red', 1, 'Red Team', '^1')
-BLUE_TEAM = Team('blue', 2, 'Blue Team', '^4')
-SPEC_TEAM = Team('spec', 3, 'Spectator', '^7')
-UNK_TEAM = Team('unk', -1, 'Unknown')
+RED_TEAM = Team('red', 1, 'Red Team', 'red', '^1')
+BLUE_TEAM = Team('blue', 2, 'Blue Team', 'blue', '^4')
+SPEC_TEAM = Team('spec', 3, 'Spectator', 'spectator', '^7')
+UNK_TEAM = Team('unk', -1, 'Unknown', 'none')
 
 teams_text = {
     'spectator':3,
@@ -292,3 +293,12 @@ teams = {
 3:SPEC_TEAM,
 -1:UNK_TEAM
 }
+
+def findTeam(t):
+    if t.isdigit() and int(t) in teams.keys():
+        return teams[int(t)]
+    else:
+        for i in teams.values():
+            if t in i.shortName: return i
+            elif t in i.longName: return i
+

@@ -14,6 +14,16 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+@command('force', 'Use the force broski!', '<{user}> <team>', level=4, alias=['f'])
+def forceCmd(obj):
+    m = obj.msg.split(' ', 2)
+    if len(m) == 3:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        t = const.findTeam(m[2])
+        Q3.R('forceteam %s %s' % (o.cid, t.urt))
+    else: obj.usage()
+
 @command('rcon', 'Run an rcon command.', '<rcon> [data]', level=4)
 def rconCmd(obj):
     m = obj.msg.split(' ', 1)
