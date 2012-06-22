@@ -14,13 +14,26 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
-@command('rcon', 'Run an rcon command', '<rcon> [data]', level=4)
+@command('rcon', 'Run an rcon command.', '<rcon> [data]', level=4)
 def rconCmd(obj):
     m = obj.msg.split(' ', 1)
     if len(m) == 2:
         c = Q3.R(m[1])
         if c: obj.client.tell('Output: %s' % c)
     else: obj.usage()
+
+@command('slap', 'Slap dat ass!', '<{user}> [amount]', level=5, alias=['s'])
+def slapCmd(obj): #!slap 0 10 blah
+    m = obj.msg.split(' ', 2)
+    if len(m) >= 2:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        c = 1
+        if len(m) == 3: c = int(m[2])
+        if c > 30: c = 30
+        for i in range(0, c): A.Q3.R('slap %s' % o.cid)
+    else:
+        obj.usage()
 
 @command('kick', 'Kick a user.', '<{user}> [reason]', level=4, alias=['k'])
 def kickCmd(obj): #!kick joe you are bad
