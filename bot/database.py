@@ -11,38 +11,35 @@ database = None
 config = None
 log = None
 
-#name=None, guid=None, ip=None, group=0, password='', joincount=0, firstjoin=None, lastjoin=None
-
-class User(Model):
-    name = CharField()
-    guid = CharField()
-    ip = CharField()
-    group = IntegerField()
-    password = CharField()
-    joincount = IntegerField()
-    firstjoin = DateTimeField()
-    lastjoin = DateTimeField()
-
-    class Meta(): pass
-
-class Ban(Model):
-    uid = IntegerField() #Bannie
-    by = ForeignKeyField(User) #Banner
-    reason = CharField() #Ban reason
-    created = DateTimeField() #Ban start
-    until = DateTimeField() #Ban end
-    active = BooleanField()
-
-    class Meta(): pass
-
 def setup(config, log):
-    global database
+    global User, Ban, database
     log.debug('SETUP: DATABASE')
     cfg = config.dbConfig
     database = dbs[cfg['type']](cfg['name'], threadlocals=True, **cfg['args'])
-    Ban.Meta.database = database
-    User.Meta.database = database
     database.connect()
+
+    class BaseModel(Model):
+        class Meta():
+            database = database
+
+    class User(BaseModel):
+        name = CharField()
+        guid = CharField()
+        ip = CharField()
+        group = IntegerField()
+        password = CharField()
+        joincount = IntegerField()
+        firstjoin = DateTimeField()
+        lastjoin = DateTimeField()
+
+    class Ban(BaseModel):
+        uid = IntegerField() #Bannie
+        by = ForeignKeyField(User) #Banner
+        reason = CharField() #Ban reason
+        created = DateTimeField() #Ban start
+        until = DateTimeField() #Ban end
+        active = BooleanField()
+
     try:
         User.create_table()
         Ban.create_table()
