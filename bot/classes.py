@@ -123,15 +123,16 @@ class Bot():
 
         if self.config.botConfig['modded']:
             if 'broadcast:' not in self.Q.rcon("sv_sayprefix"):
+                log.info("Server has say/tell prefix!")
                 self.hasPrefix = True
 
             if 'broadcast:' not in self.Q.rcon("sv_demonotice"):
+                log.info("Server has demos!")
                 self.hasDemo = True
 
-            s = self.Q.rcon('kick').split('\n')[1]
-            if s.split(' ')[-1] == "<reason>":
+            if self.Q.rcon('kick').split('\n')[1].split(' ')[-1] == "<reason>":
+                log.info('Server has kick reasons!')
                 self.hasKickMsg = True
-            log.debug(s)
 
             self.moddedSetup()
 

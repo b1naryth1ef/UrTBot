@@ -23,7 +23,8 @@ class Q3API():
         else: return plyr
 
     def tell(self, plyr, msg):
-        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format(self.prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
+        prefix = self.B.prefix if not self.B.hasPrefix else ""
+        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format(prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
 
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
@@ -31,7 +32,8 @@ class Q3API():
         return self.R('kick "%s"' % (self._rendplyr(plyr))+reason)
 
     def say(self, msg):
-        return self.R('say "%s%s"' % (self.prefix, self.Q.format('^3'+msg, self.saylength)))
+        prefix = self.B.prefix if not self.B.hasPrefix else ""
+        return self.R('say "%s"' % (self.Q.format(prefix+'^3'+msg, self.saylength)))
 
     def getObj(self, txt, reply=None):
         if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
