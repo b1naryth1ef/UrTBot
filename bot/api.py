@@ -29,7 +29,7 @@ class Q3API():
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
         del self.B.Clients[plyr.cid] #@DEV Seems shady...
-        return self.R('kick %s "%s"' % (self._rendplyr(plyr)), reason)
+        return self.R('kick %s "%s"' % (self._rendplyr(plyr), reason))
 
     def say(self, msg):
         prefix = self.B.prefix if not self.B.hasPrefix else ""
@@ -40,8 +40,8 @@ class Q3API():
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
         else: 
             res = []
-            for i in self.B.Clients:
-                if txt in i.name:res.append(i)
+            for i in self.B.Clients.values():
+                if txt in i.name: res.append(i)
             if len(i):
                 if len(res) == 1: u = res[0]
                 elif len(res) > 1:
@@ -124,6 +124,7 @@ class API():
     def fireCommand(self, cmd, data):
         cmd = cmd.lower()
         user = data['client']
+        if not user.client: user.getClient()
         log.debug('Group: %s' % user.client.group)
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']

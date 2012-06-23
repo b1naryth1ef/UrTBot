@@ -45,6 +45,9 @@ class Player():
         except Exception, e:
             print e
 
+        self.getClient()
+        
+    def getClient(self):
         q1 = [i for i in database.User.select().where(name=self.name, ip=self.ip, guid=self.cl_guid)]
         q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
         q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name)]
@@ -62,6 +65,7 @@ class Player():
         self.client.joincount += 1
         self.client.save()
         self.uid = self.client.id
+
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)

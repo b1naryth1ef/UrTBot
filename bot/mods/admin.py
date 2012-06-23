@@ -21,7 +21,7 @@ def setgroupCmd(obj):
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         lc = []
-        for l, g in enuemerate(A.B.config.botConfig['groups']):
+        for l, g in enumerate(A.B.config.botConfig['groups']):
             if m[2] in g['name']: lc.append(l)
         if len(lc) == 0: return obj.client.tell('No group %s' % m[2])
         elif len(lc) > 2: return obj.client.tell('More than one group!')
