@@ -99,7 +99,7 @@ class API():
         self.listeners['eves']['_'.join(name)] = []
         for n in [name[:i] for i in range(0, len(name)) if name[:i] != []]:
             if not self.listeners['cats'].get('_'.join(n)):
-                self.listeners['cats'][n] = []
+                self.listeners['cats']['_'.join(n)] = []
         # for i in name[:-1]:
         #     if not self.listeners['cats'].get(i):
         #         self.listeners['cats'][i] = []
