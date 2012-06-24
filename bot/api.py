@@ -36,17 +36,17 @@ class Q3API():
         return self.R('say "%s"' % (self.Q.format(prefix+'^3'+msg, self.saylength)))
 
     def getObj(self, txt, reply=None):
+        u = None
         if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
         else: 
             res = []
             for i in self.B.Clients.values():
-                if txt in i.name: res.append(i)
+                if txt.lower() in i.name.lower(): res.append(i)
             if len(res):
                 if len(res) == 1: u = res[0]
                 elif len(res) > 1:
                     reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
-                    u = None
         if not u and reply:
             reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
         return u
