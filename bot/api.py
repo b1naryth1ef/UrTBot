@@ -129,7 +129,7 @@ class API():
             for n in [g[:i] for i in range(0, len(g)) if g[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
-    def hasAccess(self, cmd, client):
+    def hasAccess(self, cmd, user):
         if not user.client: user.getClient()
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
