@@ -134,7 +134,7 @@ class API():
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
         _etc = self.config.botConfig['groups'][user.client.group]['levels']
-        if len([i for i in obj['level'] if _min <= i <= _max or i in _etc]):
+        if len([i for i in cmd['level'] if _min <= i <= _max or i in _etc]):
             return True
         return False
 
