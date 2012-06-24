@@ -10,15 +10,15 @@ class Q3API():
         self.R = bot.Q.rcon
 
         self.setLengths()
-        
+
     def setLengths(self):
         if not self.B.hasPrefix:
             self.prefix = self.B.prefix
             self.saylength = 69
             self.telllength = 64 
         else:
-            self.saylength = 74-len(self.B.prefix)
-            self.telllength = 70-len(self.B.prefix) #[PM]
+            self.saylength = 76-len(self.B.prefix)
+            self.telllength = 72-len(self.B.prefix) #[PM]
             self.prefix = ""
 
         log.debug("Say/Tell: %s/%s" % (self.saylength, self.telllength))
