@@ -14,6 +14,19 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+@command('map', 'Load a map!', '<map>', level=4)
+def mapCmd(obj):
+    m = obj.msg.split(' ', 1)
+    if len(m) == 2:
+        res = []
+        for item in A.B.maplist:
+            if m[1] in item: res.append(item)
+        if len(res) == 1: Q3.R('map %s' % res[0])
+        elif len(res) == 0: obj.client.tell('No map for %s found!' % m[1])
+        elif len(res) == 2: obj.client.tell('More than one map for %s found!' % m[1])
+    else:
+        obj.usage()
+
 @command('setgroup', 'Set a users group!', '<{user}> <group>', level=4)
 def setgroupCmd(obj):
     m = obj.msg.split(' ', 2)
@@ -46,7 +59,10 @@ def rconCmd(obj):
     m = obj.msg.split(' ', 1)
     if len(m) == 2:
         c = Q3.R(m[1])
-        if c: obj.client.tell('Output: %s' % c)
+        if c: 
+            obj.client.tell('Output:')
+            for line in c.split('\n'):
+                obj.client.tell(line)
     else: obj.usage()
 
 @command('slap', 'Slap dat ass!', '<{user}> [amount]', level=5, alias=['s'])
@@ -142,8 +158,8 @@ def leetCmd(obj):
 def sayCmd(obj):
     m = obj.msg.split(' ', 1)
     if len(m) == 2:
-        if m[1].startswith('@'): m = "^5%s^1:^3 %s" % (obj.client.name, m[1][1:])
-        else: m = m[1]
+        if m[1].startswith('@'): m = m[1][:1] 
+        else: m = "^5%s^1:^3 %s" % (obj.client.name, m[1])
         Q3.say(m)
     else:
         obj.usage()
@@ -154,13 +170,13 @@ def tellCmd(obj):
     if len(m) == 3:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        if m[2].startswith('@'): m = "^5%s^1:^3 %s" % (obj.client.name, m[2][1:])
-        else: m = m[2]
+        if m[2].startswith('@'): m = m[2][:1] 
+        else: m = "^5%s^1:^3 %s" % (obj.client.name, m[2])
         Q3.tell(o, m)
     else:
         obj.usage()
         
-@command('info', 'Get info on a user.', '{user}', 3)
+@command('info', 'Get info on a user.', '{user}', 4)
 def infoCmd(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
@@ -170,6 +186,13 @@ def infoCmd(obj):
         [obj.client.tell(i) for i in out.split('\n')]
     else:
         obj.usage()
+
+@command('list', "List the online users.", '', 3)
+def listCmd(obj):
+    obj.client.tell('Online Users: ')
+    for i in A.B.Clients.values():
+        i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.joined)
+        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' %)
 
 def init(blah, blaski): pass
 def run():

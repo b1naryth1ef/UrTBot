@@ -13,6 +13,7 @@ class Player():
         self.score = [0,0]
         self.api = api
         self.A = self.api.A
+        self.joined = datetime.now()
     
         try:
             self.name = None
