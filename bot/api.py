@@ -18,6 +18,8 @@ class Q3API():
             self.telllength = 70-len(self.B.prefix) #[PM]
             self.prefix = ""
 
+        log.debug("Say/Tell: %s/%s" % (self.saylength, self.telllength))
+
     def _rendplyr(self, plyr):
         if isinstance(plyr, Player): return plyr.cid
         else: return plyr
