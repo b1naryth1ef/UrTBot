@@ -107,7 +107,9 @@ class Bot():
         log.info('SETUP: BOT')
 
         resp = self.Q3.say("^3Starting up...")
-        if "No rconpassword set on the server." in resp:
+        if resp is None:
+            log.critical('The server is not reachable. Check the ip/port and try again!')
+        elif "No rconpassword set on the server." in resp:
             log.critical('The server does not have an rcon password check. Please check your server config and try again.')
             sys.exit()
         elif 'Bad rconpassword.' in resp:
