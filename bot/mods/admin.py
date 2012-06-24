@@ -23,7 +23,7 @@ def linetestCmd(obj):
         c = 90
     else:
         return obj.usage()
-    l = Q3.Q.format('^1ADSFSDKJFSLDKJFLA^2ADSLKJDSLKFJLJDSF^4LAKDJFLDSKJFLSJDLFK^1LSDKJFLSDKJFLSDKJFSDFLJSDLFKSDF', c)
+    l = Q3.Q.format('^1ADSFSDKJFSLDKJFLAADSLKJDSLKFJLJDSFLAKDJFLDSKJFLSJDLFKLSDKJFLSDKJFLSDKJFSDFLJSDLFKSDF', c)
     Q3.Q.rcon('say "%s"' % l)
 
 @command('setgroup', 'Set a users group!', '<{user}> <group>', level=4)
