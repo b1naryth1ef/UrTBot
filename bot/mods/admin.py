@@ -14,6 +14,18 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+@command('linetest', 'Test line outputs', '[cutoff]', level=4)
+def linetestCmd(obj):
+    m = obj.msg.split(' ', 1)
+    if len(m) == 2 and m[1].isdigit():
+        c = int(m[1])
+    elif len(m) == 1:
+        c = 90
+    else:
+        return obj.usage()
+    l = Q3.Q.format('^1ADSFSDKJFSLDKJFLA^2ADSLKJDSLKFJLJDSF^4LAKDJFLDSKJFLSJDLFK^1LSDKJFLSDKJFLSDKJFSDFLJSDLFKSDF', c)
+    Q3.Q.rcon('say "%s"' % l)
+
 @command('setgroup', 'Set a users group!', '<{user}> <group>', level=4)
 def setgroupCmd(obj):
     m = obj.msg.split(' ', 2)
@@ -28,6 +40,7 @@ def setgroupCmd(obj):
         else: 
             o.client.group = lc[0]
             o.client.save()
+            obj.client.tell('User %s successfully put in group %s' % (o.name, lc[0]))
     else: obj.usage()
 
 @command('force', 'Use the force broski!', '<{user}> <team>', level=4, alias=['f'])
