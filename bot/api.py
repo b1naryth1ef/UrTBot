@@ -74,7 +74,7 @@ class API():
             self.addListener(*i)
 
     def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
-        if type(level) not list: level = list(level)
+        if type(level) is not list: level = list(level)
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
         level = self.B.config.botConfig['permissions'].get(cmd, level)
