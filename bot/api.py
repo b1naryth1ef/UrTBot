@@ -21,8 +21,6 @@ class Q3API():
             self.telllength = 72-len(self.B.prefix) #[PM]
             self.prefix = ""
 
-        log.debug("Say/Tell: %s/%s" % (self.saylength, self.telllength))
-
     def _rendplyr(self, plyr):
         if isinstance(plyr, Player): return plyr.cid
         else: return plyr
@@ -76,10 +74,11 @@ class API():
             self.addListener(*i)
 
     def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
+        if type(level) not list: level = list(level)
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
         level = self.B.config.botConfig['permissions'].get(cmd, level)
-        self.commands[cmd] = {'exec':func, 'desc':desc, 'usage':usage, 'level':level}
+        self.commands[cmd] = {'exec':func, 'desc':desc, 'usage':usage, 'level':level, 'name':cmd}
         for i in alias:
             self.aliases[i] = cmd
 
@@ -126,18 +125,23 @@ class API():
             for cat in obj.cats.split('_'):
                 [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
 
+    def hasAccess(self, cmd, client):
+        if not user.client: user.getClient()
+        _min = self.config.botConfig['groups'][user.client.group]['minlevel']
+        _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
+        _etc = self.config.botConfig['groups'][user.client.group]['levels']
+        if len([i for i in obj['level'] if _min <= i <= _max or i in _etc]):
+            return True
+        return False
+
     def fireCommand(self, cmd, data):
         cmd = cmd.lower()
         user = data['client']
         if not user.client: user.getClient()
-        log.debug('Group: %s' % user.client.group)
-        _min = self.config.botConfig['groups'][user.client.group]['minlevel']
-        _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
-        _etc = self.config.botConfig['groups'][user.client.group]['levels']
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
         elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
         else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
-        if _min <= obj['level'] <= _max or obj['level'] in _etc:
+        if self.hasAccess(cmd, user):
             thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
         else:
             log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
@@ -214,6 +218,7 @@ EVENTS = {
 'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
 'CLIENT_CONN_DISCONNECT':Event('CLIENT_CONN_DISCONNECT'),
+'CLIENT_CONN_DISCONNECT_LATE':Event('CLIENT_CONN_DISCONNECT_LATE'),
 'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
 'CLIENT_CONN_KICKED':Event('CLIENT_CONN_KICKED'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),

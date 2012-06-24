@@ -16,10 +16,8 @@ from bot.config_handler import ConfigFile
 #--SETTRZ--#
 A = None
 home = os.getcwd()
-lastsent = None
 keepLoop = True
-botDEBUGS = []
-pluginDEBUGS = []
+modules = []
 
 #--GLOB--#
 config_prefix = None
@@ -257,6 +255,7 @@ def loadMods():
             if hasattr(i, 'run'): thread.fireThread(i.run)
             else: log.warning('Plugin %s does not have run method!' % i.__name__)
             log.info('Loaded plugin %s' % i.__name__)
+            modules.append(i)
         except Exception, e:
             log.warning('Error loading plugin %s [%s]' % (i, e))
 
@@ -271,6 +270,10 @@ def loop():
                 print line
             BOT.parse(line)
             #parse(line)
+
+def exit():
+    for i in modules:
+        if hasattr(i, 'stop'): i.stop()
 
 def Start(_version_, cfgfile):
     global BOT, proc, A, config_debugmode, db, config, log
@@ -289,19 +292,10 @@ def Start(_version_, cfgfile):
     
     x = os.uname()
     api.Q3.say('^3UrTBot V%s loaded on %s (%s/%s)' % (_version_, sys.platform, x[2], x[4]))
-    if not config.developerConfig['enabled']: #@DEV Fix this
-        try:
-            loop()
-        except:
-            thread.exit()
-            sys.exit()
-    else: 
+    if config.developerConfig['enabled']: loop()
+    else:
         try: loop()
-        except KeyboardInterrupt:
-            thread.exit()
-            sys.exit()
-
-def Exit(): sys.exit()
+        except: exit()
 
 if __name__ == "__main__":
     print "Use start.py to start everything or we'll trololololol, and die!"

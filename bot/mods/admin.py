@@ -66,15 +66,17 @@ def rconCmd(obj):
     else: obj.usage()
 
 @command('slap', 'Slap dat ass!', '<{user}> [amount]', level=5, alias=['s'])
+@command('nuke', 'Nuke dat hoe!', '<{user}> [amount]', level=5, alias=['n'])
 def slapCmd(obj): #!slap 0 10 blah
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
+        action = m[0][1:]
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         c = 1
         if len(m) == 3: c = int(m[2])
         if c > 30: c = 30
-        for i in range(0, c): A.Q3.R('slap %s' % o.cid)
+        for i in range(0, c): A.Q3.R('%s %s' % (action, o.cid))
     else:
         obj.usage()
 
@@ -158,7 +160,7 @@ def leetCmd(obj):
 def sayCmd(obj):
     m = obj.msg.split(' ', 1)
     if len(m) == 2:
-        if m[1].startswith('@'): m = m[1][:1] 
+        if m[1].startswith('@'): m = m[1][1:] 
         else: m = "^5%s^1:^3 %s" % (obj.client.name, m[1])
         Q3.say(m)
     else:
@@ -170,13 +172,13 @@ def tellCmd(obj):
     if len(m) == 3:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        if m[2].startswith('@'): m = m[2][:1] 
+        if m[2].startswith('@'): m = m[2][1:] 
         else: m = "^5%s^1:^3 %s" % (obj.client.name, m[2])
         Q3.tell(o, m)
     else:
         obj.usage()
         
-@command('info', 'Get info on a user.', '{user}', 4)
+@command('info', 'Get info on a user.', '<{user}>', 4)
 def infoCmd(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
@@ -194,7 +196,48 @@ def listCmd(obj):
         i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.joined)
         obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' % i)
 
+@command('demostart', "Start a demo.", '<{user}>', 3, ['dstart'])
+def demostartCmd(obj):
+    m = obj.msg.split(' ')
+    if len(m) == 2:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        #@TODO Add a hook into mapcycling/restarts to restart demos if the player hasnt quit
+        Q3.rcon("startserverdemo %s" % o.cid)
+        obj.client.tell('Started server demo for %s!' % o.name)
+    else:
+        obj.usage()
+
+@command('demostop', 'Stop a demo.', '<{user}>', 3, ['dstop'])
+def demostopCmd(obj):
+    m = obj.msg.split(' ')
+    if len(m) == 2:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        #@TODO When we have a hook into BOT.demos, remove it here
+        Q3.rcon("stopserverdemo %s" % o.cid)
+        obj.client.tell('Stoped server demo for %s!' % o.name)
+    else:
+        obj.usage()
+
+@command('help', 'Get some help!', '[command]', [0, 1])
+def helpCmd(obj):
+    m = obj.msg.split(' ')
+    if len(m) == 2:
+        if m[1].lower() in A.commands.keys(): cmd = A.commands[m[1].lower()]
+        elif m[1].lower() in A.aliases.keys(): cmd = A.commands[A.aliases[m[1].lower()]]
+        else: obj.client.tell("No such command %s!" % m[1])
+        obj.client.tell("%s: %s" % (cmd['name'], cmd['desc']))
+    else:
+        obj.client.tell('Help Listing: ')
+        for cmd in A.commands.values():
+            if A.hasAccess(obj.client, cmd): 
+                obj.client.tell('%s: %s' % (cmd['name'], cmd['desc']))
+
 def init(blah, blaski): pass
 def run():
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
         A.removeCommand(leetCmd)
+    if not BOT.hasDemo:
+        A.removeCommand(demostartCmd)
+        A.removeCommand(demostopCmd)

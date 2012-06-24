@@ -24,6 +24,7 @@ class Bot():
         self.hasPrefix = False
         self.hasDemo = False
         self.hasKickMsg = False
+        self.demos = {}
 
         self.redScore = 0
         self.blueScore = 0
@@ -31,6 +32,18 @@ class Bot():
         self.Clients = {} #AKA players
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
         
+    def pollPlayers(self):
+        while True:
+            time.sleep(120) #Poll players e'ry two mins
+            if len(self.Clients):
+                status = self.getStatus()
+                if status:
+                    for i in status:
+                        if int(i[0]) not in self.Clients.keys():
+                            log.debug("We didnt catch a client disconnect, correcting.")
+                            self.A.fireEvent('CLIENT_CONN_DISCONNECT_LATE', {'slot':int(i[0])})
+                            del self.Clients[int(i[0])]
+
     def roundNew(self):
         log.debug('New round starting!')
         self.A.fireEvent('GAME_ROUND_START', {})
