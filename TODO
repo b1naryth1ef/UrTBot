@@ -2,4 +2,6 @@
 - Figure out the hits/etc
 - Catch some of the kick messages
 - Find workarounds for lost/blank messages
+	- Disconnects (most important)
+	- Hot potato (semi-important)
 - Remove dateutil dependencies (soon plz!)
