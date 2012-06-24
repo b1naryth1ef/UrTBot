@@ -42,7 +42,7 @@ class Q3API():
             res = []
             for i in self.B.Clients.values():
                 if txt in i.name: res.append(i)
-            if len(i):
+            if len(res):
                 if len(res) == 1: u = res[0]
                 elif len(res) > 1:
                     reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
