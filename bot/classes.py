@@ -137,7 +137,8 @@ class Bot():
                 self.hasKickMsg = True
 
             self.moddedSetup()
-
+            
+        self.Q3.setLengths()
         self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
 

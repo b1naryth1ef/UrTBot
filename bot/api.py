@@ -9,6 +9,9 @@ class Q3API():
         self.Q = bot.Q
         self.R = bot.Q.rcon
 
+        self.setLengths()
+        
+    def setLengths(self):
         if not self.B.hasPrefix:
             self.prefix = self.B.prefix
             self.saylength = 69
