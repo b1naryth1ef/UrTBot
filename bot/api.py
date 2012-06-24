@@ -14,8 +14,8 @@ class Q3API():
             self.saylength = 69
             self.telllength = 64 
         else:
-            self.saylength = 78-len(self.B.prefix)
-            self.telllength = 74-len(self.B.prefix) #[PM]
+            self.saylength = 74-len(self.B.prefix)
+            self.telllength = 70-len(self.B.prefix) #[PM]
             self.prefix = ""
 
     def _rendplyr(self, plyr):
