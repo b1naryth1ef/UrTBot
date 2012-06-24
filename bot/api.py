@@ -145,7 +145,7 @@ class API():
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
         elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
         else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
-        if self.hasAccess(cmd, user):
+        if self.hasAccess(obj, user):
             thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
         else:
             log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
