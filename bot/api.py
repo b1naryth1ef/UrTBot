@@ -98,7 +98,7 @@ class API():
         self.events['_'.join(name)] = func
         self.listeners['eves']['_'.join(name)] = []
         for n in [name[:i] for i in range(0, len(name)) if name[:i] != []]:
-            if not self.listeners['cats'].get(n):
+            if not self.listeners['cats'].get('_'.join(n)):
                 self.listeners['cats'][n] = []
         # for i in name[:-1]:
         #     if not self.listeners['cats'].get(i):
@@ -126,8 +126,8 @@ class API():
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
             g = obj.name.split('_')
-            for n in [name[:i] for i in range(0, len(g)) if name[:i] != []]:
-                [thread.fireThread(f, obj) for f in self.listeners['cats'][n]]
+            for n in [g[:i] for i in range(0, len(g)) if g[:i] != []]:
+                [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
     def hasAccess(self, cmd, client):
         if not user.client: user.getClient()
