@@ -192,7 +192,7 @@ def listCmd(obj):
     obj.client.tell('Online Users: ')
     for i in A.B.Clients.values():
         i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.joined)
-        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' %)
+        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' % i)
 
 def init(blah, blaski): pass
 def run():
