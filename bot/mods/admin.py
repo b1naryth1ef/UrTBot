@@ -202,7 +202,8 @@ def demostartCmd(obj):
     if len(m) == 2:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        #@TODO Add a hook into mapcycling/restarts to restart demos if the player hasnt quit
+        if o.cid not in BOT.demos:
+            BOT.demos.append(o.cid)
         Q3.rcon("startserverdemo %s" % o.cid)
         obj.client.tell('Started server demo for %s!' % o.name)
     else:
@@ -214,7 +215,8 @@ def demostopCmd(obj):
     if len(m) == 2:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        #@TODO When we have a hook into BOT.demos, remove it here
+        if o.cid in BOT.demos:
+            BOT.demos.pop(BOT.demos.index(o.cid))
         Q3.rcon("stopserverdemo %s" % o.cid)
         obj.client.tell('Stoped server demo for %s!' % o.name)
     else:
@@ -233,6 +235,18 @@ def helpCmd(obj):
         for cmd in A.commands.values():
             if A.hasAccess(obj.client, cmd): 
                 obj.client.tell('%s: %s' % (cmd['name'], cmd['desc']))
+
+@listener("GAME_MATCH_START")
+def game_match_start_listener(obj):
+    if len(BOT.demos):
+        for i in BOT.demos:
+            if i in BOT.clients.values():
+                Q3.rcon("startserverdemo %s" % o.cid)
+
+@listener("CLIENT_CONN_DISCONNECT", "CLIENT_CONN_DISCONNECT_LATE")
+def client_disconnect_listener(obj):
+    if obj.cid in BOT.demos:
+        BOT.demos.pop(BOT.demos.index(obj.cid))
 
 def init(blah, blaski): pass
 def run():
