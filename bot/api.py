@@ -97,9 +97,12 @@ class API():
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
         self.events['_'.join(name)] = func
         self.listeners['eves']['_'.join(name)] = []
-        for i in name[:-1]:
-            if not self.listeners['cats'].get(i):
-                self.listeners['cats'][i] = []
+        for n in [name[:i] for i in range(0, len(name)) if name[:i] != []]:
+            if not self.listeners['cats'].get(n):
+                self.listeners['cats'][n] = []
+        # for i in name[:-1]:
+        #     if not self.listeners['cats'].get(i):
+        #         self.listeners['cats'][i] = []
         log.debug('Event %s has been registered!' % '_'.join(name))
 
     def addListener(self, name, func):
@@ -122,9 +125,10 @@ class API():
                 return log.debug('Cannot find event %s!' % name)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
-            for cat in obj.cats.split('_'):
-                [thread.fireThread(i, obj) for i in self.listeners['cats'][cat]]
-
+            g = obj.name.split('_')
+            for n in [name[:i] for i in range(0, len(g)) if name[:i] != []]:
+                [thread.fireThread(f, obj) for f in self.listeners['cats'][n]]
+                
     def hasAccess(self, cmd, client):
         if not user.client: user.getClient()
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
@@ -157,9 +161,10 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(event):
+def listener(*event):
     def decorator(target):
-        A.addListener(event, target)
+        for i in event:
+            A.addListener(i, target)
         return target
     return decorator
 
