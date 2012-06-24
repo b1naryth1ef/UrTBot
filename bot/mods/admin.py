@@ -17,13 +17,13 @@ events = {
 @command('linetest', 'Test line outputs', '[cutoff]', level=4)
 def linetestCmd(obj):
     m = obj.msg.split(' ', 1)
+    l = '^1ADSFSDKJFSLDKJFLAADSLKJDSLKFJLJDSFLAKDJFLDSKJFLSJDLFKLSDKJFLSDKJFLSDKJFSDFLJSDLFKSDF'
     if len(m) == 2 and m[1].isdigit():
-        c = int(m[1])
+        l = Q3.Q.format(l, int(m[1]))
     elif len(m) == 1:
-        c = 90
+        l = Q3.Q.format(l, Q3.saylength)
     else:
         return obj.usage()
-    l = Q3.Q.format('^1ADSFSDKJFSLDKJFLAADSLKJDSLKFJLJDSFLAKDJFLDSKJFLSJDLFKLSDKJFLSDKJFLSDKJFSDFLJSDLFKSDF', c)
     Q3.Q.rcon('say "%s"' % l)
 
 @command('setgroup', 'Set a users group!', '<{user}> <group>', level=4)
