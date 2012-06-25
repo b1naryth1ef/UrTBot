@@ -129,7 +129,7 @@ class API():
             for n in [g[:i] for i in range(0, len(g)) if g[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
-    def hasAccess(self, cmd, user):
+    def hasAccess(self, user, cmd):
         if not user.client: user.getClient()
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
@@ -145,7 +145,7 @@ class API():
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
         elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
         else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
-        if self.hasAccess(obj, user):
+        if self.hasAccess(user, obj):
             thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
         else:
             Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
