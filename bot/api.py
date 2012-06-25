@@ -130,6 +130,7 @@ class API():
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
     def hasAccess(self, user, cmd):
+        log.debug('hasAccess: %s/%s' % (user, cmd))
         if not user.client: user.getClient()
         _min = self.config.botConfig['groups'][user.client.group]['minlevel']
         _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
