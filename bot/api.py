@@ -148,7 +148,6 @@ class API():
         if self.hasAccess(obj, user):
             thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
         else:
-            log.debug('No access: %s < %s < %s' % (_min, obj['level'], _max))
             Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
