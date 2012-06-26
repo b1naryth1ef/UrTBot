@@ -86,4 +86,4 @@ class Player():
         self.__dict__.update(data)
 
     def __repr__(self):
-        return "<Player '%s' with IP %s, CID %s, UID %s, GUID %s>" % (self.name, self.cid, self.uid, self.cl_guid)
+        return "<Player '%s' with IP %s, CID %s, UID %s, GUID %s>" % (self.name, self.ip, self.cid, self.uid, self.cl_guid)
