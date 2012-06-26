@@ -76,7 +76,7 @@ def slapCmd(obj): #!slap 0 10 blah
         if len(m) == 3: c = int(m[2])
         if c > 30: c = 30
         for i in range(0, c): 
-            A.Q3.R('%s %s' % (obj._obj['name'][1:], o.cid))
+            A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
             time.sleep(.2)
     else:
         obj.usage()

@@ -79,7 +79,7 @@ class Player():
 
     def setData(self, data):
         if 'name' in data.keys(): self.name = data['name']
-        if 'team' in data.keys() and self.team != data['team']:
+        if 'team' in data.keys() and self.team != None and self.team != data['team']:
             self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
             self.team = data['team']
         self.__dict__.update(data)

@@ -3,8 +3,8 @@ from bot.api import listener, Event, command, A, Q3
 import bot.const as const
 import random
 
-@command('!teams', "Attempt to balance uneven teams", "", level=2)
-def cmdTeams(obj, t):
+@command('teams', "Attempt to balance uneven teams", "", level=2)
+def cmdTeams(obj):
 	m = obj.msg.split(" ")
 
 	redPlayers = [i.cid for i in BOT.Clients.values() if i.team == const.RED_TEAM]
