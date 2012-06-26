@@ -69,6 +69,15 @@ def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
     api.A.fireEvent('CLIENT_SAY_TEAM', dic)
 
+def parseReconnect(inp): #68.255.111.133:27960:reconnect
+    ip = inp.strip(':reconnect')
+    for cli in BOT.Clients.values():
+        if ip == cli.ip:
+            log.debug('Client #%s is reconnecting, delete the obj for now...')
+            del BOT.Clients[cli.cid]
+            return
+    log.debug('Reconnect has no client with matching ip %s' % ip)
+
 def parseClientConnect(inp): #ClientConnect: 0
     cid = int(re.findall('ClientConnect\: ([0-9a-z])', inp)[0])
     if cid in BOT.Clients.keys(): #Disconnect messages MAY be missed!
@@ -114,7 +123,7 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
         log.debug('Removing client #%s' % cid)
         del BOT.Clients[cid]
     else:
-        log.debug('Huh... client #%s wasnt in the clients list: %s' % (cid, BOT.Clients.keys()))
+        log.debug('Huh... client #%s (%s) wasnt in the clients list: %s (%s)' % (cid, type(cid), BOT.Clients.keys(), [type(i) for i in BOT.Clients.keys()]))
 
 def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
@@ -217,6 +226,7 @@ def parse(inp):
     global BOT
     if inp.startswith("say:"): parseSay(inp)
     elif inp.startswith("sayteam:"): parseSayTeam(inp)
+    elif inp.endswith(':reconnect'): parseReconnect(inp)
     elif inp.startswith('ClientConnect:'): parseClientConnect(inp)
     elif inp.startswith('ClientUserinfo:'): parseClientUserInfo(inp)
     elif inp.startswith('ClientUserinfoChanged:'): parseClientUserInfoChanged(inp)

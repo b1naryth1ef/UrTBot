@@ -76,11 +76,11 @@ def slapCmd(obj): #!slap 0 10 blah
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         c = 1
-        if len(m) == 3: c = int(m[2])
+        if len(m) == 3 and m[2].isdigit(): c = int(m[2])
         if c > 30: c = 30
         for i in range(0, c): 
             A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
-            time.sleep(.2)
+            time.sleep(1)
     else:
         obj.usage()
 
@@ -243,7 +243,7 @@ def helpCmd(obj):
         for cmd in A.commands.values():
             if A.hasAccess(obj.client, cmd): 
                 obj.client.tell('%s: %s' % (cmd['name'], cmd['desc']))
-                time.sleep(0.2)
+                time.sleep(0.5)
 
 @listener("GAME_MATCH_START")
 def game_match_start_listener(obj):
