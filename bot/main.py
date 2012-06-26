@@ -73,7 +73,7 @@ def parseReconnect(inp): #68.255.111.133:27960:reconnect
     ip = inp.strip(':reconnect')
     for cli in BOT.Clients.values():
         if ip == cli.ip:
-            log.debug('Client #%s is reconnecting, delete the obj for now...')
+            log.debug('Client #%s is reconnecting, delete the obj for now...' % cli.cid)
             del BOT.Clients[cli.cid]
             return
     log.debug('Reconnect has no client with matching ip %s' % ip)
@@ -119,11 +119,8 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
     log.debug('Got client disconnect for CID #%s' % cid)
     api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
-    if inp in BOT.Clients.keys(): 
-        log.debug('Removing client #%s' % cid)
+    if cid in BOT.Clients.keys():
         del BOT.Clients[cid]
-    else:
-        log.debug('Huh... client #%s (%s) wasnt in the clients list: %s (%s)' % (cid, type(cid), BOT.Clients.keys(), [type(i) for i in BOT.Clients.keys()]))
 
 def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
