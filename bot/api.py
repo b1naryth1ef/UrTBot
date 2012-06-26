@@ -45,7 +45,8 @@ class Q3API():
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
         else:
             res = []
-            for i in self.B.Clients.values(): if txt.lower() in i.name.lower(): res.append(i)
+            for i in self.B.Clients.values(): 
+                if txt.lower() in i.name.lower(): res.append(i)
             if len(res) == 1: u = res[0]
             elif len(res) > 1:
                 reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
