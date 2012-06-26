@@ -110,7 +110,11 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
     log.debug('Got client disconnect for CID #%s' % cid)
     api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
-    if inp in BOT.Clients.keys(): del BOT.Clients[cid]
+    if inp in BOT.Clients.keys(): 
+        log.debug('Removing client #%s' % cid)
+        del BOT.Clients[cid]
+    else:
+        log.debug('Huh... client #%s wasnt in the clients list: %s' % (cid, BOT.Clients.keys()))
 
 def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
@@ -123,6 +127,7 @@ def parseKill(inp): #@DEV change to re eventually
     method = int(inp[2][:-1])
     if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_DIE_WORLD', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
+        if method == 10: vicobj.checkTeam()
         api.A.fireEvent('CLIENT_DIE_SUICIDE', {'vic':victim, 'meth':method})
     elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: 
         api.A.fireEvent('CLIENT_KILL_TK', {'atk':attacker, 'vic':victim, 'meth':method})

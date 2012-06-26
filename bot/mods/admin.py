@@ -60,9 +60,12 @@ def rconCmd(obj):
     if len(m) == 2:
         c = Q3.R(m[1])
         if c: 
-            obj.client.tell('Output:')
-            for line in c.split('\n'):
-                obj.client.tell(line)
+            c = c.split('\n')
+            if len(c) <= 15:
+                obj.client.tell('Output:')
+                for line in c.split('\n'):
+                    obj.client.tell(line)
+                time.sleep(0.2)
     else: obj.usage()
 
 @command('slap', 'Slap dat ass!', '<{user}> [amount]', level=5, alias=['s'])
@@ -240,6 +243,7 @@ def helpCmd(obj):
         for cmd in A.commands.values():
             if A.hasAccess(obj.client, cmd): 
                 obj.client.tell('%s: %s' % (cmd['name'], cmd['desc']))
+                time.sleep(0.2)
 
 @listener("GAME_MATCH_START")
 def game_match_start_listener(obj):

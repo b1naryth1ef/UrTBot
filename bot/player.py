@@ -67,6 +67,7 @@ class Player():
         self.client.save()
         self.uid = self.client.id
 
+    def checkTeam(self): pass #@TODO
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
@@ -83,3 +84,6 @@ class Player():
             self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
             self.team = data['team']
         self.__dict__.update(data)
+
+    def __repr__(self):
+        return "<Player '%s' with IP %s, CID %s, UID %s, GUID %s>" % (self.name, self.cid, self.uid, self.cl_guid)
