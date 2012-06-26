@@ -37,7 +37,7 @@ def renderUserInfo(inp, varz={}):
         varz[i[0]] = i[1]
     if 'name' in varz.keys():
         varz['nick'] = varz['name']
-        varz['name'] = varz['name'].lower()
+        varz['name'] = varz['name'] #.lower()
     return uid,varz
     
 def renderUserInfoChange(inp, varz={}, vary={}):
@@ -49,7 +49,7 @@ def renderUserInfoChange(inp, varz={}, vary={}):
     for i in var:
         varz[i[0]] = i[1]
     if 't' in varz.keys(): vary['team'] = const.teams[int(varz['t'])]
-    if 'n' in varz.keys(): vary['name'] = varz['n'].lower()
+    if 'n' in varz.keys(): vary['name'] = varz['n'] #.lower()
     return uid,vary
 
 #--PARSING ACTIONS--#
@@ -108,6 +108,7 @@ def parseClientUserInfoChanged(inp):
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
+    log.debug('Got client disconnect for CID #%s' % cid)
     api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
     if inp in BOT.Clients.keys(): del BOT.Clients[cid]
 

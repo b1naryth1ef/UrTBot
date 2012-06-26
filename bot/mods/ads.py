@@ -65,7 +65,7 @@ def registerLoops():
 			}
 			for ad in config['messages']:
 				if type(ad) is tuple: ad = ad[0]
-				admins = 'Online Admins: '+'^3, ^1'.join([i.name for i in A.B.Clients.values() if i.client.group == A.config.botConfig['leetlevel']])
+				admins = 'Online Admins: '+'^3, ^1'.join(Q3.getAdminList())
 				Q3.say(ad.format(time=datetime.now(), admins=admins))
 				time.sleep(config['delay'])
 

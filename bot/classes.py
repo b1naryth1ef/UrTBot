@@ -1,6 +1,7 @@
 import socket, select, time, re, thread
 import bot, player, const, database, main
 from debug import log
+import thread_handler as thread
 from rcon import RCON
 from collections import deque
 import sys, os, time
@@ -152,6 +153,7 @@ class Bot():
             self.moddedSetup()
             
         self.Q3.setLengths()
+        thread.fireThread(self.pollPlayers)
         self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
 
@@ -181,5 +183,4 @@ class Bot():
     def findByName(self, name, approx=False):
         for client in [i for i in self.Clients.values() if i is not None]:
             if client.name == None: return
-            if approx and name in client.name: return client
-            if client.name == name: return client
+            if approx and name in client.name.lower(): return client

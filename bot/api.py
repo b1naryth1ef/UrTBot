@@ -40,19 +40,22 @@ class Q3API():
 
     def getObj(self, txt, reply=None):
         u = None
-        if txt.startswith('@'): u = self.B.findByName(txt[1:], approx=True)
+        if txt.startswith('@') and txt[1:].isdigit(): 
+            u = [i for i in database.User.select().where(id=int(txt[1:]))]
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
-        else: 
+        else:
             res = []
-            for i in self.B.Clients.values():
-                if txt.lower() in i.name.lower(): res.append(i)
-            if len(res):
-                if len(res) == 1: u = res[0]
-                elif len(res) > 1:
-                    reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
+            for i in self.B.Clients.values(): if txt.lower() in i.name.lower(): res.append(i)
+            if len(res) == 1: u = res[0]
+            elif len(res) > 1:
+                reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
+                return None
         if not u and reply:
             reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
         return u
+
+    def getAdminList(self):
+        return [i.name for i in self.B.Clients.values() if i.client.group == self.B.A.config.botConfig['leetlevel']]
 
 class API():
     def __init__(self):
@@ -147,7 +150,7 @@ class API():
         elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
         else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
         if self.hasAccess(user, obj):
-            thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj['usage']))
+            thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj))
         else:
             Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
@@ -169,15 +172,16 @@ def listener(*event):
     return decorator
 
 class FiredCommand():
-    def __init__(self, cmd, data, usage):
+    def __init__(self, cmd, data, obj):
         self._cmd = cmd
-        self._usage = usage
+        self._obj = obj
+        self._usage = obj['usage']
         self.__dict__.update(data)
 
     def usage(self, obj=None): #cleanup?
         obj = obj or self.client
         s = "Usage: {prefix}{cmd} "+self._usage
-        d = {'cmd':self._cmd, 'user':'cid/name/@name', 'prefix':Q3.B.config.botConfig['cmd_prefix']}
+        d = {'cmd':self._cmd, 'user':'name/cid/@uid', 'prefix':Q3.B.config.botConfig['cmd_prefix']}
         Q3.tell(obj, s.format(**d))
 
 class FiredEvent():

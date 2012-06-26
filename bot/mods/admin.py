@@ -70,20 +70,21 @@ def rconCmd(obj):
 def slapCmd(obj): #!slap 0 10 blah
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
-        action = m[0][1:]
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         c = 1
         if len(m) == 3: c = int(m[2])
         if c > 30: c = 30
-        for i in range(0, c): A.Q3.R('%s %s' % (action, o.cid))
+        for i in range(0, c): 
+            A.Q3.R('%s %s' % (obj._obj['name'][1:], o.cid))
+            time.sleep(.2)
     else:
         obj.usage()
 
 @command('kick', 'Kick a user.', '<{user}> [reason]', level=4, alias=['k'])
 def kickCmd(obj): #!kick joe you are bad
     m = obj.msg.split(' ', 2)
-    reason = "No reason given"
+    reason = "No fucks given"
     if len(m) in [2, 3]:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
@@ -189,7 +190,7 @@ def infoCmd(obj):
     else:
         obj.usage()
 
-@command('list', "List the online users.", '', 3)
+@command('list', "List the online users.", '', 4)
 def listCmd(obj):
     obj.client.tell('Online Users: ')
     for i in A.B.Clients.values():
@@ -222,6 +223,10 @@ def demostopCmd(obj):
     else:
         obj.usage()
 
+@command('admins', 'Find those more sexy than you', '', [0, 1])
+def adminsCmd(obj):
+    obj.client.tell('Admins: ^1'+'^3, ^1'.join(Q3.getAdminList()))
+
 @command('help', 'Get some help!', '[command]', [0, 1])
 def helpCmd(obj):
     m = obj.msg.split(' ')
@@ -240,7 +245,7 @@ def helpCmd(obj):
 def game_match_start_listener(obj):
     if len(BOT.demos):
         for i in BOT.demos:
-            if i in BOT.clients.values():
+            if i in BOT.Clients.values():
                 Q3.rcon("startserverdemo %s" % o.cid)
 
 @listener("CLIENT_CONN_DISCONNECT", "CLIENT_CONN_DISCONNECT_LATE")

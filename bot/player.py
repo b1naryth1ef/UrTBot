@@ -49,9 +49,9 @@ class Player():
         self.getClient()
         
     def getClient(self):
-        q1 = [i for i in database.User.select().where(name=self.name, ip=self.ip, guid=self.cl_guid)]
+        q1 = [i for i in database.User.select().where(name=self.name.lower(), ip=self.ip, guid=self.cl_guid)]
         q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
-        q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name)]
+        q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name.lower())]
         q4 = [i for i in database.User.select().where(guid=self.cl_guid)]
 
         if len(q1) or len(q2) or len(q3) or len(q4):
@@ -60,7 +60,7 @@ class Player():
                 if cli not in q: q.append(cli)
                 if len(q) == 1: self.client = q[0]
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
-        else: self.client = database.User(name=self.name, ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
+        else: self.client = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
 
         self.client.lastjoin = datetime.now()
         self.client.joincount += 1
