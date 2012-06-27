@@ -14,6 +14,8 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+kicks = []
+
 @command('map', 'Load a map!', '<map>', level=4)
 def mapCmd(obj):
     m = obj.msg.split(' ', 1)
@@ -33,6 +35,7 @@ def setgroupCmd(obj):
     if len(m) == 3:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
+        if o == self.client: return obj.client.tell('You cant set your own group silly!')
         lc = []
         for l, g in enumerate(A.B.config.botConfig['groups']):
             if m[2] in g['name']: lc.append(l)
@@ -76,11 +79,18 @@ def slapCmd(obj): #!slap 0 10 blah
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         c = 1
-        if len(m) == 3 and m[2].isdigit(): c = int(m[2])
-        if c > 30: c = 30
+        t = 1
+        if len(m) == 3:
+            if m[2].isdigit(): c = int(m[2])
+            elif m[2].startswith(':') and m[2][1:].isdigit(): 
+                c = int(m[2][1:])
+                t = .3
+        if c > 20: c = 20
+        kicks.append(o.cid)
         for i in range(0, c): 
+            if o.cid not in kicks: return
             A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
-            time.sleep(1)
+            time.sleep(t)
     else:
         obj.usage()
 
@@ -91,43 +101,27 @@ def kickCmd(obj): #!kick joe you are bad
     if len(m) in [2, 3]:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        if len(m) == 3:
-            reason = m[2]
-        A.Q3.kick(o, reason)
-        events['kick'].fire({'client':o})
-    else:
-        obj.usage()
-
-@command('ban', 'Permaban a user.', '<{user}> [reason]', 5, ['b'])
-def banCmd(obj): #!ban joe tsk tsk tsk
-    m = obj.msg.split(' ')
-    reason = "No reason given"
-    if len(m) in [2, 3]:
-        o = Q3.getObj(m[1], obj.client)
-        if not o: return
         if len(m) == 3: reason = m[2]
-        b = database.Ban(uid=o.client.id, by=obj.client.client, reason=reason, created=datetime.now(), until=datetime.now()+relativedelta(years=+10), active=True)
-        b.save()
+        database.Penalty(user=o.user, admin=obj.client.user, penalty="kick", reason=reason, creation_date=datetime.now(), expire_date=datetime.now(), active=False).save()
         A.Q3.kick(o, reason)
-        events['ban'].fire({'client':o})
         events['kick'].fire({'client':o})
     else:
         obj.usage()
 
-@command('tempban', 'Tempban a user.', '<{user}> <duration> [reason]', 5, ['tb'])
-def tempbanCmd(obj):
-    reason = "No reason given"
+@command('ban', 'Ban/Tempban a user. (-1 duration for permaban)', '<{user}> <duration> [reason]', 5, ['b'])
+def banCmd(obj):
     m = obj.msg.split(' ', 3)
+    reason = "No reason given"
     if len(m) in [3, 4]:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
         if len(m) == 4: reason = m[3]
-        dur = const.timeparse(m[2])
-        b = database.Ban(uid=o.client.id, by=obj.client.client, reason=reason, created=datetime.now(), until=datetime.now()+relativedelta(**dur), active=True)
-        b.save()
-        A.Q3.kick(o, reason)
-        events['tempban'].fire({'client':o})
+        if m[2] == "-1": dur = datetime.now()+relativedelta(years=+50)
+        else: dur = datetime.now()+relativedelta(**const.timeparse(m[2]))
+        database.Penalty(user=o.user, admin=obj.client.user, penalty="ban", reason=reason, creation_date=datetime.now(), expire_date=dur, active=True).save()
+        events['ban'].fire({'client':o})
         events['kick'].fire({'client':o})
+        A.Q3.kick(o, reason)
     else:
         obj.usage()
 
@@ -139,21 +133,22 @@ def unbanCmd(obj):
         else: q = {'name':m[1]}
         qu = [i for i in database.User.select().where(**q)]
         if len(qu) == 1:
-            b = [i for i in database.Ban.select().where(uid=qu[0].id, active=True)]
+            b = [i for i in database.Penalty.select().where(user=qu[0], penalty="ban",  active=True)]
             if len(b):
                 for i in b:
                     i.active = False
                     i.save()
-                obj.client.tell('Successfully unbanned %s' % qu[0].name)
-            else: obj.client.tell('^1No bans for %s' % qu[0].name)
-        else: obj.client.tell('^1More than one user for that query!')
+                obj.client.tell('^1Successfully unbanned ^3%s' % qu[0].name)
+            else: obj.client.tell('^1No bans for ^3%s' % qu[0].name)
+        elif len(qu) == 0: obj.client.tell('^1More than one user for that query!')
+        else: obj.client.tell('^1More than one user for that query (%s users)!' % len(qu))
     else: obj.usage()
 
 @command('leet', 'Become even more leet.', level=0, alias=['l33t'])
 def leetCmd(obj):
     if not len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
-        obj.client.client.group = BOT.config.botConfig['leetlevel']
-        obj.client.client.save()
+        obj.client.user.group = BOT.config.botConfig['leetlevel']
+        obj.client.user.save()
         obj.client.tell('Enjoy your ^1l33t^3ness!')
         log.info('User %s has gained uber-admin access through the !leet command!' % obj.client.name)
     else:
@@ -245,6 +240,17 @@ def helpCmd(obj):
                 obj.client.tell('%s: %s' % (cmd['name'], cmd['desc']))
                 time.sleep(0.5)
 
+@command('alias', 'Find aliases of the user.', '<{user}>', 3)
+def cmdAlias(obj):
+    m = obj.msg.split(' ')
+    if len(m) == 2:
+        o = Q3.getObj(m[1], obj.client)
+        if not o: return
+        q = [i.real for i in database.Alias.select().where(user=o.user)]
+        obj.client.tell('Aliases of %s: ^1%s' % (o.name, '^3, ^1'.join(q)))
+    else:
+        obj.usage()
+
 @listener("GAME_MATCH_START")
 def game_match_start_listener(obj):
     if len(BOT.demos):
@@ -252,13 +258,18 @@ def game_match_start_listener(obj):
             if i in BOT.Clients.values():
                 Q3.rcon("startserverdemo %s" % o.cid)
 
-@listener("CLIENT_CONN_DISCONNECT", "CLIENT_CONN_DISCONNECT_LATE")
+@listener("CLIENT_CONN_DISCONNECT")
 def client_disconnect_listener(obj):
-    if obj.cid in BOT.demos:
-        BOT.demos.pop(BOT.demos.index(obj.cid))
+    if obj.client.cid in BOT.demos:
+        BOT.demos.pop(BOT.demos.index(obj.client.cid))
 
-def init(blah, blaski): pass
-def run():
+@listener("CLIENT_DIE_SUICIDE")
+def client_die_sucidie_listener(obj):
+    if obj.client.cid in kicks: kicks.pop(kicks.index(obj.client.cid))
+
+def onEnable(): pass
+def onDisable(): pass
+def onBoot():
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
         A.removeCommand(leetCmd)
     if not BOT.hasDemo:

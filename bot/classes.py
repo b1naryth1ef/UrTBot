@@ -32,18 +32,6 @@ class Bot():
 
         self.Clients = {} #AKA players
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
-        
-    def pollPlayers(self):
-        while True:
-            time.sleep(120) #Poll players e'ry two mins
-            if len(self.Clients):
-                status = self.getStatus()
-                if status:
-                    for i in status:
-                        if int(i[0]) not in self.Clients.keys():
-                            log.debug("We didnt catch a client disconnect, correcting.")
-                            self.A.fireEvent('CLIENT_CONN_DISCONNECT_LATE', {'slot':int(i[0])})
-                            del self.Clients[int(i[0])]
 
     def roundNew(self):
         log.debug('New round starting!')
@@ -120,7 +108,7 @@ class Bot():
         self.Q3 = self.A.Q3
         log.info('SETUP: BOT')
 
-        resp = self.Q3.say("^3Starting up...")
+        resp = self.Q3.R("say \"^3Starting up...\"")
         if resp is None:
             log.critical('The server is not reachable. Check the ip/port and try again!')
         elif "No rconpassword set on the server." in resp:
@@ -153,7 +141,6 @@ class Bot():
             self.moddedSetup()
             
         self.Q3.setLengths()
-        thread.fireThread(self.pollPlayers)
         self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
 

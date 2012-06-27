@@ -18,7 +18,7 @@ class Player():
         try:
             self.name = None
             self.ip = None
-            self.team = None
+            self.team = SPEC_TEAM
             self.model = None
             self.sex = None
             self.headmodel = None
@@ -44,11 +44,12 @@ class Player():
             self.ut_timenudge = None
             self.setData(self.data)
         except Exception, e:
-            print e
+            log.debug(e)
 
-        self.getClient()
+        self.getUser()
+        self.checkTeam()
         
-    def getClient(self):
+    def getUser(self):
         q1 = [i for i in database.User.select().where(name=self.name.lower(), ip=self.ip, guid=self.cl_guid)]
         q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
         q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name.lower())]
@@ -58,22 +59,28 @@ class Player():
             q = []
             for cli in [i[0] for i in [q1, q2, q3, q4] if len(i)]:
                 if cli not in q: q.append(cli)
-                if len(q) == 1: self.client = q[0]
+                if len(q) == 1: self.user = q[0]
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
-        else: self.client = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
+        else: self.user = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
 
-        self.client.lastjoin = datetime.now()
-        self.client.joincount += 1
-        self.client.save()
-        self.uid = self.client.id
+        if len([i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]) == 0:
+            database.Alias(user=self.user, alias=self.name.lower(), real=self.name).save()
 
-    def checkTeam(self): pass #@TODO
+        self.user.lastjoin = datetime.now()
+        self.user.joincount += 1
+        self.user.save()
+        self.uid = self.user.id
+
+    def checkTeam(self): pass
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
 
     def kick(self, msg="Kicked!"):
         self.api.Q3.kick(self, msg)
+
+    def force(self, team):
+        self.api.Q3.force(self, team)
 
     def changeGroup(self, group): pass
     def checkAuth(self): pass

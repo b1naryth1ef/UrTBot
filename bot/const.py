@@ -301,4 +301,3 @@ def findTeam(t):
         for i in teams.values():
             if t in i.shortName: return i
             elif t in i.longName: return i
-

@@ -3,6 +3,7 @@ from bot.api import listener, Event, command, A, Q3
 from bot.config_handler import ConfigFile
 from datetime import datetime
 from bot.debug import log
+import bot.thread_handler as thread
 import sys, os, time
 
 adEvent = Event('PLUGIN_ADS_SPAM')
@@ -20,6 +21,7 @@ default_config = {
 
 config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adsconfig.cfg'), default=default_config)
 enabled = False
+en = []
 
 @command('adlist', 'List all adverts.', level=4)
 def cmdList(obj):
@@ -46,34 +48,37 @@ def cmdDel(obj):
 
 @command('adenable', 'Enable the adverts.', level=4)
 def cmdEnable(obj):
-	enabled = True
-	obj.client.tell('Adverts enabled!')
+	global enabled
+	if not enabled: 
+		enabled = True
+		obj.client.tell('Adverts enabled!')
+	else: obj.client.tell('Adverts already enabled!')
 
 @command('addisable', 'Disable the adverts.', level=4)
 def cmdDisable(obj):
-	enabled = False
-	obj.client.tell('Adverts disabled!')
+	global enabled
+	if enabled: 
+		enabled = False
+		obj.client.tell('Adverts disabled!')
+	else: obj.client.tell('Adverts already disabled!')
 
-def registerLoops():
-	x = 0
+def loop():
 	while True:
 		if len(A.B.Clients) and enabled:
-			log.debug('Sending command because %s and len %s' % (enabled, len(A.B.Clients)))
-			varz = {
-			'admins':'^3, ^1'.join([i.name for i in A.B.Clients.values() if i.client.group == A.config.botConfig['leetlevel']]),
-			'time':datetime.now()
-			}
 			for ad in config['messages']:
 				if type(ad) is tuple: ad = ad[0]
 				admins = 'Online Admins: '+'^3, ^1'.join(Q3.getAdminList())
 				Q3.say(ad.format(time=datetime.now(), admins=admins))
 				time.sleep(config['delay'])
 
-def init(B, A): pass
+def onBoot():
+	thread.fireThread(loop)
 
-def run():
+def onEnable():
 	global enabled
 	enabled = True
 
-def stop():
+def onDisable():
+	global enabled
+	enabled = False
 	config.save()

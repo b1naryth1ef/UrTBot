@@ -1,5 +1,6 @@
 from debug import log
 from player import Player
+import database
 import sys, os, time
 import thread_handler as thread
 
@@ -11,7 +12,7 @@ class Q3API():
 
         self.setLengths()
 
-    def setLengths(self):
+    def setLengths(self): #@TODO Actually figure this shit out k?
         if not self.B.hasPrefix:
             self.prefix = self.B.prefix
             self.saylength = 69
@@ -31,35 +32,41 @@ class Q3API():
 
     def kick(self, plyr, reason):
         if not self.B.hasKickMsg: reason = ""
+        else: reason = ' "%s"' % reason
+        log.debug('Kicking %s' % plyr)
         del self.B.Clients[plyr.cid] #@DEV Seems shady...
-        return self.R('kick %s "%s"' % (self._rendplyr(plyr), reason))
+        return self.R('kick %s%s' % (self._rendplyr(plyr), reason))
 
     def say(self, msg):
         prefix = self.B.prefix if not self.B.hasPrefix else ""
         return self.R('say "%s"' % (self.Q.format(prefix+'^3'+msg, self.saylength)))
 
+    def force(self, plyr, team):
+        return self.R('forceteam %s %s' % (self._rendplyr(plyr), team.urt))
+
     def getObj(self, txt, reply=None):
         u = None
         if txt.startswith('@') and txt[1:].isdigit(): 
-            u = [i for i in database.User.select().where(id=int(txt[1:]))]
-        elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = self.B.Clients[int(txt)]
-        else:
-            res = []
+            u = [i for i in self.B.Clients.values() if i.uid == int(txt[1:])]
+        elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = [self.B.Clients[int(txt)]]
+        else: 
+            u = []
             for i in self.B.Clients.values(): 
-                if txt.lower() in i.name.lower(): res.append(i)
-            if len(res) == 1: u = res[0]
-            elif len(res) > 1:
-                reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
-                return None
-        if not u and reply:
+                if txt.lower() in i.name.lower(): u.append(i)
+        if len(u) == 1: u = u[0]
+        elif len(u) > 1:
+            reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
+            u = None
+        else:
             reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
         return u
 
     def getAdminList(self):
-        return [i.name for i in self.B.Clients.values() if i.client.group == self.B.A.config.botConfig['leetlevel']]
+        return [i.name for i in self.B.Clients.values() if i.user.group == self.B.A.config.botConfig['leetlevel']]
 
 class API():
     def __init__(self):
+        self.modules = {}
         self.commands = {}
         self.aliases = {}
         self.events = {}
@@ -76,6 +83,16 @@ class API():
         self.config = config
         for i in self.listenActions:
             self.addListener(*i)
+
+        for i in self.modules.values():
+            log.info('Enabling %s!' % i['name'])
+            i['obj'].onEnable()
+
+    def addModule(self, name, obj):
+        if name not in self.modules.keys():
+            self.modules[name] = {'name':name, 'enabled':False, 'obj':obj}
+        else:
+            log.warning('Module %s already exists in A.modules' % name)
 
     def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
         if type(level) is not list: level = [level]
@@ -133,26 +150,26 @@ class API():
             for n in [g[:i] for i in range(0, len(g)) if g[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
-    def hasAccess(self, user, cmd):
-        if not user.client: user.getClient()
-        _min = self.config.botConfig['groups'][user.client.group]['minlevel']
-        _max =  self.config.botConfig['groups'][user.client.group]['maxlevel']
-        _etc = self.config.botConfig['groups'][user.client.group]['levels']
+    def hasAccess(self, client, cmd):
+        if not client.user: client.getUser()
+        _min = self.config.botConfig['groups'][client.user.group]['minlevel']
+        _max =  self.config.botConfig['groups'][client.user.group]['maxlevel']
+        _etc = self.config.botConfig['groups'][client.user.group]['levels']
         if len([i for i in cmd['level'] if _min <= i <= _max or i in _etc]):
             return True
         return False
 
     def fireCommand(self, cmd, data):
         cmd = cmd.lower()
-        user = data['client']
-        if not user.client: user.getClient()
+        client = data['client']
+        if not hasattr(client, 'user'): client.getUser()
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
         elif cmd in self.aliases.keys(): obj = self.commands[self.aliases.get(cmd)]
-        else: return Q3.tell(user, '^1No such command ^3%s^1!' % cmd)
-        if self.hasAccess(user, obj):
+        else: return Q3.tell(client, '^1No such command ^3%s^1!' % cmd)
+        if self.hasAccess(client, obj):
             thread.fireThread(obj['exec'], FiredCommand(cmd, data, obj))
         else:
-            Q3.tell(user, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
+            Q3.tell(client, '^1You do not have sufficient access to use ^3%s^1!' % cmd)
 
 A = API()
 
@@ -226,10 +243,10 @@ EVENTS = {
 'CLIENT_CONN_TIMEOUT':Event('CLIENT_CONN_TIMEOUT'),
 'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
-'CLIENT_CONN_DISCONNECT':Event('CLIENT_CONN_DISCONNECT'),
+'CLIENT_CONN_DISCONNECT_GEN':Event('CLIENT_CONN_DISCONNECT_GEN'),
 'CLIENT_CONN_DISCONNECT_LATE':Event('CLIENT_CONN_DISCONNECT_LATE'),
+'CLIENT_CONN_DISCONNECT_KICKED':Event('CLIENT_CONN_DISCONNECT_KICKED'),
 'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
-'CLIENT_CONN_KICKED':Event('CLIENT_CONN_KICKED'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
 'CLIENT_INFO_CHANGE':Event('CLIENT_INFO_CHANGE'),
 'CLIENT_INFO_NAME':Event('CLIENT_INFO_NAME'),

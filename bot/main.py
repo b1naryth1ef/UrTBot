@@ -99,12 +99,11 @@ def parseClientUserInfo(inp):
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
         if BOT.Clients[cid].cl_guid != None:
             log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
-            bq = [i for i in database.Ban.select().where(uid=BOT.Clients[cid].uid)]
-            if len(bq):
-                for ban in bq:
-                    if datetime.now() < ban.until and ban.active:
-                        log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-                        BOT.Clients[cid].kick(ban.reason)
+            pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
+            if len(pen):
+                for p in pen:
+                    log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                    BOT.Clients[cid].kick(p.reason)
         f = {'client':BOT.getClient(cid), 'info':varz}
         api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
@@ -118,7 +117,7 @@ def parseClientUserInfoChanged(inp):
 def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
     log.debug('Got client disconnect for CID #%s' % cid)
-    api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'client':BOT.getClient(cid)})
+    api.A.fireEvent('CLIENT_CONN_DISCONNECT_GEN', {'client':BOT.getClient(cid)})
     if cid in BOT.Clients.keys():
         del BOT.Clients[cid]
 
@@ -209,8 +208,7 @@ def parseClientKick(inp):
         cur = BOT.curClients()
         for i in BOT.Clients.keys():
             if i not in cur:
-                api.A.fireEvent('CLIENT_CONN_KICKED', {'cid':i})
-                api.A.fireEvent('CLIENT_CONN_DISCONNECT', {'cid':i})
+                api.A.fireEvent('CLIENT_CONN_DISCONNECT_KICKED', {'cid':i})
                 log.debug('User was indeed kicked!')
     log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
     thread.fireThread(_user_kicked, inp)
@@ -254,20 +252,18 @@ def loadConfig(cfg):
         config_groups = botConfig['groups']
         config_serversocket = botConfig['serversocket']
     except Exception, e:
-        print 'Error loading main config... [%s]' % e
+        log.critical('Error loading main config... [%s]' % e)
         sys.exit()
 
 def loadMods():
-    global BOT, A, config
-    for i in config_plugins:
-        log.info('Loading plugin %s' % i)
-        __import__('bot.mods.'+i)
-        i = sys.modules['bot.mods.'+i]
+    global BOT, config
+    for name in config_plugins:
+        log.info('Loading plugin %s' % name)
+        __import__('bot.mods.'+name)
+        i = sys.modules['bot.mods.'+name]
+        BOT.A.addModule(name, i)
         try: 
-            if hasattr(i, 'init'): thread.fireThread(i.init, BOT, config)
-            if hasattr(i, 'registerLoops'): thread.fireThread(i.registerLoops)
-            if hasattr(i, 'run'): thread.fireThread(i.run)
-            else: log.warning('Plugin %s does not have run method!' % i.__name__)
+            if hasattr(i, 'onBoot'): thread.fireThread(i.onBoot)
             log.info('Loaded plugin %s' % i.__name__)
             modules.append(i)
         except Exception, e:
@@ -283,11 +279,6 @@ def loop():
             if line != '^1Error: weapon number out of range':
                 print line
             BOT.parse(line)
-            #parse(line)
-
-def exit():
-    for i in modules:
-        if hasattr(i, 'stop'): i.stop()
 
 def Start(_version_, cfgfile):
     global BOT, proc, A, config_debugmode, db, config, log
@@ -309,7 +300,7 @@ def Start(_version_, cfgfile):
     if config.developerConfig['enabled']: loop()
     else:
         try: loop()
-        except: exit()
+        except: sys.exit()
 
 if __name__ == "__main__":
     print "Use start.py to start everything or we'll trololololol, and die!"
