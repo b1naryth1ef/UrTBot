@@ -36,8 +36,8 @@ def cmdLock(obj):
 		if not o: return
 		if o not in locks:
 			locks.append(o)
-			return obj.client.tell('Client has been locked too %s%s!' % (o.team.color, o.team.longn))
-		obj.client.tell('Client is already locked too %s%s!' % (o.team.color, o.team.longn))
+			return obj.client.tell('Client has been locked too %s!' % (o.team))
+		obj.client.tell('Client is already locked too %s!' % (o.team))
 	else:
 		obj.usage()
 
@@ -49,11 +49,10 @@ def cmdUnlock(obj):
 		if not o: return
 		if o in locks:
 			locks.pop(locks.index(o))
-			return obj.client.tell('Client has been unlocked from %s%s!' % (o.team.color, o.team.longn))
+			return obj.client.tell('Client has been unlocked from %s!' % (o.team))
 		obj.client.tell('Client isnt locked to a team!')
 	else:
 		obj.usage()
-
 
 @listener('CLIENT_TEAM_SWITCH')
 def clientTeamSwitchListener(obj):

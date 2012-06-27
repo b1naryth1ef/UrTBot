@@ -20,11 +20,6 @@ keepLoop = True
 modules = []
 
 #--GLOB--#
-config_prefix = None
-config_rcon = None
-config_rconip = None
-config_bootcommand = None
-config_groups = None
 config_plugins = None
 config_serversocket = None
 
@@ -241,15 +236,10 @@ def parse(inp):
 
 def loadConfig(cfg):
     """Loads the bot config"""
-    global log, config_prefix, config_rcon, config_rconip, config_bootcommand, config_plugins, config_groups, config_serversocket, config
+    global log, config_plugins, config_serversocket, config
     try:
         botConfig = config.botConfig
-        config_prefix = botConfig['prefix']
-        config_rcon = botConfig['rcon']
-        config_rconip = botConfig['rconip']
-        config_bootcommand = botConfig['servercommand']
         config_plugins = botConfig['plugins']
-        config_groups = botConfig['groups']
         config_serversocket = botConfig['serversocket']
     except Exception, e:
         log.critical('Error loading main config... [%s]' % e)
@@ -291,6 +281,7 @@ def Start(_version_, cfgfile):
     api.setup(BOT)
     BOT.Startup(api)
     api.A.B = BOT
+    A = api.A
     loadMods()
     api.A.finishBooting(BOT, config)
     proc = GameOutput(config_serversocket)
