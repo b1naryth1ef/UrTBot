@@ -70,6 +70,7 @@ def loop():
 				admins = 'Online Admins: '+'^3, ^1'.join(Q3.getAdminList())
 				Q3.say(ad.format(time=datetime.now(), admins=admins))
 				time.sleep(config['delay'])
+		else: time.sleep(5)
 
 def onBoot():
 	thread.fireThread(loop)
@@ -77,6 +78,7 @@ def onBoot():
 def onEnable():
 	global enabled
 	enabled = True
+
 
 def onDisable():
 	global enabled
