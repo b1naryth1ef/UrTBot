@@ -35,7 +35,7 @@ def setgroupCmd(obj):
     if len(m) == 3:
         o = Q3.getObj(m[1], obj.client)
         if not o: return
-        if o == self.client: return obj.client.tell('You cant set your own group silly!')
+        if o == obj.client: return obj.client.tell('You cant set your own group silly!')
         lc = []
         for l, g in enumerate(A.B.config.botConfig['groups']):
             if m[2] in g['name']: lc.append(l)
