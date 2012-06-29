@@ -67,8 +67,10 @@ def loop():
 		if len(A.B.Clients) and enabled:
 			for ad in config['messages']:
 				if type(ad) is tuple: ad = ad[0]
-				admins = 'Online Admins: '+'^3, ^1'.join(Q3.getAdminList())
+				li = '^3, ^1'.join(Q3.getAdminList()) if len(Q3.getAdminList()) else "None"
+				admins = 'Online Admins: ^1'+li
 				Q3.say(ad.format(time=datetime.now(), admins=admins))
+				adEvent.fire()
 				time.sleep(config['delay'])
 		else: time.sleep(5)
 

@@ -8,13 +8,25 @@ import bot.database as database
 import bot.const as const
 import sys, os, time
 
+default_config = {
+    'block_1337':True
+}
+
 events = {
     'ban':Event('PLUGIN_ADMIN_BAN'),
     'tempban':Event('PLUGIN_ADMIN_TEMPBAN'),
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
+config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adminconfig.cfg'), default=default_config)
 kicks = []
+
+@command('bitchslap', "Slap dat ass!", '', level=5)
+def bitchslapCmd(obj):
+    for cli in BOT.Clients.values():
+        if cli == obj.client: continue
+        cli.action('slap {cid}')
+    Q3.R('say ^1SLAP ^2DAT ^4ASS ^5YOSKI!!!')
 
 @command('map', 'Load a map!', '<map>', level=4)
 def mapCmd(obj):
@@ -265,11 +277,16 @@ def client_disconnect_listener(obj):
 
 @listener("CLIENT_DIE_SUICIDE")
 def client_die_sucidie_listener(obj):
-    if obj.client.cid in kicks: kicks.pop(kicks.index(obj.client.cid))
+    if obj.vic.cid in kicks: kicks.pop(kicks.index(obj.vic.cid))
+
+def client_conn_connected_listener(obj):
+    if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
 
 def onEnable(): pass
 def onDisable(): pass
 def onBoot():
+    if config.block_1337:
+        A.addListener('CLIENT_CONN_CONNECTED', client_conn_connected_listener)
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
         A.removeCommand(leetCmd)
     if not BOT.hasDemo:
