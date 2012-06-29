@@ -42,8 +42,8 @@ def setgroupCmd(obj):
         if len(lc) == 0: return obj.client.tell('No group %s' % m[2])
         elif len(lc) > 2: return obj.client.tell('More than one group!')
         else: 
-            o.client.group = lc[0]
-            o.client.save()
+            o.user.group = lc[0]
+            o.user.save()
             obj.client.tell('User %s successfully put in group %s' % (o.name, lc[0]))
     else: obj.usage()
 
