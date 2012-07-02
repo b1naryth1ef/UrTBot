@@ -63,7 +63,11 @@ class Player():
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
         else: self.user = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
 
-        if len([i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]) == 0:
+
+        q = [i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]
+        log.debug('Aliases for %s: %s' % (self.name, q))
+        if len(q) == 0:
+            log.debug('Adding alias for %s' % self.name)
             database.Alias(user=self.user, alias=self.name.lower(), real=self.name).save()
 
         self.user.lastjoin = datetime.now()
