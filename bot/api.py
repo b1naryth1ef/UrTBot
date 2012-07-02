@@ -146,8 +146,7 @@ class API():
                 return log.debug('Cannot find event %s!' % name)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
-            g = obj.name.split('_')
-            for n in [g[:i] for i in range(0, len(g)) if g[:i] != []]:
+            for n in [obj.n[:i] for i in range(0, len(obj.n)) if obj.n[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
     def hasAccess(self, client, cmd):
