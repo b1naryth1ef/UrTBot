@@ -21,13 +21,6 @@ events = {
 config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adminconfig.cfg'), default=default_config)
 kicks = []
 
-@command('bitchslap', "Slap dat ass!", '', level=5)
-def bitchslapCmd(obj):
-    for cli in BOT.Clients.values():
-        if cli == obj.client: continue
-        cli.action('slap {cid}')
-    Q3.R('say ^1SLAP ^2DAT ^4ASS ^5YOSKI!!!')
-
 @command('map', 'Load a map!', '<map>', level=4)
 def mapCmd(obj):
     m = obj.msg.split(' ', 1)
@@ -78,9 +71,9 @@ def rconCmd(obj):
             c = c.split('\n')
             if len(c) <= 15:
                 obj.client.tell('Output:')
-                for line in c.split('\n'):
+                for line in c:
                     obj.client.tell(line)
-                time.sleep(0.2)
+                time.sleep(.2)
     else: obj.usage()
 
 @command('slap', 'Slap dat ass!', '<{user}> [amount]', level=5, alias=['s'])
@@ -88,21 +81,20 @@ def rconCmd(obj):
 def slapCmd(obj): #!slap 0 10 blah
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client, multi=True)
         if not o: return
-        c = 1
-        t = 1
+        count, time = 1, 1
         if len(m) == 3:
-            if m[2].isdigit(): c = int(m[2])
+            if m[2].isdigit(): count = int(m[2])
             elif m[2].startswith(':') and m[2][1:].isdigit(): 
-                c = int(m[2][1:])
-                t = .3
-        if c > 20: c = 20
-        kicks.append(o.cid)
-        for i in range(0, c): 
-            if o.cid not in kicks: return
-            A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
-            time.sleep(t)
+                count = int(m[2][1:])
+                time = .3
+        if count > 20: count = 20
+        if not isinstance(o, list): o = [o]
+        for i in range(0, count):
+            for b in o:
+                A.Q3.R('%s %s' % (obj._obj['name'], b.cid))
+            time.sleep(time)
     else:
         obj.usage()
 
@@ -207,29 +199,21 @@ def listCmd(obj):
         i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.joined)
         obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' % i)
 
-@command('demostart', "Start a demo.", '<{user}>', 3, ['dstart'])
-def demostartCmd(obj):
+@command('stopdemo', 'Stop a demo.', '<{user}>', 3)
+@command('startdemo', 'Start a demo.', '<{user}>', 3)
+def demoCmd(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
-        o = Q3.getObj(m[1], obj.client)
+        act = 'startserverdemo' if obj._obj['name'] == 'startdemo' else 'stopserverdemo'
+        o = Q3.getObj(m[1], obj.client, multi=True)
         if not o: return
-        if o.cid not in BOT.demos:
-            BOT.demos.append(o.cid)
-        Q3.rcon("startserverdemo %s" % o.cid)
-        obj.client.tell('Started server demo for %s!' % o.name)
-    else:
-        obj.usage()
-
-@command('demostop', 'Stop a demo.', '<{user}>', 3, ['dstop'])
-def demostopCmd(obj):
-    m = obj.msg.split(' ')
-    if len(m) == 2:
-        o = Q3.getObj(m[1], obj.client)
-        if not o: return
-        if o.cid in BOT.demos:
-            BOT.demos.pop(BOT.demos.index(o.cid))
-        Q3.rcon("stopserverdemo %s" % o.cid)
-        obj.client.tell('Stoped server demo for %s!' % o.name)
+        if isinstance(o, list): 
+            plyr = 'all'
+        else:
+            plyr = o.cid
+            o = [o]
+        Q3.rcon("%s %s" % (act, plyr))
+        obj.client.tell('Started server demo for %s!' % plyr)
     else:
         obj.usage()
 
@@ -264,11 +248,7 @@ def cmdAlias(obj):
         obj.usage()
 
 @listener("GAME_MATCH_START")
-def game_match_start_listener(obj):
-    if len(BOT.demos):
-        for i in BOT.demos:
-            if i in BOT.Clients.values():
-                Q3.rcon("startserverdemo %s" % o.cid)
+def game_match_start_listener(obj): pass
 
 @listener("CLIENT_CONN_DISCONNECT")
 def client_disconnect_listener(obj):

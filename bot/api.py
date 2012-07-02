@@ -44,8 +44,9 @@ class Q3API():
     def force(self, plyr, team):
         return self.R('forceteam %s %s' % (self._rendplyr(plyr), team.urt))
 
-    def getObj(self, txt, reply=None):
+    def getObj(self, txt, reply=None, multi=False):
         u = None
+        if multi and txt == "*": return self.B.Clients.keys()
         if txt.startswith('@') and txt[1:].isdigit(): 
             u = [i for i in self.B.Clients.values() if i.uid == int(txt[1:])]
         elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = [self.B.Clients[int(txt)]]
@@ -138,7 +139,7 @@ class API():
             return self.listeners['eves'][name].append(func)
         log.warning("Event %s has not been registered!" % (name))
 
-    def fireEvent(self, name, data={}, obj=None):
+    def fireEvent(self, name, data={}, obj=None): #@DEV We should/shouldnt use name here. Use obj, or name?
         log.debug('Firing event %s' % name)
         if not obj: 
             try: obj = self.events[name].getObj(data)
@@ -146,7 +147,7 @@ class API():
                 return log.debug('Cannot find event %s!' % name)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
         if obj.cats:
-            for n in [obj.n[:i] for i in range(0, len(obj.n)) if obj.n[:i] != []]:
+            for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
     def hasAccess(self, client, cmd):
@@ -202,9 +203,10 @@ class FiredCommand():
 
 class FiredEvent():
     def __init__(self, name, data, cats=[]):
-        self.name = name
+        self._name = name
+        self._n = name.split('_')
+        self._cats = cats
         self.data = data
-        self.cats = cats
         self.__dict__.update(data)
 
 class Event():
