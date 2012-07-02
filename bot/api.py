@@ -146,7 +146,7 @@ class API():
             except:
                 return log.debug('Cannot find event %s!' % name)
         [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
-        if obj.cats:
+        if obj._cats:
             for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]:
                 [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
                 
