@@ -48,6 +48,13 @@ class Player():
 
         self.getUser()
         self.checkTeam()
+
+    def checkAlias(self):
+        q = [i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]
+        log.debug('Aliases for %s: %s' % (self.name, q))
+        if len(q) == 0:
+            log.debug('Adding alias for %s' % self.name)
+            database.Alias(user=self.user, alias=self.name.lower(), real=self.name).save()
         
     def getUser(self):
         q1 = [i for i in database.User.select().where(name=self.name.lower(), ip=self.ip, guid=self.cl_guid)]
@@ -63,13 +70,7 @@ class Player():
                 else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
         else: self.user = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
 
-
-        q = [i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]
-        log.debug('Aliases for %s: %s' % (self.name, q))
-        if len(q) == 0:
-            log.debug('Adding alias for %s' % self.name)
-            database.Alias(user=self.user, alias=self.name.lower(), real=self.name).save()
-
+        self.checkAlias()
         self.user.lastjoin = datetime.now()
         self.user.joincount += 1
         self.user.save()
@@ -90,7 +91,9 @@ class Player():
     def checkAuth(self): pass
 
     def setData(self, data):
-        if 'name' in data.keys(): self.name = data['name']
+        if 'name' in data.keys(): 
+            self.name = data['name']
+            self.checkAlias()
         if 'team' in data.keys() and self.team != None and self.team != data['team']:
             self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
             self.team = data['team']

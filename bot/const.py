@@ -33,6 +33,7 @@ gametypes = {
 8: 'bm' #Bomb
 }
 
+
 # Method Of Death (MODs)
 MOD_WATER = {'id':'1'}
 MOD_SLIME = {'id': '2'}
@@ -74,23 +75,33 @@ UT_MOD_M4= {'id':'38'}
 UT_MOD_FLAG= {'id':'39'}
 UT_MOD_GOOMBA= {'id':'40'}
 
-# Hits (yes these differ from the kill ones, go fig)
-"""
-1 UT_MOD_KNIFE
-2 UT_MOD_BERETTA
-3 UT_MOD_DEAGLE
-4 UT_MOD_SPAS
-5 UT_MOD_MP5K
-6 UT_MOD_UMP45
-8 UT_MOD_LR300
-9 UT_MOD_G36
-10 UT_MOD_PSG1
-14 UT_MOD_SR8
-15 UT_MOD_AK103
-17 UT_MOD_NEGEV
-19 UT_MOD_M4
-21 UT_MOD_HEGRENADE
-"""
+
+HITS = {
+ 1: 'UT_MOD_KNIFE',
+ 2: 'UT_MOD_BERETTA',
+ 3: 'UT_MOD_DEAGLE',
+ 4: 'UT_MOD_SPAS',
+ 5: 'UT_MOD_MP5K',
+ 6: 'UT_MOD_UMP45',
+ 8: 'UT_MOD_LR300',
+ 9: 'UT_MOD_G36',
+ 10: 'UT_MOD_PSG1',
+ 14: 'UT_MOD_SR8',
+ 15: 'UT_MOD_AK103',
+ 17: 'UT_MOD_NEGEV',
+ 19: 'UT_MOD_M4',
+ 21: 'UT_MOD_HEGRENADE'
+}
+
+HITZONES = {
+0:'head',
+1:'helmet',
+2:'torso',
+3:'kevlar',
+4:'arms',
+5:'legs',
+6:'body',
+}
 
 # Hitzones
 """ verbatim:
@@ -100,52 +111,9 @@ Chouille is client 1
 KillGirl is client 2
 5 is the hit area (here the legs)
 9 is the weapon ID
-
-Hit areas are:
-0: Head
-1: Helmet
-2: Torso
-3: Kevlar
-4: Arms
-5: Legs
-6: Body
 """
 
-# Items (pickupable)
-# These don't have an integer attached to them, they just 'are'
-"""
-UT_WEAPON_M4
-UT_WEAPON_GRENADE_FRAG
-UT_WEAPON_NEGEV
-UT_WEAPON_BOMB
-UT_WEAPON_AK103
-UT_WEAPON_SR8
-UT_WEAPON_GRENADE_SMOKE
-UT_WEAPON_GRENADE_FLASH
-UT_WEAPON_GRENADE_HE
-UT_WEAPON_PSG1
-UT_WEAPON_G36
-UT_WEAPON_LR
-UT_WEAPON_HK69
-UT_WEAPON_UMP45
-UT_WEAPON_MP5K
-UT_WEAPON_SPAS12
-UT_WEAPON_DEAGLE
-UT_WEAPON_BERETTA
-UT_WEAPON_KNIFE
-UT_WEAPON_BOMB
-UT_ITEM_APR
-UT_ITEM_EXTRAAMMO
-UT_ITEM_HELMET
-UT_ITEM_LASER
-UT_ITEM_SILENCER
-UT_ITEM_MEDKIT
-UT_ITEM_NVG
-UT_ITEM_VEST
-UT_ITEM_BOMB
-"""
-
-damage = { 
+DAMAGES = { 
     'PASSIVE': [0, 0, 0, 0, 0, 0, 0, 0],
     MOD_TELEFRAG['id']: [0, 0, 0, 0, 0, 0, 0, 0],
     UT_MOD_KNIFE['id']: [100, 60, 44, 35, 20, 20, 44, 100],
@@ -170,7 +138,7 @@ damage = {
     UT_MOD_GOOMBA['id']: [100, 100, 100, 100, 100, 100, 100, 100],
     }
 
-gearInfo = {
+GEARS = {
     
  #Sidearms  
  'F':{'id':UT_MOD_BERETTA['id'], 'name':'Beretta', 'damage':damage[UT_MOD_BERETTA['id']]}, 

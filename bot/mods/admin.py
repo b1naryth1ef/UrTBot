@@ -83,18 +83,18 @@ def slapCmd(obj): #!slap 0 10 blah
     if len(m) >= 2:
         o = Q3.getObj(m[1], obj.client, multi=True)
         if not o: return
-        count, time = 1, 1
+        count, stime = 1, 1
         if len(m) == 3:
             if m[2].isdigit(): count = int(m[2])
             elif m[2].startswith(':') and m[2][1:].isdigit(): 
                 count = int(m[2][1:])
-                time = .3
+                stime = .3
         if count > 20: count = 20
         if not isinstance(o, list): o = [o]
         for i in range(0, count):
             for b in o:
                 A.Q3.R('%s %s' % (obj._obj['name'], b.cid))
-            time.sleep(time)
+            time.sleep(stime)
     else:
         obj.usage()
 
@@ -256,8 +256,7 @@ def client_disconnect_listener(obj):
         BOT.demos.pop(BOT.demos.index(obj.client.cid))
 
 @listener("CLIENT_DIE_SUICIDE")
-def client_die_sucidie_listener(obj):
-    if obj.vic.cid in kicks: kicks.pop(kicks.index(obj.vic.cid))
+def client_die_sucidie_listener(obj): pass
 
 def client_conn_connected_listener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
