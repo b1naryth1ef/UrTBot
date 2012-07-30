@@ -17,7 +17,6 @@ default = {
     'prefix': "^1[^2BOT^1]: ",
     'cmd_prefix':'!',
     'cmd_on_team_say':True,
-    'modded':False,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",
     'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
@@ -44,10 +43,10 @@ default = {
 },
 
 'developerConfig':{
+    'enabled':True,
     'logging':True,
     'logfile':'debug.log',
-    'loglevel':'debug',
-    'enabled':True,
+    'loglevel':'debug',   
 },
 
 'UrTConfig':{

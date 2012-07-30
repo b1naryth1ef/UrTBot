@@ -24,10 +24,6 @@ def setup(config, log):
 
     class User(BaseModel):
         name = CharField()
-        guid = CharField()
-        ip = CharField()
-        group = IntegerField()
-        password = CharField()
         joincount = IntegerField()
         firstjoin = DateTimeField()
         lastjoin = DateTimeField()

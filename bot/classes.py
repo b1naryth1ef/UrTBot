@@ -22,9 +22,6 @@ class Bot():
         self.loadingMap = False
         self.justChangedMap = False
 
-        self.hasPrefix = False
-        self.hasDemo = False
-        self.hasKickMsg = False
         self.demos = {}
 
         self.redScore = 0
@@ -69,7 +66,7 @@ class Bot():
         self.blueScore = int(line[1])
 
     def getPlayers(self): #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
-        r = self.Q.rcon('players').split('\n')
+        r = self.Q.rcon('players').split('\n') #@DEV THIS IS BROKEN. FIX FOR 4.2!!!
         self.setScores(r[3])
         for player in self.Clients.values():
             player.setData(self.dumpUser(player.cid))
@@ -120,36 +117,18 @@ class Bot():
         
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
 
+        self.Q.rcon('sv_sayprefix "%s: "' % self.config.botConfig['prefix'])
+        self.Q.rcon('sv_tellprefix "%s [PM]: "' % self.config.botConfig['prefix'])
+        self.Q.rcon('sv_demonotice ""')
+
         self.getGameType() #Set g_gametype in self.gamedata
         self.getCurrentMap() #set mapname in self.gamedata
 
         self.addPlayers()
-
-        if self.config.botConfig['modded']:
-            if 'broadcast:' not in self.Q.rcon("sv_sayprefix"):
-                log.info("Server has say/tell prefix!")
-                self.hasPrefix = True
-
-            if 'broadcast:' not in self.Q.rcon("sv_demonotice"):
-                log.info("Server has demos!")
-                self.hasDemo = True
-
-            if self.Q.rcon('kick').split('\n')[1].split(' ')[-1] == "<reason>":
-                log.info('Server has kick reasons!')
-                self.hasKickMsg = True
-
-            self.moddedSetup()
             
         self.Q3.setLengths()
         self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
-
-    def moddedSetup(self):
-        if self.hasPrefix:
-            self.Q.rcon('sv_sayprefix "%s: "' % self.config.botConfig['prefix'])
-            self.Q.rcon('sv_tellprefix "%s [PM]: "' % self.config.botConfig['prefix'])
-        if self.hasDemo:
-            self.Q.rcon('sv_demonotice ""')
 
     def addPlayers(self):
         status = self.getStatus()

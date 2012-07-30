@@ -13,6 +13,7 @@ class Player():
         self.score = [0,0]
         self.api = api
         self.A = self.api.A
+        self.group = 0 #@TODO 4.2
         self.joined = datetime.now()
     
         try:
@@ -48,29 +49,13 @@ class Player():
 
         self.getUser()
         self.checkTeam()
-
-    def checkAlias(self):
-        q = [i for i in database.Alias.select().where(user=self.user, alias=self.name.lower())]
-        log.debug('Aliases for %s: %s' % (self.name, q))
-        if len(q) == 0:
-            log.debug('Adding alias for %s' % self.name)
-            database.Alias(user=self.user, alias=self.name.lower(), real=self.name).save()
         
     def getUser(self):
-        q1 = [i for i in database.User.select().where(name=self.name.lower(), ip=self.ip, guid=self.cl_guid)]
-        q2 = [i for i in database.User.select().where(ip=self.ip, guid=self.cl_guid)]
-        q3 = [i for i in database.User.select().where(ip=self.ip, name=self.name.lower())]
-        q4 = [i for i in database.User.select().where(guid=self.cl_guid)]
+        q = [i for i in database.User.select().where(name=self.name.lower())]
+        if len(q):
+            self.user = q[0]
+        else: self.user = database.User(name=self.name.lower(), joincount=0, firstjoin=datetime.now())
 
-        if len(q1) or len(q2) or len(q3) or len(q4):
-            q = []
-            for cli in [i[0] for i in [q1, q2, q3, q4] if len(i)]:
-                if cli not in q: q.append(cli)
-                if len(q) == 1: self.user = q[0]
-                else: log.warning('Found more than one result for %s, %s, %s (%s results)' % (self.name, self.ip, self.cl_guid, len(q)))
-        else: self.user = database.User(name=self.name.lower(), ip=self.ip, guid=self.cl_guid, group=0, joincount=0, firstjoin=datetime.now())
-
-        self.checkAlias()
         self.user.lastjoin = datetime.now()
         self.user.joincount += 1
         self.user.save()
@@ -87,10 +72,7 @@ class Player():
     def force(self, team):
         self.api.Q3.force(self, team)
 
-    def changeGroup(self, group): pass
-    def checkAuth(self): pass
-
-    def setData(self, data):
+    def setData(self, data): #@TODO Fix
         if 'name' in data.keys(): 
             self.name = data['name']
             self.checkAlias()

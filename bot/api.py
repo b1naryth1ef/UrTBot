@@ -12,39 +12,33 @@ class Q3API():
 
         self.setLengths()
 
-    def setLengths(self): #@TODO Actually figure this shit out k?
-        if not self.B.hasPrefix:
-            self.prefix = self.B.prefix
-            self.saylength = 69
-            self.telllength = 64 
-        else:
-            self.saylength = 76-len(self.B.prefix)
-            self.telllength = 72-len(self.B.prefix) #[PM]
-            self.prefix = ""
+    def setLengths(self): #@TODO check for 4.2
+        self.prefix = self.B.prefix
+        self.saylength = 69
+        self.telllength = 64
 
     def _rendplyr(self, plyr):
         if isinstance(plyr, Player): return plyr.cid
         else: return plyr
 
     def tell(self, plyr, msg):
-        prefix = self.B.prefix if not self.B.hasPrefix else ""
-        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format(prefix+'^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
+        log.debug('Telling %s: %s' % (plyr, msg))
+        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format('^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
 
     def kick(self, plyr, reason):
-        if not self.B.hasKickMsg: reason = ""
-        else: reason = ' "%s"' % reason
         log.debug('Kicking %s' % plyr)
         del self.B.Clients[plyr.cid] #@DEV Seems shady...
-        return self.R('kick %s%s' % (self._rendplyr(plyr), reason))
+        return self.R('kick %s "%s"' % (self._rendplyr(plyr), reason))
 
     def say(self, msg):
-        prefix = self.B.prefix if not self.B.hasPrefix else ""
-        return self.R('say "%s"' % (self.Q.format(prefix+'^3'+msg, self.saylength)))
+        log.debug("Saying: %s" % msg)
+        return self.R('say "%s"' % (self.Q.format('^3'+msg, self.saylength)))
 
     def force(self, plyr, team):
+        log.debug('Forcing %s to %s' % (plyr, team))
         return self.R('forceteam %s %s' % (self._rendplyr(plyr), team.urt))
 
-    def getObj(self, txt, reply=None, multi=False):
+    def getObj(self, txt, reply=None, multi=False): #@TODO Cleanup
         u = None
         if multi and txt == "*": return self.B.Clients.keys()
         if txt.startswith('@') and txt[1:].isdigit(): 

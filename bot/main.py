@@ -64,14 +64,15 @@ def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
     api.A.fireEvent('CLIENT_SAY_TEAM', dic)
 
-def parseReconnect(inp): #68.255.111.133:27960:reconnect
-    ip = inp.strip(':reconnect')
-    for cli in BOT.Clients.values():
-        if ip == cli.ip:
-            log.debug('Client #%s is reconnecting, delete the obj for now...' % cli.cid)
-            del BOT.Clients[cli.cid]
-            return
-    log.debug('Reconnect has no client with matching ip %s' % ip)
+#@CHECK 4.2
+# def parseReconnect(inp): #68.255.111.133:27960:reconnect
+#     ip = inp.strip(':reconnect')
+#     for cli in BOT.Clients.values():
+#         if ip == cli.ip:
+#             log.debug('Client #%s is reconnecting, delete the obj for now...' % cli.cid)
+#             del BOT.Clients[cli.cid]
+#             return
+#     log.debug('Reconnect has no client with matching ip %s' % ip)
 
 def parseClientConnect(inp): #ClientConnect: 0
     cid = int(re.findall('ClientConnect\: ([0-9a-z])', inp)[0])
@@ -170,21 +171,11 @@ def parsePlayerBegin(inp): pass
     #client = int(inp[1])
     #api.A.fireEvent('CLIENT_BEGIN', {'client':client})
 
-def parseShutdownGame(inp):
+def parseShutdownGame(inp): #@NOTE 4.2: check callvote!
     api.A.fireEvent('GAME_SHUTDOWN', {})
     if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
     else: log.debug('Sounds like server is going down...')
     log.debug('SHUTDOWN WITH %s' % BOT.logback[0])
-    # We clear out our client list on shutdown. Doesn't happen with 'rcon map ..' but does
-    # when the mapcycle changes maps? hrmph. investigate.
-    # In fact I'm not sure how to detect an 'rcon map' yet! Geeeeeez.
-    # rcon from 127.0.0.1:
-    # map
-    # That should work ye?
-    # for key in BOT.Clients.keys():
-    #     api.A.fireEvent('CLIENT_DISCONNECT', {'client':key})
-    #     del BOT.Clients[key]
-    # ^^^ Dont run that because then a map change is treated as new clients connecting. Not sure how to fix that stuffz
 
 def parseInitGame(inp):
     BOT.matchNew(dict(re.findall(r'\\([^\\]+)\\([^\\]+)', inp)))
@@ -212,11 +203,24 @@ def parseTimeLimitHit(inp):
     BOT.getPlayers()
     BOT.matchEnd()
 
+#@TODO 4.2
+def parseAccountKick(inp): pass
+def parseAccountBan(inp): pass
+def parseAccountValidated(inp): pass
+def parseAccountRejected(inp): pass
+def parseCallVote(inp): pass
+def parseRadio(inp): pass
+
 def parse(inp):
     global BOT
     if inp.startswith("say:"): parseSay(inp)
     elif inp.startswith("sayteam:"): parseSayTeam(inp)
-    elif inp.endswith(':reconnect'): parseReconnect(inp)
+    #@TODO 4.2
+    elif inp.startswith("AccountKick:"): parseAccountKick(inp)
+    elif inp.startswith("AccountBan:"): parseAccountBan(inp)
+    elif inp.startswith("AccountValidated:"): parseAccountValidated(inp)
+    elif inp.startswith("AccountRejected:"): parseAccountRejected(inp)
+    #elif inp.endswith(':reconnect'): parseReconnect(inp) #@CHECK 4.2
     elif inp.startswith('ClientConnect:'): parseClientConnect(inp)
     elif inp.startswith('ClientUserinfo:'): parseClientUserInfo(inp)
     elif inp.startswith('ClientUserinfoChanged:'): parseClientUserInfoChanged(inp)
@@ -226,6 +230,8 @@ def parse(inp):
     elif inp.startswith('Item'): parseItem(inp)
     elif inp.startswith('Flag:'): parseFlag(inp)
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
+    elif inp.startswith("Callvote:"): parseCallVote(inp) #@TODO 4.2
+    elif inp.startswith("Radio:"): parseRadio(inp) #@TODO 4.2
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
     elif inp.startswith('InitGame:'): parseInitGame(inp)
