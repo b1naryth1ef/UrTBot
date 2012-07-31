@@ -15,6 +15,9 @@ class Player():
         self.A = self.api.A
         self.group = 0 #@TODO 4.2
         self.joined = datetime.now()
+
+        self.hasauth = False
+        self.authname = None #@NOTE should always be lowercase
     
         try:
             self.name = None
@@ -48,20 +51,22 @@ class Player():
             log.debug(e)
 
         self.getUser()
-        self.checkTeam()
         
     def getUser(self):
-        q = [i for i in database.User.select().where(name=self.name.lower())]
-        if len(q):
-            self.user = q[0]
-        else: self.user = database.User(name=self.name.lower(), joincount=0, firstjoin=datetime.now())
+        if self.hasauth and self.authname:
+            q = [i for i in database.User.select().where(name=self.authname)]
+            if len(q): 
+                self.user = q[0]
+                log.debug('Found user with authname "%s" and uid "%s"' % (self.authname, self.user.id))
+            else: 
+                self.user = database.User(name=self.authname, joincount=0, firstjoin=datetime.now())
+                log.debug('Added user with authname "%s"' % self.authname)
+            self.user.lastjoin = datetime.now()
+            self.user.joincount += 1
+            self.user.save()
+            self.uid = self.user.id
 
-        self.user.lastjoin = datetime.now()
-        self.user.joincount += 1
-        self.user.save()
-        self.uid = self.user.id
-
-    def checkTeam(self): pass
+    #def checkTeam(self): pass #@CHECK 4.2
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)

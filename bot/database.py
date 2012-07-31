@@ -42,10 +42,9 @@ def setup(config, log):
         real = CharField()
         alias = CharField()
 
-    try:
-        User.create_table()
-        Penalty.create_table()
-        Alias.create_table()
-    except: pass
+    User.create_table(True)
+    Penalty.create_table(True)
+    Alias.create_table(True)
+
     log.debug('SETUP DONE: DATABASE')
     return database, User

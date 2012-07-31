@@ -154,7 +154,7 @@ class API():
         return False
 
     def fireCommand(self, cmd, data):
-        cmd = cmd.lower()
+        cmd = cmd.lower().replace('#', '')
         client = data['client']
         if not hasattr(client, 'user'): client.getUser()
         if cmd in self.commands.keys(): obj = self.commands.get(cmd)
@@ -175,9 +175,11 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(*event):
+def listener(events):
     def decorator(target):
-        for i in event:
+        if not getattr(events, '__iter__', False):
+            events = [events]
+        for i in events:
             A.addListener(i, target)
         return target
     return decorator
@@ -218,8 +220,8 @@ class Event():
         A.fireEvent(self.name, obj=self.getObj(data))
 
 EVENTS = {
-'CLIENT_HIT_DO':Event('CLIENT_HIT_DO'),
-'CLIENT_HIT_GET':Event('CLIENT_HIT_GET'),
+'CLIENT_HIT_DO':Event('CLIENT_HIT_ATK'),
+'CLIENT_HIT_GET':Event('CLIENT_HIT_DEF'),
 'CLIENT_DIE_TK':Event('CLIENT_DIE_TK'),
 'CLIENT_DIE_WORLD':Event('CLIENT_DIE_WORLD'),
 'CLIENT_DIE_SUICIDE':Event('CLIENT_DIE_SUICIDE'),
@@ -234,29 +236,27 @@ EVENTS = {
 'CLIENT_TEAM_JOIN':Event('CLIENT_TEAM_JOIN'),
 'CLIENT_TEAM_QUIT':Event('CLIENT_TEAM_QUIT'),
 'CLIENT_ITEM_PICKUP':Event('CLIENT_ITEM_PICKUP'),
-'CLIENT_CONN_JOIN':Event('CLIENT_CONN_JOIN'),
-'CLIENT_CONN_TIMEOUT':Event('CLIENT_CONN_TIMEOUT'),
-'CLIENT_CONN_DENIED':Event('CLIENT_CONN_DENIED'),
 'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
-'CLIENT_CONN_DISCONNECT_GEN':Event('CLIENT_CONN_DISCONNECT_GEN'),
-'CLIENT_CONN_DISCONNECT_LATE':Event('CLIENT_CONN_DISCONNECT_LATE'),
-'CLIENT_CONN_DISCONNECT_KICKED':Event('CLIENT_CONN_DISCONNECT_KICKED'),
 'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
+'CLIENT_CONN_DC_GEN':Event('CLIENT_CONN_DC_GEN'),
+'CLIENT_CONN_DC_CI':Event('CLIENT_CONN_DC_CI'),
+'CLIENT_CONN_DC_KICK':Event('CLIENT_CONN_DC_KICK'),
 'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
 'CLIENT_INFO_CHANGE':Event('CLIENT_INFO_CHANGE'),
-'CLIENT_INFO_NAME':Event('CLIENT_INFO_NAME'),
-'CLIENT_INFO_UPDATE':Event('CLIENT_INFO_UPDATE'),
+'CLIENT_GEN_VOTE':Event('CLIENT_GEN_VOTE'),
+'CLIENT_GEN_RADIO':Event('CLIENT_GEN_RADIO'),
 'GAME_MATCH_START':Event('GAME_MATCH_START'),
 'GAME_ROUND_START':Event('GAME_ROUND_START'),
 'GAME_ROUND_END':Event('GAME_ROUND_END'),
 'GAME_MATCH_END':Event('GAME_MATCH_END'),
 'GAME_SHUTDOWN':Event('GAME_SHUTDOWN'),
 'GAME_STARTUP':Event('GAME_STARTUP'),
+'GAME_VOTE_CALL':Event('GAME_VOTE_CALL'),
 'GAME_FLAG_RETURN':Event('GAME_FLAG_RETURN'),
-'GAME_FLAG_PICKUP':Event('GAME_FLAG_PICKUP'),
 'GAME_FLAG_CAPTURE':Event('GAME_FLAG_CAPTURE'),
+'GAME_FLAG_PICKUP':Event('GAME_FLAG_PICKUP'),
 'GAME_FLAG_DROP':Event('GAME_FLAG_DROP'),
-'GAME_FLAG_RESET':Event('GAME_FLAG_RESET'),
+'GAME_FLAG_HOTPOTATO':Event('GAME_FLAG_HOTPOTATO'),
 }
 
 def setup(BOT):

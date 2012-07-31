@@ -24,7 +24,8 @@ config_plugins = None
 config_serversocket = None
 
 #--RENDERING ACTIONS--#
-def renderUserInfo(inp, varz={}):
+def renderUserInfo(inp):
+    varz = {}
     inp2 = inp.split(' ', 2)
     uid = int(inp2[1])
     var = re.findall(r'\\([^\\]+)\\([^\\]+)', inp)
@@ -35,9 +36,10 @@ def renderUserInfo(inp, varz={}):
         varz['name'] = varz['name'] #.lower()
     return uid,varz
     
-def renderUserInfoChange(inp, varz={}, vary={}):
+def renderUserInfoChange(inp):
     #r is race, n is name, t is team
     #ClientUserinfoChanged: 0 n\[WoC]*WolfXxXBunny\t\3\r\0\tl\0\f0\\f1\\f2\\a0\0\a1\0\a2\255
+    varz, vary = {}, {}
     inp2 = inp.split(' ', 2)
     uid = int(inp2[1])
     var = re.findall(r'([^\\]+)\\([^\\]+)', inp2[2])
@@ -50,47 +52,42 @@ def renderUserInfoChange(inp, varz={}, vary={}):
 #--PARSING ACTIONS--#
 def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
     inp = inp.split(' ', 3)[1:]
-    dic = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
-    if len(inp) > 2 and inp[2].startswith(config.botConfig['cmd_prefix']):
-        api.A.fireEvent('CLIENT_SAY_CMD', dic)
-        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
-    api.A.fireEvent('CLIENT_SAY_GLOBAL', dic)
+    info = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
+    if len(inp) > 2 and info['msg'].startswith(botConfig['cmd_prefix']):
+        api.A.fireEvent('CLIENT_SAY_CMD', info)
+        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
+    api.A.fireEvent('CLIENT_SAY_GLOBAL', info)
 
 def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
     inp = inp.split(' ', 3)[1:]
-    dic = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
-    if len(inp) > 2 and inp[2].startswith(config.botConfig['cmd_prefix']) and config.botConfig['cmd_on_team_say'] is True:
-        api.A.fireEvent('CLIENT_SAY_CMD', dic)
-        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], dic)
-    api.A.fireEvent('CLIENT_SAY_TEAM', dic)
+    info = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
+    if len(inp) > 2 and info['msg'].startswith(botConfig['cmd_prefix']) and botConfig['cmd_on_team_say'] is True:
+        api.A.fireEvent('CLIENT_SAY_CMD', info)
+        api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
+    api.A.fireEvent('CLIENT_SAY_TEAM', info)
 
 #@CHECK 4.2
-# def parseReconnect(inp): #68.255.111.133:27960:reconnect
-#     ip = inp.strip(':reconnect')
-#     for cli in BOT.Clients.values():
-#         if ip == cli.ip:
-#             log.debug('Client #%s is reconnecting, delete the obj for now...' % cli.cid)
-#             del BOT.Clients[cli.cid]
-#             return
-#     log.debug('Reconnect has no client with matching ip %s' % ip)
+def parseReconnect(inp): #68.255.111.133:27960:reconnect
+    ip = inp.strip(':reconnect')
+    for cli in BOT.Clients.values():
+        if ip == cli.ip:
+            log.debug('Client #%s is reconnecting!' % cli.cid)
+            del BOT.Clients[cli.cid]
+            api.A.fireEvent('CLIENT_CONN_RECONNECT', {'cid':cli.cid})    
+            return
+    log.debug('Reconnect has no client with matching ip %s' % ip)
 
 def parseClientConnect(inp): #ClientConnect: 0
-    cid = int(re.findall('ClientConnect\: ([0-9a-z])', inp)[0])
-    if cid in BOT.Clients.keys(): #Disconnect messages MAY be missed!
-        if BOT.loadingMap is False and BOT.justChangedMap is False:
-            log.warning('Client #%s is already connected... Something is wrong. Flush \'em, danno!' % (inp))
-            del BOT.Clients[cid]
-        else:
-            BOT.justChangedMap = False
+    cid = int(re.findall('ClientConnect\: ([0-9]+)', inp)[0])
     api.A.fireEvent('CLIENT_CONN_CONNECT', {"cid":cid})
 
 def parseClientUserInfo(inp):
     cid, varz = renderUserInfo(inp)
-    log.debug('Clients: %s' % BOT.Clients.keys())
     if cid in BOT.Clients.keys():
-        api.A.fireEvent('CLIENT_INFO_UPDATE')
+        api.A.fireEvent('CLIENT_INFO_CHANGE')
         thread.fireThread(BOT.Clients[cid].setData, varz)
     else:
+        log.debug('Got join CUI for #%s' % cid)
         BOT.Clients[cid] = player.Player(cid, varz, api)
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
         if BOT.Clients[cid].cl_guid != None:
@@ -100,35 +97,34 @@ def parseClientUserInfo(inp):
                 for p in pen:
                     log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
                     BOT.Clients[cid].kick(p.reason)
+        BOT.Clients[cid].waitingForBegin = True
         f = {'client':BOT.getClient(cid), 'info':varz}
-        api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
+        #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
 
 def parseClientUserInfoChanged(inp):
-    cid, varz = renderUserInfoChange(inp, {}, {})
-    if cid in BOT.Clients.keys(): 
-        thread.fireThread(BOT.Clients[cid].setData, varz)
-        api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
+    cid, varz = renderUserInfoChange(inp)
+    thread.fireThread(BOT.Clients[cid].setData, varz)
+    api.A.fireEvent('CLIENT_INFO_CHANGE', {'client': BOT.getClient(cid), 'info':varz})
 
 def parseClientDisconnect(inp): #ClientDisconnect: 0
-    cid = int(re.findall('ClientDisconnect\: ([0-9a-z])', inp)[0])
-    log.debug('Got client disconnect for CID #%s' % cid)
-    api.A.fireEvent('CLIENT_CONN_DISCONNECT_GEN', {'client':BOT.getClient(cid)})
-    if cid in BOT.Clients.keys():
-        del BOT.Clients[cid]
+    cid = int(re.findall('ClientDisconnect\: ([0-9+])', inp)[0])
+    log.debug('ClientDisconnect: %s' % cid)
+    api.A.fireEvent('CLIENT_CONN_DC_GEN', {'client':BOT.getClient(cid)})
+    del BOT.Clients[cid] #@TODO Make a temp repo for recently disconnected
 
 def parseKill(inp): #@DEV change to re eventually
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
     inp = inp.split(" ")[1:]
     attacker = int(inp[0])
-    if attacker == 1022: atkobj = None #We're world. Setting this None might break shit (but hopefully not)
+    if attacker == 1022: atkobj = None #We're world.
     else: atkobj = BOT.Clients[attacker] #We're a player
     victim = int(inp[1])
     vicobj = BOT.Clients[victim]
     method = int(inp[2][:-1])
     if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_DIE_WORLD', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        if method == 10: vicobj.checkTeam()
+        if method == 10: vicobj.checkTeam() #Team switch
         api.A.fireEvent('CLIENT_DIE_SUICIDE', {'vic':victim, 'meth':method})
     elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: 
         api.A.fireEvent('CLIENT_KILL_TK', {'atk':attacker, 'vic':victim, 'meth':method})
@@ -140,11 +136,8 @@ def parseKill(inp): #@DEV change to re eventually
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
     inp = inp.split(' ')
-    attacker = int(inp[1])
-    victim = int(inp[2])
-    hitloc = int(inp[3])
-    method = int(inp[4][:-1])
-    api.A.fireEvent('CLIENT_HIT_DO', {'atk':BOT.getClient(attacker), 'vic':BOT.getClient(victim), 'loc':hitloc, 'meth':method})
+    info = {'atk':BOT.getClient(int(inp[1])), 'vic':BOT.getClient(int(inp[2])), 'loc':int(inp[3]), 'meth':int(inp[4][:-1])}
+    api.A.fireEvent('CLIENT_HIT_ATK', info)
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
@@ -163,15 +156,34 @@ def parseFlag(inp):
 
 def parseFlagReturn(inp):
     inp = inp.strip().split(' ', 3)
-    api.A.fireEvent('GAME_FLAG_RESET', {'flag':inp[2], 'flagid':const.flagtypes[inp[2]]})
+    api.A.fireEvent('GAME_FLAG_RETURN', {'flag':inp[2], 'flagid':const.flagtypes[inp[2]]})
 
-def parsePlayerBegin(inp): pass
-    #ClientBegin: 0
-    #inp = inp.split(' ')
-    #client = int(inp[1])
-    #api.A.fireEvent('CLIENT_BEGIN', {'client':client})
+def parseHotPotato(inp): #Hotpotato:
+    api.A.fireEvent('GAME_FLAG_HOTPOTATO', {})
 
-def parseShutdownGame(inp): #@NOTE 4.2: check callvote!
+def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
+    inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)[0]
+    cli = BOT.getClient(int(inp[0]))
+    vote = inp[1]
+    api.A.fireEvent('GAME_VOTE_CALL', {'client':cli, 'vote':vote})
+
+def parseVote(inp): #Vote: 0 - 2
+    inp = inp.split(' ')
+    cid, vote = int(inp[1]), int(inp[3])
+    api.A.fireEvent('CLIENT_GEN_VOTE', {'client':BOT.getClient(cid), 'vote':vote})
+
+def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
+    inp = inp.split('Radio: ')[-1].split(' - ')
+    cli = BOT.getClient(int(inp[0]))
+    msg = [int(inp[1]), int(inp[2])]
+    api.A.fireEvent('CLIENT_GEN_RADIO', {'client': cli, 'msg': msg, 'loc':inp[3], "text":inp[4]})
+
+def parsePlayerBegin(inp): 
+    cli = BOT.getClient(int(inp.split(' ')[1]))
+    if cli.waitingForBegin:
+        api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client:'BOT.getClient(cid)})
+
+def parseShutdownGame(inp): #@FIXME need better rcon msgs before I can do this
     api.A.fireEvent('GAME_SHUTDOWN', {})
     if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
     else: log.debug('Sounds like server is going down...')
@@ -188,7 +200,7 @@ def parseSurvivorWinner(inp):
         BOT.roundEnd()
     else: log.warning('Wait... Got SurvivorWinner but we\'re not playing TS, BM, or FTL?')
 
-def parseClientKick(inp):
+def parseClientKick(inp): #@FIXME Hopefully barb will add some better debug
     def _user_kicked(inp):  
         time.sleep(5)
         cur = BOT.curClients()
@@ -208,21 +220,21 @@ def parseAccountKick(inp): pass
 def parseAccountBan(inp): pass
 def parseAccountValidated(inp): pass
 def parseAccountRejected(inp): pass
-def parseCallVote(inp): pass
-def parseRadio(inp): pass
-def parseHotPotato(inp): pass
-def parseVote(inp): pass
+#def parseCallVote(inp): pass
+#def parseRadio(inp): pass
+#def parseHotPotato(inp): pass
+#def parseVote(inp): pass
 
 def parse(inp):
     global BOT
     if inp.startswith("say:"): parseSay(inp)
     elif inp.startswith("sayteam:"): parseSayTeam(inp)
-    #@TODO 4.2
+    #@TODO 4.2 this should all wait tell we have a working demo
     elif inp.startswith("AccountKick:"): parseAccountKick(inp)
     elif inp.startswith("AccountBan:"): parseAccountBan(inp)
     elif inp.startswith("AccountValidated:"): parseAccountValidated(inp)
     elif inp.startswith("AccountRejected:"): parseAccountRejected(inp)
-    #elif inp.endswith(':reconnect'): parseReconnect(inp) #@CHECK 4.2
+    elif inp.endswith(':reconnect'): parseReconnect(inp) #@CHECK 4.2
     elif inp.startswith('ClientConnect:'): parseClientConnect(inp)
     elif inp.startswith('ClientUserinfo:'): parseClientUserInfo(inp)
     elif inp.startswith('ClientUserinfoChanged:'): parseClientUserInfoChanged(inp)
@@ -232,10 +244,10 @@ def parse(inp):
     elif inp.startswith('Item'): parseItem(inp)
     elif inp.startswith('Flag:'): parseFlag(inp)
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
-    elif inp.startswith("Callvote:"): parseCallVote(inp) #@TODO 4.2
-    elif inp.startswith("Radio:"): parseRadio(inp) #@TODO 4.2
-    elif inp.startswith('Hotpotato:'): parseHotPotato(inp) #@TODO 4.2
-    elif inp.startswith('Vote:'): parseVote(inp) #@TODO 4.2
+    elif inp.startswith('Hotpotato:'): parseHotPotato(inp) #@CHECK 4.2
+    elif inp.startswith("Callvote:"): parseCallVote(inp) #@CHECK 4.2
+    elif inp.startswith('Vote:'): parseVote(inp) #@CHECK 4.2
+    elif inp.startswith("Radio:"): parseRadio(inp) #@CHECK 4.2
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
     elif inp.startswith('InitGame:'): parseInitGame(inp)
@@ -246,7 +258,7 @@ def parse(inp):
 
 def loadConfig(cfg):
     """Loads the bot config"""
-    global log, config_plugins, config_serversocket, config
+    global log, config_plugins, config_serversocket, config, botConfig
     try:
         botConfig = config.botConfig
         config_plugins = botConfig['plugins']
