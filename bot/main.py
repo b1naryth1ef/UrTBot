@@ -210,6 +210,8 @@ def parseAccountValidated(inp): pass
 def parseAccountRejected(inp): pass
 def parseCallVote(inp): pass
 def parseRadio(inp): pass
+def parseHotPotato(inp): pass
+def parseVote(inp): pass
 
 def parse(inp):
     global BOT
@@ -232,6 +234,8 @@ def parse(inp):
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
     elif inp.startswith("Callvote:"): parseCallVote(inp) #@TODO 4.2
     elif inp.startswith("Radio:"): parseRadio(inp) #@TODO 4.2
+    elif inp.startswith('Hotpotato:'): parseHotPotato(inp) #@TODO 4.2
+    elif inp.startswith('Vote:'): parseVote(inp) #@TODO 4.2
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
     elif inp.startswith('InitGame:'): parseInitGame(inp)
