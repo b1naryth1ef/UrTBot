@@ -1,63 +1,12 @@
 from debug import log
 from player import Player
+from q3api import Q3API
 import database
 import sys, os, time
 import thread_handler as thread
 
-class Q3API():
-    def __init__(self, bot):
-        self.B = bot
-        self.Q = bot.Q
-        self.R = bot.Q.rcon
+EVENTS = {}
 
-        self.setLengths()
-
-    def setLengths(self): #@TODO check for 4.2
-        self.prefix = self.B.prefix
-        self.saylength = 69
-        self.telllength = 64
-
-    def _rendplyr(self, plyr):
-        if isinstance(plyr, Player): return plyr.cid
-        else: return plyr
-
-    def tell(self, plyr, msg):
-        log.debug('Telling %s: %s' % (plyr, msg))
-        return self.R('tell %s "%s"' % (self._rendplyr(plyr), self.Q.format('^3'+msg, self.telllength))) #@DEV check if R.format() works on tell
-
-    def kick(self, plyr, reason):
-        log.debug('Kicking %s' % plyr)
-        del self.B.Clients[plyr.cid] #@DEV Seems shady...
-        return self.R('kick %s "%s"' % (self._rendplyr(plyr), reason))
-
-    def say(self, msg):
-        log.debug("Saying: %s" % msg)
-        return self.R('say "%s"' % (self.Q.format('^3'+msg, self.saylength)))
-
-    def force(self, plyr, team):
-        log.debug('Forcing %s to %s' % (plyr, team))
-        return self.R('forceteam %s %s' % (self._rendplyr(plyr), team.urt))
-
-    def getObj(self, txt, reply=None, multi=False): #@TODO Cleanup
-        u = None
-        if multi and txt == "*": return self.B.Clients.keys()
-        if txt.startswith('@') and txt[1:].isdigit(): 
-            u = [i for i in self.B.Clients.values() if i.uid == int(txt[1:])]
-        elif txt.isdigit() and int(txt) in self.B.Clients.keys(): u = [self.B.Clients[int(txt)]]
-        else: 
-            u = []
-            for i in self.B.Clients.values(): 
-                if txt.lower() in i.name.lower(): u.append(i)
-        if len(u) == 1: u = u[0]
-        elif len(u) > 1:
-            reply.tell('^1Found more than one user for your query! Try again with a more specific search term!')
-            u = None
-        else:
-            reply.tell('^1Could not find user! Try again, and remember to place an @ in front of names containg numbers!')
-        return u
-
-    def getAdminList(self):
-        return [i.name for i in self.B.Clients.values() if i.user.group == self.B.A.config.botConfig['leetlevel']]
 
 class API():
     def __init__(self):
@@ -105,7 +54,7 @@ class API():
                 if i in self.aliases.keys():
                     del self.aliases[i]
         if cmd in self.commands.keys():
-            del self.commands[cmd] #@TODO Eventually move to new dict?
+            del self.commands[cmd]
         else:
             log.warning('Command %s is not registered so we cant remove it!' % cmd)
 
@@ -116,33 +65,38 @@ class API():
         for n in [name[:i] for i in range(0, len(name)) if name[:i] != []]:
             if not self.listeners['cats'].get('_'.join(n)):
                 self.listeners['cats']['_'.join(n)] = []
-        # for i in name[:-1]:
-        #     if not self.listeners['cats'].get(i):
-        #         self.listeners['cats'][i] = []
         log.debug('Event %s has been registered!' % '_'.join(name))
 
-    def addListener(self, name, func):
+    def addListener(self, name, func, b_c=None, b_u=None):
         if isinstance(name, Event):
             name = name.name
         if not self.booted: 
-            self.listenActions.append((name, func))
+            self.listenActions.append((name, func, b_c, b_u))
             return
+        if name in self.listeners['eves']:
+            return self.listeners['eves'][name].append([func, b_c, b_u])
         if name in self.listeners['cats']:
-            return self.listeners['cats'][name].append(func)
-        if name in self.listeners['eves'].keys():
-            return self.listeners['eves'][name].append(func)
+            return self.listeners['cats'][name].append([func, b_c, b_u])
         log.warning("Event %s has not been registered!" % (name))
 
-    def fireEvent(self, name, data={}, obj=None): #@DEV We should/shouldnt use name here. Use obj, or name?
+    def fireEvent(self, name, data={}, obj=None):
+        def _feve(i):
+            if 'client' in data:
+                if i[1] and i[1] != data['client'].cid: return
+                if i[2] and i[2] != data['client'].uid: return
+            thread.fireThread(i[0], obj)
+
         log.debug('Firing event %s' % name)
         if not obj: 
             try: obj = self.events[name].getObj(data)
             except:
-                return log.debug('Cannot find event %s!' % name)
-        [thread.fireThread(i, obj) for i in self.listeners['eves'][name]]
+                return log.warning('Cannot find event %s!' % name)
+        for i in self.listeners['eves'][name]:
+            _feve(i)
         if obj._cats:
-            for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]:
-                [thread.fireThread(f, obj) for f in self.listeners['cats']['_'.join(n)]]
+            for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]: #@FIXME clean this up plz
+                for i in self.listeners['cats']['_'.join(n)]:
+                    _feve(i)
                 
     def hasAccess(self, client, cmd):
         if not client.user: client.getUser()
@@ -175,12 +129,12 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(events):
+def listener(events, bind_cid=None, bind_uid=None):
     def decorator(target):
         if not getattr(events, '__iter__', False):
             events = [events]
         for i in events:
-            A.addListener(i, target)
+            A.addListener(i, target, bind_cid, bind_uid)
         return target
     return decorator
 
@@ -212,6 +166,7 @@ class Event():
         self.name = name
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
+        EVENTS[name] = self
 
     def getObj(self, data={}):
         return FiredEvent(self.name, data, self.cats)
@@ -219,45 +174,48 @@ class Event():
     def fire(self, data={}):
         A.fireEvent(self.name, obj=self.getObj(data))
 
-EVENTS = {
-'CLIENT_HIT_DO':Event('CLIENT_HIT_ATK'),
-'CLIENT_HIT_GET':Event('CLIENT_HIT_DEF'),
-'CLIENT_DIE_TK':Event('CLIENT_DIE_TK'),
-'CLIENT_DIE_WORLD':Event('CLIENT_DIE_WORLD'),
-'CLIENT_DIE_SUICIDE':Event('CLIENT_DIE_SUICIDE'),
-'CLIENT_DIE_GEN':Event('CLIENT_DIE_GEN'),
-'CLIENT_KILL_TK':Event('CLIENT_KILL_TK'),
-'CLIENT_KILL_GEN':Event('CLIENT_KILL_GEN'),
-'CLIENT_SAY_CMD':Event('CLIENT_SAY_CMD'), #
-'CLIENT_SAY_GLOBAL':Event('CLIENT_SAY_GLOBAL'),
-'CLIENT_SAY_TEAM':Event('CLIENT_SAY_TEAM'),
-'CLIENT_SAY_TELL':Event('CLIENT_SAY_TELL'),
-'CLIENT_TEAM_SWITCH':Event('CLIENT_TEAM_SWITCH'),
-'CLIENT_TEAM_JOIN':Event('CLIENT_TEAM_JOIN'),
-'CLIENT_TEAM_QUIT':Event('CLIENT_TEAM_QUIT'),
-'CLIENT_ITEM_PICKUP':Event('CLIENT_ITEM_PICKUP'),
-'CLIENT_CONN_CONNECT':Event('CLIENT_CONN_CONNECT'),
-'CLIENT_CONN_CONNECTED':Event('CLIENT_CONN_CONNECTED'),
-'CLIENT_CONN_DC_GEN':Event('CLIENT_CONN_DC_GEN'),
-'CLIENT_CONN_DC_CI':Event('CLIENT_CONN_DC_CI'),
-'CLIENT_CONN_DC_KICK':Event('CLIENT_CONN_DC_KICK'),
-'CLIENT_INFO_SET':Event('CLIENT_INFO_SET'),
-'CLIENT_INFO_CHANGE':Event('CLIENT_INFO_CHANGE'),
-'CLIENT_GEN_VOTE':Event('CLIENT_GEN_VOTE'),
-'CLIENT_GEN_RADIO':Event('CLIENT_GEN_RADIO'),
-'GAME_MATCH_START':Event('GAME_MATCH_START'),
-'GAME_ROUND_START':Event('GAME_ROUND_START'),
-'GAME_ROUND_END':Event('GAME_ROUND_END'),
-'GAME_MATCH_END':Event('GAME_MATCH_END'),
-'GAME_SHUTDOWN':Event('GAME_SHUTDOWN'),
-'GAME_STARTUP':Event('GAME_STARTUP'),
-'GAME_VOTE_CALL':Event('GAME_VOTE_CALL'),
-'GAME_FLAG_RETURN':Event('GAME_FLAG_RETURN'),
-'GAME_FLAG_CAPTURE':Event('GAME_FLAG_CAPTURE'),
-'GAME_FLAG_PICKUP':Event('GAME_FLAG_PICKUP'),
-'GAME_FLAG_DROP':Event('GAME_FLAG_DROP'),
-'GAME_FLAG_HOTPOTATO':Event('GAME_FLAG_HOTPOTATO'),
-}
+#CLIENT
+Event('CLIENT_HIT_ATK'),
+Event('CLIENT_HIT_DEF'),
+Event('CLIENT_DIE_TK'),
+Event('CLIENT_DIE_WORLD'),
+Event('CLIENT_DIE_SUICIDE'),
+Event('CLIENT_DIE_GEN'),
+Event('CLIENT_KILL_TK'),
+Event('CLIENT_KILL_GEN'),
+Event('CLIENT_SAY_CMD'),
+Event('CLIENT_SAY_GLOBAL'),
+Event('CLIENT_SAY_TEAM'),
+Event('CLIENT_SAY_TELL'),
+Event('CLIENT_TEAM_SWITCH'),
+Event('CLIENT_TEAM_JOIN'),
+Event('CLIENT_TEAM_QUIT'),
+Event('CLIENT_ITEM_PICKUP'),
+Event('CLIENT_CONN_CONNECT'),
+Event('CLIENT_CONN_CONNECTED'),
+Event('CLIENT_CONN_DC_GEN'),
+Event('CLIENT_CONN_DC_CI'),
+Event('CLIENT_CONN_DC_KICK'),
+Event('CLIENT_INFO_SET'),
+Event('CLIENT_INFO_CHANGE'),
+Event('CLIENT_GEN_VOTE'),
+Event('CLIENT_GEN_RADIO'),
+#GAME
+Event('GAME_MATCH_START'),
+Event('GAME_ROUND_START'),
+Event('GAME_ROUND_END'),
+Event('GAME_MATCH_END'),
+Event('GAME_GEN_SHUTDOWN'),
+Event('GAME_GEN_STARTUP'),
+Event('GAME_VOTE_CALL'),
+Event('GAME_VOTE_PASS'),
+Event('GAME_VOTE_FAIL'),
+Event('GAME_VOTE_VETO'),
+Event('GAME_FLAG_RETURN'),
+Event('GAME_FLAG_CAPTURE'),
+Event('GAME_FLAG_PICKUP'),
+Event('GAME_FLAG_DROP'),
+Event('GAME_FLAG_HOTPOTATO'),
 
 def setup(BOT):
     global Q3, A

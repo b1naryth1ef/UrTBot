@@ -28,7 +28,14 @@ class Bot():
         self.blueScore = 0
 
         self.Clients = {} #AKA players
+        self.ClientBacklog = deque()
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
+
+    def removeClient(cid):
+        if len(self.ClientBacklog) > 10:
+            self.ClientBacklog.popleft()
+        self.ClientBacklog.append(self.Clients[cid])
+        del self.Clients[cid]
 
     def roundNew(self):
         log.debug('New round starting!')
@@ -108,8 +115,9 @@ class Bot():
         resp = self.Q3.R("say \"^3Starting up...\"")
         if resp is None:
             log.critical('The server is not reachable. Check the ip/port and try again!')
+            sys.exit()
         elif "No rconpassword set on the server." in resp:
-            log.critical('The server does not have an rcon password check. Please check your server config and try again.')
+            log.critical('The server does not have an rcon password. Please check your server config and try again.')
             sys.exit()
         elif 'Bad rconpassword.' in resp:
             log.critical('The rcon password you provided was incorrect. Please double check it and try again.')

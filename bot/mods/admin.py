@@ -38,7 +38,7 @@ def mapCmd(obj):
 def setgroupCmd(obj):
     m = obj.msg.split(' ', 2)
     if len(m) == 3:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         if o == obj.client: return obj.client.tell('You cant set your own group silly!')
         lc = []
@@ -56,7 +56,7 @@ def setgroupCmd(obj):
 def forceCmd(obj):
     m = obj.msg.split(' ', 2)
     if len(m) == 3:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         t = const.findTeam(m[2])
         Q3.R('forceteam %s %s' % (o.cid, t.urt))
@@ -81,7 +81,7 @@ def rconCmd(obj):
 def slapCmd(obj): #!slap 0 10 blah
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
-        o = Q3.getObj(m[1], obj.client, multi=True)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         count, stime = 1, 1
         if len(m) == 3:
@@ -92,8 +92,7 @@ def slapCmd(obj): #!slap 0 10 blah
         if count > 20: count = 20
         if not isinstance(o, list): o = [o]
         for i in range(0, count):
-            for b in o:
-                A.Q3.R('%s %s' % (obj._obj['name'], b.cid))
+            A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
             time.sleep(stime)
     else:
         obj.usage()
@@ -103,7 +102,7 @@ def kickCmd(obj): #!kick joe you are bad
     m = obj.msg.split(' ', 2)
     reason = "No fucks given"
     if len(m) in [2, 3]:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         if len(m) == 3: reason = m[2]
         database.Penalty(user=o.user, admin=obj.client.user, penalty="kick", reason=reason, creation_date=datetime.now(), expire_date=datetime.now(), active=False).save()
@@ -117,7 +116,7 @@ def banCmd(obj):
     m = obj.msg.split(' ', 3)
     reason = "No reason given"
     if len(m) in [3, 4]:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         if len(m) == 4: reason = m[3]
         if m[2] == "-1": dur = datetime.now()+relativedelta(years=+50)
@@ -173,7 +172,7 @@ def sayCmd(obj):
 def tellCmd(obj):
     m = obj.msg.split(' ', 2)
     if len(m) == 3:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         if m[2].startswith('@'): m = m[2][1:] 
         else: m = "^5%s^1:^3 %s" % (obj.client.name, m[2])
@@ -185,7 +184,7 @@ def tellCmd(obj):
 def infoCmd(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         out = 'Info for ^1%s^3\n---------------------\nUID: ^1%s\n^3CID: ^1%s\n^3IP: ^1%s\n^3GUID: ^1%s' % (o.name, o.uid, o.cid, o.ip, o.cl_guid)
         [obj.client.tell(i) for i in out.split('\n')]
@@ -205,15 +204,13 @@ def demoCmd(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
         act = 'startserverdemo' if obj._obj['name'] == 'startdemo' else 'stopserverdemo'
-        o = Q3.getObj(m[1], obj.client, multi=True)
-        if not o: return
-        if isinstance(o, list): 
-            plyr = 'all'
-        else:
-            plyr = o.cid
-            o = [o]
-        Q3.rcon("%s %s" % (act, plyr))
-        obj.client.tell('Started server demo for %s!' % plyr)
+        if m[1] == '*':o = 'all'
+        else: 
+            o = Q3.getObj(m[1], obj.client.tell)]
+            if not o: return
+            o = o.cid
+        Q3.rcon("%s %s" % (act, o))
+        obj.client.tell('Started server demo for %s!' % o)
     else:
         obj.usage()
 
@@ -240,7 +237,7 @@ def helpCmd(obj):
 def cmdAlias(obj):
     m = obj.msg.split(' ')
     if len(m) == 2:
-        o = Q3.getObj(m[1], obj.client)
+        o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         q = [i.real for i in database.Alias.select().where(user=o.user)]
         obj.client.tell('Aliases of %s: ^1%s' % (o.name, '^3, ^1'.join(q)))

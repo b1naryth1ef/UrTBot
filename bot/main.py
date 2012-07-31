@@ -72,7 +72,7 @@ def parseReconnect(inp): #68.255.111.133:27960:reconnect
     for cli in BOT.Clients.values():
         if ip == cli.ip:
             log.debug('Client #%s is reconnecting!' % cli.cid)
-            del BOT.Clients[cli.cid]
+            BOT.removeClient(cli.cid)
             api.A.fireEvent('CLIENT_CONN_RECONNECT', {'cid':cli.cid})    
             return
     log.debug('Reconnect has no client with matching ip %s' % ip)
@@ -111,9 +111,9 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
     cid = int(re.findall('ClientDisconnect\: ([0-9+])', inp)[0])
     log.debug('ClientDisconnect: %s' % cid)
     api.A.fireEvent('CLIENT_CONN_DC_GEN', {'client':BOT.getClient(cid)})
-    del BOT.Clients[cid] #@TODO Make a temp repo for recently disconnected
+    BOT.removeClient(cid)
 
-def parseKill(inp): #@DEV change to re eventually
+def parseKill(inp):
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
     inp = inp.split(" ")[1:]
     attacker = int(inp[0])
