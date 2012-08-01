@@ -7,7 +7,6 @@ import thread_handler as thread
 
 EVENTS = {}
 
-
 class API():
     def __init__(self):
         self.plugins = {}
@@ -69,17 +68,19 @@ class API():
                 self.listeners['cats']['_'.join(n)] = []
         log.debug('Event %s has been registered!' % '_'.join(name))
 
-    def addListener(self, name, func, b_c=None, b_u=None):
+    def addListener(self, name, func, cid=None, uid=None):
         if isinstance(name, Event):
             name = name.name
         if not self.booted: 
-            self.listenActions.append((name, func, b_c, b_u))
+            self.listenActions.append((name, func, cid, uid))
             return
         if name in self.listeners['eves']:
-            return self.listeners['eves'][name].append([func, b_c, b_u])
+            return self.listeners['eves'][name].append([func, cid, uid])
         if name in self.listeners['cats']:
-            return self.listeners['cats'][name].append([func, b_c, b_u])
+            return self.listeners['cats'][name].append([func, cid, uid])
         log.warning("Event %s has not been registered!" % (name))
+
+    def rmvListener(self, func, name=None): pass #@TODO write this
 
     def fireEvent(self, name, data={}, obj=None):
         def _feve(i):
@@ -87,18 +88,19 @@ class API():
                 if i[1] and i[1] != data['client'].cid: return
                 if i[2] and i[2] != data['client'].uid: return
             thread.fireThread(i[0], obj)
-
-        log.debug('Firing event %s' % name)
-        if not obj: 
-            try: obj = self.events[name].getObj(data)
-            except:
-                return log.warning('Cannot find event %s!' % name)
-        for i in self.listeners['eves'][name]:
-            _feve(i)
-        if obj._cats:
-            for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]: #@FIXME clean this up plz
-                for i in self.listeners['cats']['_'.join(n)]:
-                    _feve(i)
+        if type(name) != list: names = list(name)
+        for name in names:
+            log.debug('Firing event %s' % name)
+            if not obj: 
+                try: obj = self.events[name].getObj(data)
+                except:
+                    return log.warning('Cannot find event %s!' % name)
+            for i in self.listeners['eves'][name]:
+                _feve(i)
+            if obj._cats:
+                for n in [obj._n[:i] for i in range(0, len(obj._n)) if obj._n[:i] != []]: #@FIXME clean this up plz
+                    for i in self.listeners['cats']['_'.join(n)]:
+                        _feve(i)
                 
     def hasAccess(self, client, cmd):
         if not client.user: client.getUser()
@@ -129,12 +131,12 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(events, bind_cid=None, bind_uid=None):
+def listener(events, cid=None, uid=None):
     def decorator(target):
         if not getattr(events, '__iter__', False):
             events = [events]
         for i in events:
-            A.addListener(i, target, bind_cid, bind_uid)
+            A.addListener(i, target, cid, uid)
         return target
     return decorator
 
@@ -189,7 +191,7 @@ Event('CLIENT_SAY_TEAM'),
 Event('CLIENT_SAY_TELL'),
 Event('CLIENT_TEAM_SWITCH'),
 Event('CLIENT_TEAM_JOIN'),
-Event('CLIENT_TEAM_QUIT'),
+Event('CLIENT_TEAM_LEAVE'),
 Event('CLIENT_ITEM_PICKUP'),
 Event('CLIENT_CONN_CONNECT'),
 Event('CLIENT_CONN_CONNECTED'),
@@ -205,6 +207,7 @@ Event('GAME_MATCH_START'),
 Event('GAME_ROUND_START'),
 Event('GAME_ROUND_END'),
 Event('GAME_MATCH_END'),
+Event('GAME_MATCH_TIMELIMIT'),
 Event('GAME_GEN_SHUTDOWN'),
 Event('GAME_GEN_STARTUP'),
 Event('GAME_VOTE_CALL'),

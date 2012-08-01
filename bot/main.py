@@ -66,6 +66,12 @@ def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
     api.A.fireEvent('CLIENT_SAY_TEAM', info)
 
+#@CHECK untested
+def parseTell(inp): #saytell: 0 0 B1naryTh1ef: test
+    inp = inp.split(' ', 4)
+    info = {'client':BOT.getClient(int(inp[1])), 'to':BOT.getClient(int(inp[2])), 'msg':inp[4]}
+    api.A.fireEvent('CLIENT_SAY_TELL', info) 
+
 #@CHECK 4.2
 def parseReconnect(inp): #68.255.111.133:27960:reconnect
     ip = inp.strip(':reconnect')
@@ -90,13 +96,16 @@ def parseClientUserInfo(inp):
         log.debug('Got join CUI for #%s' % cid)
         BOT.Clients[cid] = player.Player(cid, varz, api)
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
-        if BOT.Clients[cid].cl_guid != None:
-            log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
-            pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
-            if len(pen):
-                for p in pen:
-                    log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-                    BOT.Clients[cid].kick(p.reason)
+
+        #@TODO Check/fix this for 4.2
+        # if BOT.Clients[cid].cl_guid != None:
+        #     log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
+        #     pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
+        #     if len(pen):
+        #         for p in pen:
+        #             log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+        #             BOT.Clients[cid].kick(p.reason)
+
         BOT.Clients[cid].waitingForBegin = True
         f = {'client':BOT.getClient(cid), 'info':varz}
         #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
@@ -116,28 +125,31 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
 def parseKill(inp):
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
     inp = inp.split(" ")[1:]
-    attacker = int(inp[0])
-    if attacker == 1022: atkobj = None #We're world.
-    else: atkobj = BOT.Clients[attacker] #We're a player
-    victim = int(inp[1])
-    vicobj = BOT.Clients[victim]
+    if int(inp[0]) == 1022: atk = None #We're world.
+    else: atk = BOT.getClient(int(inp[0])) #We're a player
+    vic = BOT.getClient([int(inp[1]))
     method = int(inp[2][:-1])
-    if method in [1, 3, 9, 39]: api.A.fireEvent('CLIENT_DIE_WORLD', {'vic':victim, 'meth':method}) #Water, lava, trigger_hurt or flag (hot patato)
+    obj = {'attacker':atk, 'victim':vic, 'method':method}
+    if method in [1, 3, 9, 39]: #Water, lava, trigger_hurt or flag (hot patato)
+        api.A.fireEvent('CLIENT_DIE_WORLD', obj+{'client':vic}) 
     elif method in [7, 6, 10, 31, 32]: #Various suicides
         if method == 10: vicobj.checkTeam() #Team switch
-        api.A.fireEvent('CLIENT_DIE_SUICIDE', {'vic':victim, 'meth':method})
-    elif atkobj.team == vicobj.team and atkobj.name != vicobj.name: 
-        api.A.fireEvent('CLIENT_KILL_TK', {'atk':attacker, 'vic':victim, 'meth':method})
-        api.A.fireEvent('CLIENT_DIE_TK', {'atk':attacker, 'vic':victim, 'meth':method})
+        api.A.fireEvent('CLIENT_DIE_SUICIDE', obj+{'client':vic})
+    elif atk.team == vic.team and atk.name != vic.name: 
+        api.A.fireEvent('CLIENT_KILL_TK', obj+{'client':atk})
+        api.A.fireEvent('CLIENT_DIE_TK', obj+{'client':vic})
     else:
-        api.A.fireEvent('CLIENT_KILL_GEN', {'atk':attacker, 'vic':victim, 'meth':method})
-        api.A.fireEvent('CLIENT_DIE_GEN', {'vic':victim})
+        api.A.fireEvent('CLIENT_KILL_GEN', obj+{'client':atk})
+        api.A.fireEvent('CLIENT_DIE_GEN', obj+{'client':vic})
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
     inp = inp.split(' ')
-    info = {'atk':BOT.getClient(int(inp[1])), 'vic':BOT.getClient(int(inp[2])), 'loc':int(inp[3]), 'meth':int(inp[4][:-1])}
-    api.A.fireEvent('CLIENT_HIT_ATK', info)
+    atk = BOT.getClient(int(inp[1]))
+    vic = BOT.getClient(int(inp[2]))
+    a = {'attacker':atk, 'victim':vic, 'location':int(inp[3]), 'method':int(inp[4][:-1])}
+    api.A.fireEvent('CLIENT_HIT_ATK', {'client':atk}+a)
+    api.A.fireEvent('CLIENT_HIT_DEF', {'client':vic}+a)
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
@@ -165,7 +177,7 @@ def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
     inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)[0]
     cli = BOT.getClient(int(inp[0]))
     vote = inp[1]
-    api.A.fireEvent('GAME_VOTE_CALL', {'client':cli, 'vote':vote})
+    api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
 
 def parseVote(inp): #Vote: 0 - 2
     inp = inp.split(' ')
@@ -206,30 +218,27 @@ def parseClientKick(inp): #@FIXME Hopefully barb will add some better debug
         cur = BOT.curClients()
         for i in BOT.Clients.keys():
             if i not in cur:
-                api.A.fireEvent('CLIENT_CONN_DISCONNECT_KICKED', {'cid':i})
+                api.A.fireEvent('CLIENT_CONN_DC_KICK', {'client':BOT.getClient(i)}) #@DEV Watch this. If we del the obj...
                 log.debug('User was indeed kicked!')
     log.debug('Seems like a user was kicked... Threading out parseUserKicked()')
     thread.fireThread(_user_kicked, inp)
     
 def parseTimeLimitHit(inp):
+    api.A.fireEvent('GAME_MATCH_TIMELIMIT', {})
     BOT.getPlayers()
     BOT.matchEnd()
 
-#@TODO 4.2
+#@DEV Wait for live 4.2 to implement this stuff
 def parseAccountKick(inp): pass
 def parseAccountBan(inp): pass
 def parseAccountValidated(inp): pass
 def parseAccountRejected(inp): pass
-#def parseCallVote(inp): pass
-#def parseRadio(inp): pass
-#def parseHotPotato(inp): pass
-#def parseVote(inp): pass
 
 def parse(inp):
     global BOT
     if inp.startswith("say:"): parseSay(inp)
     elif inp.startswith("sayteam:"): parseSayTeam(inp)
-    #@TODO 4.2 this should all wait tell we have a working demo
+    elif inp.startswith("saytell:"): parseTell(inp) #@CHECK Test
     elif inp.startswith("AccountKick:"): parseAccountKick(inp)
     elif inp.startswith("AccountBan:"): parseAccountBan(inp)
     elif inp.startswith("AccountValidated:"): parseAccountValidated(inp)
