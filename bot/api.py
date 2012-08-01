@@ -10,7 +10,7 @@ EVENTS = {}
 
 class API():
     def __init__(self):
-        self.modules = {}
+        self.plugins = {}
         self.commands = {}
         self.aliases = {}
         self.events = {}
@@ -28,17 +28,19 @@ class API():
         for i in self.listenActions:
             self.addListener(*i)
 
-        for i in self.modules.values():
+        for i in self.plugins.values():
             log.info('Enabling %s!' % i['name'])
             i['obj'].onEnable()
 
     def addModule(self, name, obj):
-        if name not in self.modules.keys():
-            self.modules[name] = {'name':name, 'enabled':False, 'obj':obj}
+        if name not in self.plugins.keys():
+            self.plugins[name] = {'name':name, 'enabled':False, 'obj':obj}
         else:
-            log.warning('Module %s already exists in A.modules' % name)
+            log.warning('Module %s already exists!' % name)
 
     def addCommand(self, cmd, func, desc='', usage='', level=0, alias=[]):
+        func._cmd = cmd
+        func._alias = alias
         if type(level) is not list: level = [level]
         if self.commands.get(cmd):
             return log.warning("Command %s has already been registered!" % cmd)
@@ -47,7 +49,7 @@ class API():
         for i in alias:
             self.aliases[i] = cmd
 
-    def removeCommand(self, cmd):
+    def rmvCommand(self, cmd):
         if hasattr(cmd, '_cmd'): cmd = cmd._cmd
         if hasattr(cmd, '_alias'):
             for i in cmd._alias:
@@ -58,9 +60,9 @@ class API():
         else:
             log.warning('Command %s is not registered so we cant remove it!' % cmd)
 
-    def addEvent(self, name, func):
+    def addEvent(self, name, obj):
         if self.events.get('_'.join(name)): return log.warning("Event %s has already been registered!" % name)
-        self.events['_'.join(name)] = func
+        self.events['_'.join(name)] = obj
         self.listeners['eves']['_'.join(name)] = []
         for n in [name[:i] for i in range(0, len(name)) if name[:i] != []]:
             if not self.listeners['cats'].get('_'.join(n)):
@@ -124,8 +126,6 @@ A = API()
 def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
     def decorator(target):
         A.addCommand(cmd, target, desc, usage, level, alias)
-        target._cmd = cmd
-        target._alias = alias
         return target
     return decorator
 
@@ -166,7 +166,7 @@ class Event():
         self.name = name
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
-        EVENTS[name] = self
+        #EVENTS[name] = self
 
     def getObj(self, data={}):
         return FiredEvent(self.name, data, self.cats)

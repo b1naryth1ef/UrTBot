@@ -253,7 +253,7 @@ def parse(inp):
     elif inp.startswith('InitGame:'): parseInitGame(inp)
     elif inp.startswith('InitRound:'): parseInitRound(inp)
     elif inp.startswith('SurvivorWinner:'): parseSurvivorWinner(inp)
-    elif inp.startswith('clientkick') or inp.startswith('kick'): parseClientKick(inp)#@DEV This needs to be fixed in beta
+    elif inp.startswith('clientkick') or inp.startswith('kick'): parseClientKick(inp) #@DEV Hopefully 4.2 provides a fix for this
     elif inp.startswith('Exit: Timelimit hit.'): parseTimeLimitHit(inp)
 
 def loadConfig(cfg):
