@@ -18,7 +18,7 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
-config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adminconfig.cfg'), default=default_config)
+config = ConfigFile(os.path.join(A.configs_path, 'adminconfig.cfg'), default=default_config)
 kicks = []
 
 @command('map', 'Load a map!', '<map>', level=4)
@@ -52,14 +52,16 @@ def setgroupCmd(obj):
             obj.client.tell('User %s successfully put in group %s' % (o.name, lc[0]))
     else: obj.usage()
 
-@command('force', 'Use the force broski!', '<{user}> <team>', level=4, alias=['f'])
+@command('force', 'Use the force broski!', '<{user}> <team> [lock]', level=4, alias=['f']) #@TODO Should change desc if not a.hasPlugin('fairplay')
 def forceCmd(obj):
-    m = obj.msg.split(' ', 2)
-    if len(m) == 3:
+    m = obj.msg.split(' ', 3)
+    if len(m) >= 3:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         t = const.findTeam(m[2])
         Q3.R('forceteam %s %s' % (o.cid, t.urt))
+        if len(m) == 4 and A.hasPlugin('fairplay'):
+            o.locked = t
     else: obj.usage()
 
 @command('rcon', 'Run an rcon command.', '<rcon> [data]', level=4)
@@ -244,27 +246,24 @@ def cmdAlias(obj):
     else:
         obj.usage()
 
-@listener("GAME_MATCH_START")
-def game_match_start_listener(obj): pass
+@command('smite', 'Smite a user!', '<{user}> [msg]', 5, ['kill'])
+def cmdSmite(obj):
+    m = obj.msg.split(' ', 2)
+    if len(m) >= 2:
+        o = Q3.getObj(m[1], obj.client.tell)
+        if not o: return
+        Q3.smite(o)
+        if len(m) == 3:
+            o.tell(msg[2:])
+    else: obj.usage()
 
-@listener("CLIENT_CONN_DISCONNECT")
-def client_disconnect_listener(obj):
-    if obj.client.cid in BOT.demos:
-        BOT.demos.pop(BOT.demos.index(obj.client.cid))
-
-@listener("CLIENT_DIE_SUICIDE")
-def client_die_sucidie_listener(obj): pass
-
-def client_conn_connected_listener(obj):
+def clientInfoSetListener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
 
 def onEnable(): pass
 def onDisable(): pass
 def onBoot():
     if config.block_1337:
-        A.addListener('CLIENT_CONN_CONNECTED', client_conn_connected_listener)
+        A.addListener('CLIENT_INFO_SET', clientInfoSetListener)
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
         A.removeCommand(leetCmd)
-    if not BOT.hasDemo:
-        A.removeCommand(demostartCmd)
-        A.removeCommand(demostopCmd)

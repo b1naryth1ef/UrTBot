@@ -20,6 +20,8 @@ class API():
         self.Q3 = None
         self.config = None
 
+        self.configs_path = os.path.join('./', 'bot', 'mods', 'config')
+
     def finishBooting(self, bot, config):
         self.booted = True
         self.B = bot
@@ -31,7 +33,10 @@ class API():
             log.info('Enabling %s!' % i['name'])
             i['obj'].onEnable()
 
-    def addModule(self, name, obj):
+    def hasPlugin(self, name):
+        return name in self.plugins.keys()
+
+    def addPlugin(self, name, obj):
         if name not in self.plugins.keys():
             self.plugins[name] = {'name':name, 'enabled':False, 'obj':obj}
         else:

@@ -282,7 +282,7 @@ def loadMods():
         log.info('Loading plugin %s' % name)
         __import__('bot.mods.'+name)
         i = sys.modules['bot.mods.'+name]
-        BOT.A.addModule(name, i)
+        BOT.A.addPlugin(name, i)
         try: 
             if hasattr(i, 'onBoot'): thread.fireThread(i.onBoot)
             log.info('Loaded plugin %s' % i.__name__)
