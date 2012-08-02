@@ -1,2 +1,4 @@
-#Q3Tester
-Q3Tester is a handly tool built by [@b1naryth1ef](http://github.com/b1naryth1ef) to help test [UrTBot](http://github.com/b1naryth1ef/urtbot). It takes a Q3 server logfile in, and allows for both basic rcon-querying and log playback (in realtime, or accelerated!) to allow for debugging of log-file bots. Its still in development, so checkback soon!
+UrTBot
+======
+
+[Read more here!](https://github.com/b1naryth1ef/UrTBot/wiki)
