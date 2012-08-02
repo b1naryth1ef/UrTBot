@@ -141,6 +141,7 @@ def listener(events, cid=None, uid=None):
         if not getattr(events, '__iter__', False):
             events = [events]
         for i in events:
+            if isinstance(i, Event): i = i.name
             A.addListener(i, target, cid, uid)
         return target
     return decorator
@@ -168,9 +169,8 @@ class FiredEvent():
 
 class Event():
     def __init__(self, name):
-        name = name.upper()
-        self.n = name.split('_')
-        self.name = name
+        self.name = name.upper()
+        self.n = self.name.split('_')
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
         #EVENTS[name] = self

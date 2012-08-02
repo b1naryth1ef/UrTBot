@@ -3,7 +3,7 @@ from bot.main import BOT
 from bot.api import listener, Event, command, A, Q3
 from bot.debug import log
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import relativedelta #@TODO get rid of this dep
 import bot.database as database
 import bot.const as const
 import sys, os, time

@@ -6,36 +6,65 @@ import sys, os, time
 import random
 
 default_config = {
-    'max_points':300,
-    'points':{
-    	0:{
-    		'hit':35,
-    		'kill':100,
-    	},
-    	1:{
-    		'hit':30,
-    		'kill': 90,
-    	},
-    	2:{
-    		'hit':25,
-    		'kill': 80,
-    	},
-    	3:{
-    		'hit':15,
-    		'kill': 40,
-    	},
-    	4:{
-    		'hit': 5,
-    		'kill': 10,
-    	},
-    	5:{
-    		'hit': 0,
-    		'kill': 0,
-    	}
+    'points_default':{
+    	'hit':15,
+    	'kill':100,
+    	'max':300,
     }
+    'groups':{
+    	1:{'max': 300},
+    	2:{'max': 400},
+    	3:{'max': 500},
+    	4:{'max': -1},
+    	5:{'max': -1},
+    	6:{'max': -1}
+    },
+    'warn_msg':'Do not attack teamates!'
 }
 
 config = ConfigFile(os.path.join(A.configs_path, 'fairplay.cfg'), default=default_config)
+
+def getPlayerContainer(plyr):
+	if not hasattr(plyr, 'points_container'):
+		plyr.points_container = PointsContainer(plyr)
+	return plyr.points_container
+
+def getPoints(plyr):
+	grp = BOT.config.groups[plyr.group]
+	maxlvl = max([grp['maxlevel']]+grp['levels'])
+	if maxlvl in config.groups.keys():
+		res = {}
+		for i in ['max', 'hit', 'kill']:
+			if i not in config.groups[maxlvl].keys():
+				res[i] = config.points_default[i]
+		res.update(config.groups[maxlvl])
+		return res
+	else: return config.points_default
+
+class PointsContainer(): #@FIXME Internals suck
+	def __init__(self, player):
+		self.player = player
+		self.points = 0
+
+		self.q = getPoints(player)
+		self.tier = [i for i in range(0, self.q['max']/3)]
+		self.msgs = [False, False, False]
+
+	def addPoints(self, amount, warning):
+		self.points += amount
+		addpoints.fire({'client':self.player, 'amount':amount, 'reason':warning})
+		if self.points >= self.tier[self.msgs.index(False)]:
+			player.tell('Warning %s of 3: %s' % (self.msgs.index(False), warning))
+			self.msgs[self.msgs.index(False)] = True
+			if not False in self.msgs:
+				player.kick('Too many warnings!') #@TODO Fix this up so we can clear users etc
+
+addpointsaction = Event('PLUGIN_FAIRPLAY_ACTION_ADDPOINTS')
+addpoints = Event('PLUGIN_FAIRPLAY_ADDPOINTS')
+
+@listener(addpointsaction)
+def addPointsListener(obj):
+	getPlayerContainer(obj['client']).addPoints(obj.amount, obj.reason)
 
 @command('teams', 'Even out the teams', '', 1)
 def cmdTeams(obj): #@TODO Factor locked players in?
