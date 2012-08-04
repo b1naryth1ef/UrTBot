@@ -71,8 +71,8 @@ class RCON:
 		"""
 		res = re.findall('print\\n".*?" is:"(.*?)\^7"', self.rcon(name))
 		if len(res):
-			if res.isdigit(): res = int(res[0])
-			else: res = res[0]
+			res = res[0]
+			if res.isdigit(): res = int(res)
 			return res
 
 	def format(self, string, length):
