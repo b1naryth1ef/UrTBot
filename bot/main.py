@@ -185,7 +185,7 @@ def parseHotPotato(inp): #Hotpotato:
 
 def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
     log.debug('Callvote "%s"' % inp)
-    inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)
+    inp = re.findall('Callvote: ([0-9]+) - "(.*?)"', inp)
     if len(inp):
         inp = inp[0]
         cli = BOT.getClient(int(inp[0]))
@@ -193,15 +193,19 @@ def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
         api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
 
 def parseVote(inp): #Vote: 0 - 2
-    inp = inp.split(' ')
-    cid, vote = int(inp[1]), int(inp[3])
-    api.A.fireEvent('CLIENT_GEN_VOTE', {'client':BOT.getClient(cid), 'vote':vote})
+    inp = re.findall('Vote: ([0-9]+) - ([012])', inp)
+    if len(inp):
+        inp = inp[0]
+        cid, vote = int(inp[0]), int(inp[1])
+        api.A.fireEvent('CLIENT_GEN_VOTE', {'client':BOT.getClient(cid), 'vote':vote})
 
 def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
-    inp = inp.split('Radio: ')[-1].split(' - ')
-    cli = BOT.getClient(int(inp[0]))
-    msg = [int(inp[1]), int(inp[2])]
-    api.A.fireEvent('CLIENT_GEN_RADIO', {'client': cli, 'msg': msg, 'loc':inp[3], "text":inp[4]})
+    inp = re.findall('Radio: ([0-9]+) - ([0-9]+) - ([0-9]+) - (.*?) - "(.*?)"', inp)
+    if len(inp):
+        inp = inp[0]
+        cli = BOT.getClient(int(inp[0]))
+        msg = [int(inp[1]), int(inp[2])]
+        api.A.fireEvent('CLIENT_GEN_RADIO', {'client': cli, 'msg': msg, 'loc':inp[3], "text":inp[4]})
 
 def parsePlayerBegin(inp): 
     cli = BOT.getClient(int(inp.split(' ')[1]))
