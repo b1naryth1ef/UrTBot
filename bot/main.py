@@ -136,7 +136,7 @@ def parseKill(inp):
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_WORLD', obj)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        if method == 10: vicobj.checkTeam() #Team switch
+        if method == 10: vic.checkTeam() #Team switch
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_SUICIDE', obj)
     elif atk.team == vic.team and atk.name != vic.name: 
