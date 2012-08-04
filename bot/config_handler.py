@@ -43,7 +43,7 @@ defaultcfg = {
 },
 
 'developerConfig':{
-    'enabled':True,
+    'enabled':False,
     'logging':True,
     'logfile':'debug.log',
     'loglevel':'debug',   
