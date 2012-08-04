@@ -127,7 +127,7 @@ def parseKill(inp):
     inp = inp.split(" ")[1:]
     if int(inp[0]) == 1022: atk = None #We're world.
     else: atk = BOT.getClient(int(inp[0])) #We're a player
-    vic = BOT.getClient([int(inp[1]))
+    vic = BOT.getClient([int(inp[1])])
     method = int(inp[2][:-1])
     obj = {'attacker':atk, 'victim':vic, 'method':method}
     if method in [1, 3, 9, 39]: #Water, lava, trigger_hurt or flag (hot patato)
