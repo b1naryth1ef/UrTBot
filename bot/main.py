@@ -228,11 +228,24 @@ def parseTimeLimitHit(inp):
     BOT.getPlayers()
     BOT.matchEnd()
 
-#@DEV Wait for live 4.2 to implement this stuff
+def parseAccountValidated(inp): #@CHECK
+    #AccountValidated: 0 - civil - -1 - "well known"
+    inp = inp.split('AccountValidated:')[-1]
+    inp = inp.split('-')
+    cid = int(inp[0])
+    info = {
+        'authname':inp[1],
+        '_unk':inp[2], #@DEV wtf is this field?
+        'authlevel':int(inp[3]),
+        'authnoteriety':inp[4]
+    }
+    BOT.updateData(info)
+    BOT.getClient(cid).getUser()
+
+#@DEV not sure on these formats yet
+def parseAccountRejected(inp): pass
 def parseAccountKick(inp): pass
 def parseAccountBan(inp): pass
-def parseAccountValidated(inp): pass
-def parseAccountRejected(inp): pass
 
 def parse(inp):
     global BOT

@@ -14,10 +14,11 @@ class Player():
         self.api = api
         self.A = self.api.A
         self.group = 0 #@TODO 4.2
-        self.joined = datetime.now()
 
         self.hasauth = False
         self.authname = None #@NOTE should always be lowercase
+        self.authlevel = 0 #@NOTE integer only
+        self.authnotoriety = None
     
         try:
             self.name = None
@@ -50,21 +51,37 @@ class Player():
         except Exception, e:
             log.debug(e)
 
-        self.getUser()
+    def updateInfo(self, d):
+        self.__dict__.update(d)
         
     def getUser(self):
-        if self.hasauth and self.authname:
-            q = [i for i in database.User.select().where(name=self.authname)]
-            if len(q): 
-                self.user = q[0]
-                log.debug('Found user with authname "%s" and uid "%s"' % (self.authname, self.user.id))
-            else: 
-                self.user = database.User(name=self.authname, joincount=0, firstjoin=datetime.now())
-                log.debug('Added user with authname "%s"' % self.authname)
-            self.user.lastjoin = datetime.now()
-            self.user.joincount += 1
-            self.user.save()
-            self.uid = self.user.id
+        log.debug('Attempting to get user for %s' % self.__repr__())
+        q = [i for i in database.User.select().where(authname=self.authname)]
+        q2 = [i for i in database.User.select().where(guid=self.cl_guid, ip=self.ip)]
+        if len(q): 
+            self.user = q[0]
+            log.debug('Found user from authinfo!')
+        elif len(q2) and not self.hasauth: #@DEV dont find users that have auth? 
+            self.user = q2[0]
+            log.debug('Found user w/o authinfo!')
+        else: 
+            self.user = database.User(
+                name=self.name, 
+                authname=self.authname,
+                authlevel=self.authlevel, 
+                joincount=0, 
+                firstjoin=datetime.now(),
+                level=self.authlevel,
+                guid=self.cl_guid,
+                ip=self.ip,
+                group=self.group,
+                )
+            log.debug('Added user with authname "%s"' % self.authname)
+
+        self.user.lastjoin = datetime.now()
+        self.user.joincount += 1
+        self.user.save()
+        self.uid = self.user.id
 
     #def checkTeam(self): pass #@CHECK 4.2
 
