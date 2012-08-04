@@ -93,7 +93,7 @@ class API():
                 if i[1] and i[1] != data['client'].cid: return
                 if i[2] and i[2] != data['client'].uid: return
             thread.fireThread(i[0], obj)
-        if type(name) != list: names = list(name)
+        if type(name) != list: names = [name]
         for name in names:
             log.debug('Firing event %s' % name)
             if not obj: 
