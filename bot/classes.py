@@ -85,6 +85,7 @@ class Bot():
         for l in i:
             l = re.findall('([0-9]+): (.*?) (.*?) k:([0-9]+) d:([0-9]+) ping:([0-9]+) (.*?)', l)
             if len(l):
+                l = l[0]
                 if int(l[0]) == cid:
                     return const.findTeam(l[2])
 

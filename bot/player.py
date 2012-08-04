@@ -77,7 +77,7 @@ class Player():
                 ip=self.ip,
                 group=0,
                 )
-            log.debug('Added user with authname "%s"' % self.authname)
+            log.debug('Added user!')
 
         self.user.lastjoin = datetime.now()
         self.user.joincount += 1
