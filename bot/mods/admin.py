@@ -257,7 +257,6 @@ def cmdSmite(obj):
             o.tell(msg[2:])
     else: obj.usage()
 
-@listener('')
 
 def clientInfoSetListener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
