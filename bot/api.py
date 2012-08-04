@@ -87,13 +87,14 @@ class API():
 
     def rmvListener(self, func, name=None): pass #@TODO write this
 
-    def fireEvent(self, name, data={}, obj=None):
+    def fireEvent(self, names, data={}, obj=None):
         def _feve(i):
             if 'client' in data:
                 if i[1] and i[1] != data['client'].cid: return
                 if i[2] and i[2] != data['client'].uid: return
             thread.fireThread(i[0], obj)
-        if type(name) != list: names = [name]
+        if type(names) in (str, int): names = [names]
+        elif type(names) != list: names = list(names)
         for name in names:
             log.debug('Firing event %s' % name)
             if not obj: 
