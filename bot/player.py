@@ -24,7 +24,7 @@ class Player():
         try:
             self.name = None
             self.ip = None
-            self.team = SPEC_TEAM
+            self.team = self.A.B.getPlayerTeam(self.cid)
             self.model = None
             self.sex = None
             self.headmodel = None
@@ -85,9 +85,11 @@ class Player():
         self.uid = self.user.id
 
     def checkTeam(self):
-        log.debug('Checking player team [is: %s]' % self.team)
-        self.team = self.A.B.getPlayerTeam(self.cid)
-        log.debug('Player team is now: %s' % self.team)
+        t = self.A.B.getPlayerTeam(self.cid)
+        if t != self.team:
+            log.debug('Player %s switched teams %s >> %s' % (self.cid, self.team, t))
+            self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':t, 'from':self.team})
+            self.team = t
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
