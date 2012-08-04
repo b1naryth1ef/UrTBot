@@ -97,7 +97,7 @@ class Player():
     def setData(self, data): #@TODO Fix
         if 'name' in data.keys(): 
             self.name = data['name']
-            self.checkAlias()
+            #self.checkAlias()
         if 'team' in data.keys() and self.team != None and self.team != data['team']:
             self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
             self.team = data['team']
