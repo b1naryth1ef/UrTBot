@@ -92,7 +92,6 @@ def slapCmd(obj): #!slap 0 10 blah
                 count = int(m[2][1:])
                 stime = .3
         if count > 20: count = 20
-        if not isinstance(o, list): o = [o]
         for i in range(0, count):
             A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
             time.sleep(stime)
@@ -197,8 +196,8 @@ def infoCmd(obj):
 def listCmd(obj):
     obj.client.tell('Online Users: ')
     for i in A.B.Clients.values():
-        i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.user.lastjoin)
-        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' % i)
+        i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.user.lastjoin, i.hasauth)
+        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s ^1AUTHED: ^3%s' % i)
 
 @command('stopdemo', 'Stop a demo.', '<{user}>', 3)
 @command('startdemo', 'Start a demo.', '<{user}>', 3)
