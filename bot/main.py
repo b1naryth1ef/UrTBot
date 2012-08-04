@@ -184,10 +184,13 @@ def parseHotPotato(inp): #Hotpotato:
     api.A.fireEvent('GAME_FLAG_HOTPOTATO', {})
 
 def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
-    inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)[0]
-    cli = BOT.getClient(int(inp[0]))
-    vote = inp[1]
-    api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
+    log.debug('Callvote "%s"' % inp)
+    inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)
+    if len(inp):
+        inp = inp[0]
+        cli = BOT.getClient(int(inp[0]))
+        vote = inp[1]
+        api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
 
 def parseVote(inp): #Vote: 0 - 2
     inp = inp.split(' ')
