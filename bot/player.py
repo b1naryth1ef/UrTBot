@@ -58,9 +58,9 @@ class Player():
         
     def getUser(self):
         log.debug('Attempting to get user for %s' % self.__repr__())
-        if self.authname: q = [i for i in database.User.select().where(authname=self.authname)]
+        if self.authname and self.hasauth: q = [i for i in database.User.select().where(authname=self.authname)]
         q2 = [i for i in database.User.select().where(guid=self.cl_guid, ip=self.ip)]
-        if self.authname and len(q): 
+        if self.hasauth and self.authname and len(q): 
             self.user = q[0]
             log.debug('Found user from authinfo!')
         elif len(q2) and not self.hasauth: #@DEV dont find users that have auth? 
