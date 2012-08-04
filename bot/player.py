@@ -56,7 +56,7 @@ class Player():
         self.__dict__.update(d)
         
     def getUser(self):
-        log.debug('Attempting to get user for %s' % self.__repr__())
+        log.debug('Attempting to get user for %s' % self.cid)
         if self.authname and self.hasauth: q = [i for i in database.User.select().where(authname=self.authname)]
         q2 = [i for i in database.User.select().where(guid=self.cl_guid)]
         if self.hasauth and self.authname and len(q): 
