@@ -9,7 +9,8 @@ import bot.const as const
 import sys, os, time
 
 default_config = {
-    'block_1337':True
+    'block_1337':True,
+    'admin_only_vote':True,
 }
 
 events = {
@@ -255,6 +256,8 @@ def cmdSmite(obj):
         if len(m) == 3:
             o.tell(msg[2:])
     else: obj.usage()
+
+@listener('')
 
 def clientInfoSetListener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
