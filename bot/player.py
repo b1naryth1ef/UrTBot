@@ -15,6 +15,8 @@ class Player():
         self.A = self.api.A
         self.group = 0 #@TODO 4.2
 
+        self.waitingForBegin = True
+
         self.hasauth = False
         self.authname = None #@NOTE should always be lowercase
         self.authlevel = 0 #@NOTE integer only

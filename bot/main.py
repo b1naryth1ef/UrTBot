@@ -130,6 +130,7 @@ def parseKill(inp):
     vic = BOT.getClient([int(inp[1])])
     method = int(inp[2][:-1])
     obj = {'attacker':atk, 'victim':vic, 'method':method}
+    log.debug('Kill: %s/%s' % (vic, atk))
     if method in [1, 3, 9, 39]: #Water, lava, trigger_hurt or flag (hot patato)
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_WORLD', obj)
