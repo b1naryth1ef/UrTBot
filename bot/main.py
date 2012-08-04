@@ -126,9 +126,7 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
 def parseKill(inpz):
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
     inp = inpz.split(" ")[1:]
-    if int(inp[0]) == 1022: 
-        log.debug('We\'re world!')
-        atk = None #We're world.
+    if int(inp[0]) == 1022: atk = None #We're world.
     else: atk = BOT.getClient(int(inp[0])) #We're a player
     vic = BOT.getClient(int(inp[1]))
     method = int(inp[2][:-1])
@@ -152,7 +150,7 @@ def parseKill(inpz):
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_GEN', obj)
     else:
-        log.debug('Problem parsing killline: "%s"' % inpz)
+        log.warning('Problem parsing killline: "%s"' % inpz)
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso

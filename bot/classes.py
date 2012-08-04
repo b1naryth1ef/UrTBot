@@ -32,10 +32,11 @@ class Bot():
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 
     def removeClient(self, cid):
-        if len(self.ClientBacklog) > 10:
-            self.ClientBacklog.popleft()
-        self.ClientBacklog.append(self.Clients[cid])
-        del self.Clients[cid]
+        if cid in self.Clients.keys():
+            if len(self.ClientBacklog) > 10:
+                self.ClientBacklog.popleft()
+            self.ClientBacklog.append(self.Clients[cid])
+            del self.Clients[cid]
 
     def roundNew(self):
         log.debug('New round starting!')
