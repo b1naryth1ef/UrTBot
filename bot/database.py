@@ -35,6 +35,7 @@ def setup(config, log):
 
     class Penalty(BaseModel):
         user = ForeignKeyField(User)
+        ip = CharField()
         admin = ForeignKeyField(User)
         penalty = CharField()
         reason = CharField()
