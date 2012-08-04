@@ -11,6 +11,8 @@ import sys, os, time
 default_config = {
     'block_1337':True,
     'admin_only_vote':True,
+    'kick_default_reason':"No Reason",
+    'ban_default_reason':"No Reason"
 }
 
 events = {
@@ -22,7 +24,20 @@ events = {
 config = ConfigFile(os.path.join(A.configs_path, 'adminconfig.cfg'), default=default_config)
 kicks = []
 
-@command('map', 'Load a map!', '<map>', level=4)
+@command('cyclemap', 'Cycle the map.', '[delay (secs)]', level=4, alias=['cycle'])
+def cycleMapCmd(obj):
+    m = obj.msg.split(' ', 1)
+    delay = 0
+    if len(m) == 2:
+        if m[1].isdigit():
+            delay = int(m[1])
+        else:
+            return obj.client.tell('The delay value was invalid!')
+    if delay > 30: delay = 30
+    time.sleep(delay)
+    Q3.R('cyclemap')
+
+@command('map', 'Load a map.', '<map>', level=4)
 def mapCmd(obj):
     m = obj.msg.split(' ', 1)
     if len(m) == 2:
@@ -48,6 +63,8 @@ def setgroupCmd(obj):
         if len(lc) == 0: return obj.client.tell('No group %s' % m[2])
         elif len(lc) > 2: return obj.client.tell('More than one group!')
         else: 
+            if lc[0].maxlevel > BOT.getGroup(obj.client.user.group).maxlevel: 
+                return obj.client.tell('You can set someone to a higher group then you!')
             o.user.group = lc[0]
             o.user.save()
             obj.client.tell('User %s successfully put in group %s' % (o.name, lc[0]))
@@ -102,7 +119,7 @@ def slapCmd(obj): #!slap 0 10 blah
 @command('kick', 'Kick a user.', '<{user}> [reason]', level=4, alias=['k'])
 def kickCmd(obj): #!kick joe you are bad
     m = obj.msg.split(' ', 2)
-    reason = "No fucks given"
+    reason = config.kick_default_reason
     if len(m) in [2, 3]:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
@@ -116,7 +133,7 @@ def kickCmd(obj): #!kick joe you are bad
 @command('ban', 'Ban/Tempban a user. (-1 duration for permaban)', '<{user}> <duration> [reason]', 5, ['b'])
 def banCmd(obj):
     m = obj.msg.split(' ', 3)
-    reason = "No reason given"
+    reason = config.ban_default_reason
     if len(m) in [3, 4]:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
@@ -158,7 +175,7 @@ def leetCmd(obj):
         log.info('User %s has gained uber-admin access through the !leet command!' % obj.client.name)
     else:
         obj.client.tell('^1Hahah nope!')
-        log.debug('User %s tried gaining access with `!leet` command and was denied.' % obj.client.name)
+        log.info('User %s tried gaining access with `!leet` command and was denied.' % obj.client.name)
 
 @command('say', 'Say something.', '<[@]message>', 3, [BOT.config.botConfig['cmd_prefix']])
 def sayCmd(obj):
@@ -177,7 +194,7 @@ def tellCmd(obj):
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         if m[2].startswith('@'): m = m[2][1:] 
-        else: m = "^5%s^1:^3 %s" % (obj.client.name, m[2])
+        else: m = "^5%s^1 to ^5%s^1:^3 %s" % (obj.client.name, o.name, m[2])
         Q3.tell(o, m)
     else:
         obj.usage()
@@ -188,7 +205,7 @@ def infoCmd(obj):
     if len(m) == 2:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
-        out = 'Info for ^1%s^3\n---------------------\nUID: ^1%s\n^3CID: ^1%s\n^3IP: ^1%s\n^3GUID: ^1%s' % (o.name, o.uid, o.cid, o.ip, o.cl_guid)
+        out = 'Info for ^1%s^3\n---------------------\nUID: ^1%s\n^3CID: ^1%s\n^3IP: ^1%s\n^3GUID: ^1%s\n^3AUTHED: ^1%s' % (o.name, o.uid, o.cid, o.ip, o.cl_guid, o.hasauth)
         [obj.client.tell(i) for i in out.split('\n')]
     else:
         obj.usage()
@@ -218,7 +235,9 @@ def demoCmd(obj):
 
 @command('admins', 'Find those more sexy than you', '', [0, 1])
 def adminsCmd(obj):
-    obj.client.tell('Admins: ^1'+'^3, ^1'.join(Q3.getAdminList()))
+    if len(Q3.getAdminList()):
+        return obj.client.tell('Admins: ^1'+'^3, ^1'.join(Q3.getAdminList()))
+    obj.client.tell('No admins currently online!')
 
 @command('help', 'Get some help!', '[command]', [0, 1])
 def helpCmd(obj):
@@ -246,7 +265,7 @@ def cmdAlias(obj):
     else:
         obj.usage()
 
-@command('smite', 'Smite a user!', '<{user}> [msg]', 5, ['kill'])
+@command('smite', 'Smite a user.', '<{user}> [msg]', 5, ['kill'])
 def cmdSmite(obj):
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
@@ -257,6 +276,12 @@ def cmdSmite(obj):
             o.tell(msg[2:])
     else: obj.usage()
 
+@command('status', 'Get the bot status.', '', 4)
+def cmdStatus(obj):
+    uptime = datetime.now()-BOT.boottime
+    db_count = len([i for i in database.User.select()])
+    msg = "^3Uptime: ^1%s\n^3DB User Count: ^1%s" % (uptime, db_count)
+    obj.client.tell(msg)
 
 def clientInfoSetListener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()

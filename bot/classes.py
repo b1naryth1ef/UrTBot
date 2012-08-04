@@ -1,10 +1,11 @@
 import socket, select, time, re, thread
 import bot, player, const, database, main
-from debug import log
-import thread_handler as thread
-from rcon import RCON
-from collections import deque
 import sys, os, time
+import thread_handler as thread
+from collections import deque
+from rcon import RCON
+from debug import log
+from datetime import datetime
 
 class Bot():
     def __init__(self, config=None, database=None):
@@ -12,6 +13,8 @@ class Bot():
         self.Q = RCON(config.botConfig['rconip'], config.botConfig['rcon'])
         self.database = database
         self.config = config
+
+        self.boottime = datetime.now() #@NOTE this could be more acurate but screw it
 
         self.enabled = True
         self.logback = deque()
@@ -30,6 +33,9 @@ class Bot():
         self.Clients = {} #AKA players
         self.ClientBacklog = deque()
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
+
+    def getGroup(gid):
+        return self.config.groups.get(gid)
 
     def removeClient(self, cid):
         if cid in self.Clients.keys():

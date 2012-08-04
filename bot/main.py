@@ -100,13 +100,13 @@ def parseClientUserInfo(inp):
         BOT.Clients[cid].waitingForBegin = True
 
         #@TODO Check/fix this for 4.2
-        # if BOT.Clients[cid].cl_guid != None:
-        #     log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
-        #     pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
-        #     if len(pen):
-        #         for p in pen:
-        #             log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-        #             BOT.Clients[cid].kick(p.reason)
+        if BOT.Clients[cid].cl_guid != None:
+            log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
+            pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
+            if len(pen):
+                for p in pen:
+                    log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                    BOT.Clients[cid].kick(p.reason)
         
         f = {'client':BOT.getClient(cid), 'info':varz}
         #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
