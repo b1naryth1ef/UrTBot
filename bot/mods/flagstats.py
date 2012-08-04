@@ -1,66 +1,54 @@
-import time
-from init import A
+from bot.config_handler import ConfigFile
+from bot.main import BOT
+from bot.api import listener, Event, command, A, Q3
+import sys, os, time
 
-_name = "Flagstats"
-
-redFlag = None
-blueFlag = None
-
-class Timer(object): #@CREDIT B1
-	def __init__(self):
+class Timer(object):
+	def __init__(self, name=None):
+		self.name = name
 		self.startt = 0
 		self.endt = 0
-		self.status = 0
+		self.running = False
 	
 	def start(self): 
-		if self.status == 0:
+		if not self.running:
 			self.startt = time.time()
-			self.status = 1
+			self.running = True
+
 	def stop(self):
-		if self.status == 1: 
+		if self.running: 
 			self.endt = time.time()
-			self.status = 0
+			self.running = False
+
 	def value(self): 
 		x = self.endt-self.startt
 		return '{number:.{digits}f}'.format(number=x, digits=2)
+
 	def reset(self):
 		self.startt = 0
 		self.endt = 0
-		self.status = 0
+		self.running = False
 
-def eventListener(obj, f):
-	"""
-	The making of this plugin was hell. 
-	Fuck the iourt team for the stupid
-	decisions in the way flag capping is
-	handled. Die in a cold, dark, horrible
-	place.
-	-B1
-	"""
-	global A, redFlag, blueFlag
-	if redFlag == None: redFlag = Timer()
-	if blueFlag == None: blueFlag = Timer()
+redFlag = Timer('Blue Flag')
+blueFlag = Timer('Red Flag')
 
-	elif obj.type == "GAME_FLAGPICKUP":
-		print obj.data['flagid'], redFlag.status, blueFlag.status
-		if obj.data['flagid'] == 1 and redFlag.status == 0: redFlag.start()
-		elif obj.data['flagid'] == 2 and blueFlag.status == 0: blueFlag.start()
+@listener('GAME_FLAG')
+def eventListener(obj):
+	flags = {1:redFlag, 2:blueFlag}
+	if obj._name == "GAME_FLAG_PICKUP":
+		if not flags[obj.flagid].running:
+			flags[obj.flagid].start()
 
-	elif obj.type == "GAME_FLAGRETURN":
-		if obj.data['flagid'] == 1: redFlag.reset()
-		elif obj.data['flagid'] == 2: blueFlag.reset()
+	elif obj._name == "GAME_FLAG_CAPTURE":
+		if flags[obj.flagid].running:
+			o = flags[obj.flagid]
+			o.stop()
+			A.say('%s captured in %s seconds' % (o.name, o.value())) #@TODO add color
 
-	elif obj.type == "GAME_FLAGCAPTURE":
-		if obj.data['flagid'] == 2:
-			redFlag.stop()
-			A.say('%sRed %sFlag captured in %s%s seconds' % (A.RED, A.YELLOW, A.CYAN, redFlag.value()))
-			redFlag.reset()
-		elif obj.data['flagid'] == 1:
-			blueFlag.stop()
-			A.say('%sBlue %sFlag captured in %s%s seconds' % (A.BLUE, A.YELLOW, A.CYAN, blueFlag.value()))
-			blueFlag.reset()
-	elif obj.type == "GAME_FLAGRESET":
-		if obj.data['flagid'] == 1: redFlag.reset()
-		elif obj.data['flagid'] == 2: blueFlag.reset()
+	elif obj._name in ['GAME_FLAG_RETURN', 'GAME_FLAG_HOTPOTATO']:
+		if flags[obj.flagid].running:
+			flags[obj.flagid].reset()
 
-def init(): A.addListeners(['GAME_FLAGPICKUP', 'GAME_FLAGDROP', 'GAME_FLAGRETURN', 'GAME_FLAGCAPTURE', 'GAME_FLAGRESET'], eventListener)
+def onEnable(): pass
+def onDisable(): pass
+def onBoot(): pass

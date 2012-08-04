@@ -20,6 +20,8 @@ class API():
         self.Q3 = None
         self.config = None
 
+        self.configs_path = os.path.join('./', 'bot', 'mods', 'config')
+
     def finishBooting(self, bot, config):
         self.booted = True
         self.B = bot
@@ -31,7 +33,10 @@ class API():
             log.info('Enabling %s!' % i['name'])
             i['obj'].onEnable()
 
-    def addModule(self, name, obj):
+    def hasPlugin(self, name):
+        return name in self.plugins.keys()
+
+    def addPlugin(self, name, obj):
         if name not in self.plugins.keys():
             self.plugins[name] = {'name':name, 'enabled':False, 'obj':obj}
         else:
@@ -82,13 +87,14 @@ class API():
 
     def rmvListener(self, func, name=None): pass #@TODO write this
 
-    def fireEvent(self, name, data={}, obj=None):
+    def fireEvent(self, names, data={}, obj=None):
         def _feve(i):
             if 'client' in data:
                 if i[1] and i[1] != data['client'].cid: return
                 if i[2] and i[2] != data['client'].uid: return
             thread.fireThread(i[0], obj)
-        if type(name) != list: names = list(name)
+        if type(names) in (str, int): names = [names]
+        elif type(names) != list: names = list(names)
         for name in names:
             log.debug('Firing event %s' % name)
             if not obj: 
@@ -131,11 +137,12 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(events, cid=None, uid=None):
+def listener(eventz, cid=None, uid=None):
     def decorator(target):
-        if not getattr(events, '__iter__', False):
-            events = [events]
+        if not getattr(eventz, '__iter__', False):
+            eventz = [eventz]
         for i in events:
+            if isinstance(i, Event): i = i.name
             A.addListener(i, target, cid, uid)
         return target
     return decorator
@@ -163,9 +170,8 @@ class FiredEvent():
 
 class Event():
     def __init__(self, name):
-        name = name.upper()
-        self.n = name.split('_')
-        self.name = name
+        self.name = name.upper()
+        self.n = self.name.split('_')
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
         #EVENTS[name] = self
@@ -200,6 +206,7 @@ Event('CLIENT_CONN_DC_CI'),
 Event('CLIENT_CONN_DC_KICK'),
 Event('CLIENT_INFO_SET'),
 Event('CLIENT_INFO_CHANGE'),
+Event('CLIENT_GEN_CALLVOTE'),
 Event('CLIENT_GEN_VOTE'),
 Event('CLIENT_GEN_RADIO'),
 #GAME

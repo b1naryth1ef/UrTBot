@@ -1,4 +1,5 @@
 from debug import log
+from player import Player
 
 class Q3API():
     def __init__(self, bot):
@@ -57,7 +58,7 @@ class Q3API():
             return self.B.getClient(int(txt))
         else:
             u = [i for i in self.B.Clients.values() if txt.lower() in i.name.lower()]
-            if len(u) == 1: return u
+            if len(u) == 1: return u[0]
             if reply and len(u) > 1:
                 reply('^1Found more than one user for your query! Try again with a more specific search term!')
             elif reply:

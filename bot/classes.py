@@ -31,11 +31,12 @@ class Bot():
         self.ClientBacklog = deque()
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 
-    def removeClient(cid):
-        if len(self.ClientBacklog) > 10:
-            self.ClientBacklog.popleft()
-        self.ClientBacklog.append(self.Clients[cid])
-        del self.Clients[cid]
+    def removeClient(self, cid):
+        if cid in self.Clients.keys():
+            if len(self.ClientBacklog) > 10:
+                self.ClientBacklog.popleft()
+            self.ClientBacklog.append(self.Clients[cid])
+            del self.Clients[cid]
 
     def roundNew(self):
         log.debug('New round starting!')
@@ -125,6 +126,8 @@ class Bot():
         
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
 
+        self.hasauth = bool((self.Q.getCvar('auth_enable'))) #@NOTE this can fail !!
+        log.debug('Hasauth: %s' % self.hasauth)
         self.Q.rcon('sv_sayprefix "%s: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_tellprefix "%s [PM]: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_demonotice ""')
@@ -134,7 +137,7 @@ class Bot():
 
         self.addPlayers()
             
-        self.Q3.setLengths()
+        #self.Q3.setLengths()
         self.Q3.say("^3Startup complete.")
         log.info('SETUP DONE: BOT')
 
@@ -145,6 +148,7 @@ class Bot():
                 log.debug('Add User: %s, %s' % (i, i[0]))
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
+                self.Clients[uid].getUser()
             self.getPlayers() #Set team/score for players
 
     def getClientTeam(self): pass

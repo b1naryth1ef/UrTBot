@@ -12,7 +12,7 @@ import sys, os, time
 import pprint, json
 
 
-default = {
+defaultcfg = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]: ",
     'cmd_prefix':'!',
@@ -43,7 +43,7 @@ default = {
 },
 
 'developerConfig':{
-    'enabled':True,
+    'enabled':False,
     'logging':True,
     'logfile':'debug.log',
     'loglevel':'debug',   
@@ -61,14 +61,17 @@ default = {
     'ut4_turnpike','ut4_uptown' ],
     # PK3s that aren't actually maps
     'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
-                        'pak0^7', 'common-spog']
+                        'pak0^7', 'common-spog', 'zUrT42_0001',
+                        'zUrT42_0002', 'zUrT42_0003', 'zUrT42_0004',
+                        'zUrT42_0005', 'zUrT42_0006', 'zUrT42_0007',
+                        'zUrT42_0008', 'zUrT42_0009']
 }}
 
 class ConfigFile():
-    def __init__(self, configfile='config', default=default):
+    def __init__(self, configfile='config', default=None):
         self.configfile = configfile.replace('.cfg', '')
-        self.config = self.load(default)
-        self.default = default
+        self.default = default or defaultcfg
+        self.config = self.load(self.default)
 
         self.check()
         self.save()

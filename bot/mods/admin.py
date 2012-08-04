@@ -3,13 +3,14 @@ from bot.main import BOT
 from bot.api import listener, Event, command, A, Q3
 from bot.debug import log
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import relativedelta #@TODO get rid of this dep
 import bot.database as database
 import bot.const as const
 import sys, os, time
 
 default_config = {
-    'block_1337':True
+    'block_1337':True,
+    'admin_only_vote':True,
 }
 
 events = {
@@ -18,7 +19,7 @@ events = {
     'kick':Event('PLUGIN_ADMIN_KICK')
 }
 
-config = ConfigFile(os.path.join('./', 'bot', 'mods', 'config', 'adminconfig.cfg'), default=default_config)
+config = ConfigFile(os.path.join(A.configs_path, 'adminconfig.cfg'), default=default_config)
 kicks = []
 
 @command('map', 'Load a map!', '<map>', level=4)
@@ -52,14 +53,16 @@ def setgroupCmd(obj):
             obj.client.tell('User %s successfully put in group %s' % (o.name, lc[0]))
     else: obj.usage()
 
-@command('force', 'Use the force broski!', '<{user}> <team>', level=4, alias=['f'])
+@command('force', 'Use the force broski!', '<{user}> <team> [lock]', level=4, alias=['f']) #@TODO Should change desc if not a.hasPlugin('fairplay')
 def forceCmd(obj):
-    m = obj.msg.split(' ', 2)
-    if len(m) == 3:
+    m = obj.msg.split(' ', 3)
+    if len(m) >= 3:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         t = const.findTeam(m[2])
         Q3.R('forceteam %s %s' % (o.cid, t.urt))
+        if len(m) == 4 and A.hasPlugin('fairplay'):
+            o.locked = t
     else: obj.usage()
 
 @command('rcon', 'Run an rcon command.', '<rcon> [data]', level=4)
@@ -90,7 +93,6 @@ def slapCmd(obj): #!slap 0 10 blah
                 count = int(m[2][1:])
                 stime = .3
         if count > 20: count = 20
-        if not isinstance(o, list): o = [o]
         for i in range(0, count):
             A.Q3.R('%s %s' % (obj._obj['name'], o.cid))
             time.sleep(stime)
@@ -195,8 +197,8 @@ def infoCmd(obj):
 def listCmd(obj):
     obj.client.tell('Online Users: ')
     for i in A.B.Clients.values():
-        i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.joined)
-        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s' % i)
+        i = (i.name, i.cid, i.uid, i.ip, datetime.now()-i.user.lastjoin, i.hasauth)
+        obj.client.tell('^1Name: ^3%s ^1CID: ^3%s ^1UID: ^3%s ^1IP: ^3%s ^1ONLINE-FOR: ^3%s ^1AUTHED: ^3%s' % i)
 
 @command('stopdemo', 'Stop a demo.', '<{user}>', 3)
 @command('startdemo', 'Start a demo.', '<{user}>', 3)
@@ -206,7 +208,7 @@ def demoCmd(obj):
         act = 'startserverdemo' if obj._obj['name'] == 'startdemo' else 'stopserverdemo'
         if m[1] == '*':o = 'all'
         else: 
-            o = Q3.getObj(m[1], obj.client.tell)]
+            o = Q3.getObj(m[1], obj.client.tell)
             if not o: return
             o = o.cid
         Q3.rcon("%s %s" % (act, o))
@@ -244,27 +246,25 @@ def cmdAlias(obj):
     else:
         obj.usage()
 
-@listener("GAME_MATCH_START")
-def game_match_start_listener(obj): pass
+@command('smite', 'Smite a user!', '<{user}> [msg]', 5, ['kill'])
+def cmdSmite(obj):
+    m = obj.msg.split(' ', 2)
+    if len(m) >= 2:
+        o = Q3.getObj(m[1], obj.client.tell)
+        if not o: return
+        Q3.smite(o)
+        if len(m) == 3:
+            o.tell(msg[2:])
+    else: obj.usage()
 
-@listener("CLIENT_CONN_DISCONNECT")
-def client_disconnect_listener(obj):
-    if obj.client.cid in BOT.demos:
-        BOT.demos.pop(BOT.demos.index(obj.client.cid))
 
-@listener("CLIENT_DIE_SUICIDE")
-def client_die_sucidie_listener(obj): pass
-
-def client_conn_connected_listener(obj):
+def clientInfoSetListener(obj):
     if obj.client.ip.split(':')[-1] == "1337": obj.client.kick()
 
 def onEnable(): pass
 def onDisable(): pass
 def onBoot():
     if config.block_1337:
-        A.addListener('CLIENT_CONN_CONNECTED', client_conn_connected_listener)
+        A.addListener('CLIENT_INFO_SET', clientInfoSetListener)
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
-        A.removeCommand(leetCmd)
-    if not BOT.hasDemo:
-        A.removeCommand(demostartCmd)
-        A.removeCommand(demostopCmd)
+        A.rmvCommand(leetCmd)

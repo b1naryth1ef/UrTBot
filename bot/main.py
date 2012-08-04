@@ -96,6 +96,8 @@ def parseClientUserInfo(inp):
         log.debug('Got join CUI for #%s' % cid)
         BOT.Clients[cid] = player.Player(cid, varz, api)
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
+        if not BOT.hasauth: BOT.getClient(cid).getUser()
+        BOT.Clients[cid].waitingForBegin = True
 
         #@TODO Check/fix this for 4.2
         # if BOT.Clients[cid].cl_guid != None:
@@ -105,8 +107,7 @@ def parseClientUserInfo(inp):
         #         for p in pen:
         #             log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
         #             BOT.Clients[cid].kick(p.reason)
-
-        BOT.Clients[cid].waitingForBegin = True
+        
         f = {'client':BOT.getClient(cid), 'info':varz}
         #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
@@ -122,25 +123,34 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
     api.A.fireEvent('CLIENT_CONN_DC_GEN', {'client':BOT.getClient(cid)})
     BOT.removeClient(cid)
 
-def parseKill(inp):
+def parseKill(inpz):
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
-    inp = inp.split(" ")[1:]
+    inp = inpz.split(" ")[1:]
     if int(inp[0]) == 1022: atk = None #We're world.
     else: atk = BOT.getClient(int(inp[0])) #We're a player
-    vic = BOT.getClient([int(inp[1]))
+    vic = BOT.getClient(int(inp[1]))
     method = int(inp[2][:-1])
     obj = {'attacker':atk, 'victim':vic, 'method':method}
+    log.debug('Kill: %s/%s' % (vic, atk))
     if method in [1, 3, 9, 39]: #Water, lava, trigger_hurt or flag (hot patato)
-        api.A.fireEvent('CLIENT_DIE_WORLD', obj+{'client':vic}) 
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_WORLD', obj)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        if method == 10: vicobj.checkTeam() #Team switch
-        api.A.fireEvent('CLIENT_DIE_SUICIDE', obj+{'client':vic})
-    elif atk.team == vic.team and atk.name != vic.name: 
-        api.A.fireEvent('CLIENT_KILL_TK', obj+{'client':atk})
-        api.A.fireEvent('CLIENT_DIE_TK', obj+{'client':vic})
+        if method == 10: vic.checkTeam() #Team switch
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_SUICIDE', obj)
+    elif atk and vic and atk.team == vic.team and atk.name != vic.name: 
+        obj.update({'client':atk})
+        api.A.fireEvent('CLIENT_KILL_TK', obj)
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_TK', obj)
+    elif atk and vic:
+        obj.update({'client':atk})
+        api.A.fireEvent('CLIENT_KILL_GEN', obj)
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_GEN', obj)
     else:
-        api.A.fireEvent('CLIENT_KILL_GEN', obj+{'client':atk})
-        api.A.fireEvent('CLIENT_DIE_GEN', obj+{'client':vic})
+        log.warning('Problem parsing killline: "%s"' % inpz)
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
@@ -148,8 +158,10 @@ def parseHit(inp):
     atk = BOT.getClient(int(inp[1]))
     vic = BOT.getClient(int(inp[2]))
     a = {'attacker':atk, 'victim':vic, 'location':int(inp[3]), 'method':int(inp[4][:-1])}
-    api.A.fireEvent('CLIENT_HIT_ATK', {'client':atk}+a)
-    api.A.fireEvent('CLIENT_HIT_DEF', {'client':vic}+a)
+    a.update({'client':atk})
+    api.A.fireEvent('CLIENT_HIT_ATK', a)
+    a.update({'client':vic})
+    api.A.fireEvent('CLIENT_HIT_DEF', a)
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45
@@ -174,26 +186,33 @@ def parseHotPotato(inp): #Hotpotato:
     api.A.fireEvent('GAME_FLAG_HOTPOTATO', {})
 
 def parseCallVote(inp): #Callvote: 1 - "map dressingroom"
-    inp = re.findall('Callvote: ([0-9]+) - "([0-9a-zA-Z ]+)"', inp)[0]
-    cli = BOT.getClient(int(inp[0]))
-    vote = inp[1]
-    api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
+    log.debug('Callvote "%s"' % inp)
+    inp = re.findall('Callvote: ([0-9]+) - "(.*?)"', inp)
+    if len(inp):
+        inp = inp[0]
+        cli = BOT.getClient(int(inp[0]))
+        vote = inp[1]
+        api.A.fireEvent(['GAME_VOTE_CALL', 'CLIENT_GEN_CALLVOTE'], {'client':cli, 'vote':vote})
 
 def parseVote(inp): #Vote: 0 - 2
-    inp = inp.split(' ')
-    cid, vote = int(inp[1]), int(inp[3])
-    api.A.fireEvent('CLIENT_GEN_VOTE', {'client':BOT.getClient(cid), 'vote':vote})
+    inp = re.findall('Vote: ([0-9]+) - ([012])', inp)
+    if len(inp):
+        inp = inp[0]
+        cid, vote = int(inp[0]), int(inp[1])
+        api.A.fireEvent('CLIENT_GEN_VOTE', {'client':BOT.getClient(cid), 'vote':vote})
 
 def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
-    inp = inp.split('Radio: ')[-1].split(' - ')
-    cli = BOT.getClient(int(inp[0]))
-    msg = [int(inp[1]), int(inp[2])]
-    api.A.fireEvent('CLIENT_GEN_RADIO', {'client': cli, 'msg': msg, 'loc':inp[3], "text":inp[4]})
+    inp = re.findall('Radio: ([0-9]+) - ([0-9]+) - ([0-9]+) - (.*?) - "(.*?)"', inp)
+    if len(inp):
+        inp = inp[0]
+        cli = BOT.getClient(int(inp[0]))
+        msg = [int(inp[1]), int(inp[2])]
+        api.A.fireEvent('CLIENT_GEN_RADIO', {'client': cli, 'msg': msg, 'loc':inp[3], "text":inp[4]})
 
 def parsePlayerBegin(inp): 
     cli = BOT.getClient(int(inp.split(' ')[1]))
-    if cli.waitingForBegin:
-        api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client:'BOT.getClient(cid)})
+    if cli and cli.waitingForBegin: #@NOTE If the bot starts WHILE someone is loading, this can herpaderp
+        api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':cli})
 
 def parseShutdownGame(inp): #@FIXME need better rcon msgs before I can do this
     api.A.fireEvent('GAME_SHUTDOWN', {})
@@ -228,11 +247,24 @@ def parseTimeLimitHit(inp):
     BOT.getPlayers()
     BOT.matchEnd()
 
-#@DEV Wait for live 4.2 to implement this stuff
+def parseAccountValidated(inp): #@CHECK
+    #AccountValidated: 0 - civil - -1 - "well known"
+    inp = inp.split('AccountValidated:')[-1]
+    inp = inp.split('-')
+    cid = int(inp[0])
+    info = {
+        'authname':inp[1],
+        '_unk':inp[2], #@DEV wtf is this field?
+        'authlevel':int(inp[3]),
+        'authnoteriety':inp[4]
+    }
+    BOT.updateData(info)
+    BOT.getClient(cid).getUser()
+
+#@DEV not sure on these formats yet
+def parseAccountRejected(inp): pass
 def parseAccountKick(inp): pass
 def parseAccountBan(inp): pass
-def parseAccountValidated(inp): pass
-def parseAccountRejected(inp): pass
 
 def parse(inp):
     global BOT
@@ -254,9 +286,9 @@ def parse(inp):
     elif inp.startswith('Flag:'): parseFlag(inp)
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
     elif inp.startswith('Hotpotato:'): parseHotPotato(inp) #@CHECK 4.2
-    elif inp.startswith("Callvote:"): parseCallVote(inp) #@CHECK 4.2
+    elif inp.startswith("Callvote:"): parseCallVote(inp)
     elif inp.startswith('Vote:'): parseVote(inp) #@CHECK 4.2
-    elif inp.startswith("Radio:"): parseRadio(inp) #@CHECK 4.2
+    elif inp.startswith("Radio:"): parseRadio(inp)
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
     elif inp.startswith('InitGame:'): parseInitGame(inp)
@@ -282,7 +314,7 @@ def loadMods():
         log.info('Loading plugin %s' % name)
         __import__('bot.mods.'+name)
         i = sys.modules['bot.mods.'+name]
-        BOT.A.addModule(name, i)
+        BOT.A.addPlugin(name, i)
         try: 
             if hasattr(i, 'onBoot'): thread.fireThread(i.onBoot)
             log.info('Loaded plugin %s' % i.__name__)
