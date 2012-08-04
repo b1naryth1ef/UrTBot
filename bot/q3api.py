@@ -1,4 +1,5 @@
 from debug import log
+from player import Player
 
 class Q3API():
     def __init__(self, bot):

@@ -208,7 +208,7 @@ def demoCmd(obj):
         act = 'startserverdemo' if obj._obj['name'] == 'startdemo' else 'stopserverdemo'
         if m[1] == '*':o = 'all'
         else: 
-            o = Q3.getObj(m[1], obj.client.tell)]
+            o = Q3.getObj(m[1], obj.client.tell)
             if not o: return
             o = o.cid
         Q3.rcon("%s %s" % (act, o))

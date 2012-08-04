@@ -12,7 +12,7 @@ import sys, os, time
 import pprint, json
 
 
-default = {
+defaultcfg = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]: ",
     'cmd_prefix':'!',
@@ -68,10 +68,10 @@ default = {
 }}
 
 class ConfigFile():
-    def __init__(self, configfile='config', defaulty=None):
+    def __init__(self, configfile='config', default=None):
         self.configfile = configfile.replace('.cfg', '')
-        self.config = self.load(default)
-        self.default = defaulty or default
+        self.default = default or defaultcfg
+        self.config = self.load(self.default)
 
         self.check()
         self.save()
