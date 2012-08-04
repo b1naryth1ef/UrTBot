@@ -161,7 +161,7 @@ class Listener():
 
         for i in events:
             if isinstance(i, Event): i = i.name
-            A.addListener(i, self)
+            A.addListener(i, obj=self)
 
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)
