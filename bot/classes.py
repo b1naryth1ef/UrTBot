@@ -79,6 +79,15 @@ class Bot():
         self.redScore = int(line[0])
         self.blueScore = int(line[1])
 
+    def getPlayerTeam(self, cid):
+        i = self.Q.rcon('players').split('\n')[4:]
+        out = []
+        for l in i:
+            l = re.findall('([0-9]+): (.*?) (.*?) k:([0-9]+) d:([0-9]+) ping:([0-9]+) (.*?)', l)
+            if len(l):
+                if int(l[0]) == cid:
+                    return const.findTeam(l[2])
+
     def getPlayers(self): #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
         r = self.Q.rcon('players').split('\n') #@DEV THIS IS BROKEN. FIX FOR 4.2!!!
         self.setScores(r[3])
@@ -155,6 +164,7 @@ class Bot():
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
                 self.Clients[uid].getUser()
+                self.Clients[uid].waitingForBegin = False
             self.getPlayers() #Set team/score for players
 
     def getClientTeam(self): pass

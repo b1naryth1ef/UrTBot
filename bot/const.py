@@ -267,5 +267,5 @@ def findTeam(t):
         return teams[int(t)]
     else:
         for i in teams.values():
-            if t in i.shortName: return i
-            elif t in i.longName: return i
+            if t.lower() in i.shortName: return i
+            elif t.lower() in i.longName: return i
