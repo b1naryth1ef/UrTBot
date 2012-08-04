@@ -131,16 +131,22 @@ def parseKill(inp):
     method = int(inp[2][:-1])
     obj = {'attacker':atk, 'victim':vic, 'method':method}
     if method in [1, 3, 9, 39]: #Water, lava, trigger_hurt or flag (hot patato)
-        api.A.fireEvent('CLIENT_DIE_WORLD', obj.update({'client':vic}))
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_WORLD', obj)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
         if method == 10: vicobj.checkTeam() #Team switch
-        api.A.fireEvent('CLIENT_DIE_SUICIDE', obj.update({'client':vic}))
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_SUICIDE', obj)
     elif atk.team == vic.team and atk.name != vic.name: 
-        api.A.fireEvent('CLIENT_KILL_TK', obj.update({'client':atk}))
-        api.A.fireEvent('CLIENT_DIE_TK', obj.update({'client':vic}))
+        obj.update({'client':atk})
+        api.A.fireEvent('CLIENT_KILL_TK', obj)
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_TK', obj)
     else:
-        api.A.fireEvent('CLIENT_KILL_GEN', obj.update({'client':atk}))
-        api.A.fireEvent('CLIENT_DIE_GEN', obj.update({'client':vic}))
+        obj.update({'client':atk})
+        api.A.fireEvent('CLIENT_KILL_GEN', obj)
+        obj.update({'client':vic})
+        api.A.fireEvent('CLIENT_DIE_GEN', obj)
 
 def parseHit(inp):
     #Hit: 1 0 2 21: Skin_antifa(fr) hit Antho888 in the Torso
@@ -148,8 +154,10 @@ def parseHit(inp):
     atk = BOT.getClient(int(inp[1]))
     vic = BOT.getClient(int(inp[2]))
     a = {'attacker':atk, 'victim':vic, 'location':int(inp[3]), 'method':int(inp[4][:-1])}
-    api.A.fireEvent('CLIENT_HIT_ATK', a.update({'client':atk}))
-    api.A.fireEvent('CLIENT_HIT_DEF', a.update({'client':vic}))
+    a.update({'client':atk})
+    api.A.fireEvent('CLIENT_HIT_ATK', a)
+    a.update({'client':vic})
+    api.A.fireEvent('CLIENT_HIT_DEF', a)
 
 def parseItem(inp):
     #Item: 1 ut_weapon_ump45

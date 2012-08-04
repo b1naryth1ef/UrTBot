@@ -19,6 +19,12 @@ split = lambda s, l: [s[i:i+l] for i in range(0, len(s), l)]
 
 class RCON:
 	def __init__(self, server='localhost', password='password', port=27960):
+		"""
+		The main RCON class for interacting with servers.
+		server (str): The server, default is localhost
+		password (str): The rconpassword, default is password
+		port (int): The server port, default is 27960
+		"""
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		if ':' in server:
 			self.server, self.port = server.split(":")
@@ -59,6 +65,16 @@ class RCON:
 
 		return data[4:] if data != None else data
 
+	def getCvar(self, name):
+		"""
+		Get an rcon cvar, by name
+		"""
+		res = re.findall('print\\n".*?" is:"(.*?)\^7"', self.rcon(name))
+		if len(res):
+			if res.isdigit(): res = int(res[0])
+			else: res = res[0]
+			return res
+
 	def format(self, string, length):
 		new = None
 		for i in split(string, length):
@@ -66,6 +82,9 @@ class RCON:
 		return new
 
 	def rcon(self, cmd):
+		"""
+		Send an rcon command, cmd
+		"""
 		self.lock.acquire(1)
 		reply = self.cmd('rcon "%s" %s' % (self.password, cmd))
 		self.lock.release()

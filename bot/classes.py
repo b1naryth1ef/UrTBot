@@ -125,6 +125,8 @@ class Bot():
         
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
 
+        self.hasauth = bool((self.Q.getCvar('auth_enable')) #@NOTE this can fail !!
+        log.debug('Hasauth: %s' % self.hasauth)
         self.Q.rcon('sv_sayprefix "%s: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_tellprefix "%s [PM]: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_demonotice ""')
