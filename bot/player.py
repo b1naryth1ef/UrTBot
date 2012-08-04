@@ -85,7 +85,7 @@ class Player():
         self.user.save()
         self.uid = self.user.id
 
-    #def checkTeam(self): pass #@CHECK 4.2
+    def checkTeam(self): pass #@CHECK 4.2
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
