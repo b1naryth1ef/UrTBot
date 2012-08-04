@@ -147,6 +147,7 @@ class Bot():
                 log.debug('Add User: %s, %s' % (i, i[0]))
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
+                self.Clients[uid].getUser()
             self.getPlayers() #Set team/score for players
 
     def getClientTeam(self): pass
