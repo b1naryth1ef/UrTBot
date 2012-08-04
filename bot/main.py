@@ -193,7 +193,7 @@ def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
 def parsePlayerBegin(inp): 
     cli = BOT.getClient(int(inp.split(' ')[1]))
     if cli.waitingForBegin:
-        api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client:'BOT.getClient(cid)})
+        api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':BOT.getClient(cid)})
 
 def parseShutdownGame(inp): #@FIXME need better rcon msgs before I can do this
     api.A.fireEvent('GAME_SHUTDOWN', {})
