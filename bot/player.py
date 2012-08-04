@@ -85,7 +85,7 @@ class Player():
         self.uid = self.user.id
 
     def checkTeam(self):
-        log.debug('Player Team Verbose: Currently: %s | Players: %s' % (self.team, self.api.Q3.rcon('players')))
+        log.debug('Player Team Verbose: Currently: %s | Players: %s' % (self.team, self.api.Q3.R('players')))
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
