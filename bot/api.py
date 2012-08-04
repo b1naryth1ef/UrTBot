@@ -137,10 +137,10 @@ def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
         return target
     return decorator
 
-def listener(events, cid=None, uid=None):
+def listener(eventz, cid=None, uid=None):
     def decorator(target):
-        if not getattr(events, '__iter__', False):
-            events = [events]
+        if not getattr(eventz, '__iter__', False):
+            eventz = [eventz]
         for i in events:
             if isinstance(i, Event): i = i.name
             A.addListener(i, target, cid, uid)
