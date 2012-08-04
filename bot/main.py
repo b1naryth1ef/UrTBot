@@ -126,7 +126,9 @@ def parseClientDisconnect(inp): #ClientDisconnect: 0
 def parseKill(inp):
     #Kill: 1 0 15: WolfXxXBunny killed [WoC]*B1naryth1ef by UT_MOD_DEAGLE
     inp = inp.split(" ")[1:]
-    if int(inp[0]) == 1022: atk = None #We're world.
+    if int(inp[0]) == 1022: 
+        log.debug('We\'re world!')
+        atk = None #We're world.
     else: atk = BOT.getClient(int(inp[0])) #We're a player
     vic = BOT.getClient(int(inp[1]))
     method = int(inp[2][:-1])
