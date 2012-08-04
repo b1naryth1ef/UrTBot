@@ -31,7 +31,7 @@ class Bot():
         self.ClientBacklog = deque()
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 
-    def removeClient(cid):
+    def removeClient(self, cid):
         if len(self.ClientBacklog) > 10:
             self.ClientBacklog.popleft()
         self.ClientBacklog.append(self.Clients[cid])

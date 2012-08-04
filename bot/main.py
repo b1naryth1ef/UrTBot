@@ -209,7 +209,7 @@ def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
 
 def parsePlayerBegin(inp): 
     cli = BOT.getClient(int(inp.split(' ')[1]))
-    if cli.waitingForBegin:
+    if cli and cli.waitingForBegin: #@NOTE If the bot starts WHILE someone is loading, this can herpaderp
         api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':BOT.getClient(cid)})
 
 def parseShutdownGame(inp): #@FIXME need better rcon msgs before I can do this
@@ -284,9 +284,9 @@ def parse(inp):
     elif inp.startswith('Flag:'): parseFlag(inp)
     elif inp.startswith('Flag Return:'): parseFlagReturn(inp)
     elif inp.startswith('Hotpotato:'): parseHotPotato(inp) #@CHECK 4.2
-    elif inp.startswith("Callvote:"): parseCallVote(inp) #@CHECK 4.2
+    elif inp.startswith("Callvote:"): parseCallVote(inp)
     elif inp.startswith('Vote:'): parseVote(inp) #@CHECK 4.2
-    elif inp.startswith("Radio:"): parseRadio(inp) #@CHECK 4.2
+    elif inp.startswith("Radio:"): parseRadio(inp)
     elif inp.startswith('ClientBegin:'): parsePlayerBegin(inp)
     elif inp.startswith('ShutdownGame:'): parseShutdownGame(inp)
     elif inp.startswith('InitGame:'): parseInitGame(inp)

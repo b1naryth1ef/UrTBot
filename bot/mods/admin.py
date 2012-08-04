@@ -266,4 +266,4 @@ def onBoot():
     if config.block_1337:
         A.addListener('CLIENT_INFO_SET', clientInfoSetListener)
     if len([i for i in database.User.select().where(group=BOT.config.botConfig['leetlevel'])]):
-        A.removeCommand(leetCmd)
+        A.rmvCommand(leetCmd)
