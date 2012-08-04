@@ -61,14 +61,17 @@ default = {
     'ut4_turnpike','ut4_uptown' ],
     # PK3s that aren't actually maps
     'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
-                        'pak0^7', 'common-spog']
+                        'pak0^7', 'common-spog', 'zUrT42_0001',
+                        'zUrT42_0002', 'zUrT42_0003', 'zUrT42_0004',
+                        'zUrT42_0005', 'zUrT42_0006', 'zUrT42_0007',
+                        'zUrT42_0008', 'zUrT42_0009']
 }}
 
 class ConfigFile():
-    def __init__(self, configfile='config', default=default):
+    def __init__(self, configfile='config', defaulty=None):
         self.configfile = configfile.replace('.cfg', '')
         self.config = self.load(default)
-        self.default = default
+        self.default = defaulty or default
 
         self.check()
         self.save()
