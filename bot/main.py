@@ -96,6 +96,8 @@ def parseClientUserInfo(inp):
         log.debug('Got join CUI for #%s' % cid)
         BOT.Clients[cid] = player.Player(cid, varz, api)
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
+        if not BOT.hasauth: BOT.getClient(cid).getUser()
+        BOT.Clients[cid].waitingForBegin = True
 
         #@TODO Check/fix this for 4.2
         # if BOT.Clients[cid].cl_guid != None:
@@ -105,8 +107,7 @@ def parseClientUserInfo(inp):
         #         for p in pen:
         #             log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
         #             BOT.Clients[cid].kick(p.reason)
-
-        BOT.Clients[cid].waitingForBegin = True
+        
         f = {'client':BOT.getClient(cid), 'info':varz}
         #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
