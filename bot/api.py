@@ -149,7 +149,7 @@ def listener(eventz, cid=None, uid=None):
         if not getattr(eventz, '__iter__', False):
             eventz = [eventz]
         l = Listener(target, eventz, cid, uid)
-        return target
+        return l
     return decorator
 
 class Listener():
@@ -159,11 +159,25 @@ class Listener():
         self.uid = uid
         self.func = func
 
+        self.paused = False
+
         for i in events:
             if isinstance(i, Event): i = i.name
             A.addListener(i, obj=self)
 
+    def remove(self):
+        A.rmvListener(self)
+
+    def unpause(self):
+        if self.paused:
+            self.paused = False
+
+    def pause(self):
+        if not self.paused:
+            self.paused = True
+
     def __call__(self, *args, **kwargs):
+        if self.paused: return
         self.func(*args, **kwargs)
 
 class FiredCommand():
