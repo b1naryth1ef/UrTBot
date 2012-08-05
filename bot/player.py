@@ -77,7 +77,7 @@ class Player():
                 firstjoin=datetime.now(),
                 level=self.authlevel,
                 guid=self.cl_guid,
-                ip=self.ip,teamteam
+                ip=self.ip,
                 group=0,
                 )
             log.debug('Added user!')
