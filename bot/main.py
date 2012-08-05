@@ -94,7 +94,7 @@ def parseClientUserInfo(inp):
         log.debug('Got join CUI for #%s' % cid)
         BOT.Clients[cid] = player.Player(cid, varz, api)
         BOT.Clients[cid].setData(BOT.dumpUser(cid))
-        if not BOT.hasauth: BOT.getClient(cid).getUser()
+        if not BOT.authEnabled: BOT.getClient(cid).getUser()
         BOT.Clients[cid].waitingForBegin = True
 
         if BOT.Clients[cid].cl_guid != None:
