@@ -145,7 +145,7 @@ class Bot():
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
 
         self.serverData['hasauth'] = self.Q.getCvar('auth_enable')
-        if self.serverData['hasauth'].isdigit(): bool(int(self.serverData['hasauth']))
+        if type(self.serverData['hasauth']) is int: bool(self.serverData['hasauth'])
         else: log.error('Error getting hasauth: %s' % self.serverData['hasauth'])
 
         if self.serverData['hasauth'] and self.config.botConfig['use_auth']:
