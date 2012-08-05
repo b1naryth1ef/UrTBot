@@ -16,10 +16,12 @@ defaultcfg = {
 'botConfig':{
     'prefix': "^1[^2BOT^1]: ",
     'cmd_prefix':'!',
-    'cmd_on_team_say':True,
+    'cmd_on_sayteam':True,
+    'cmd_on_selftell':True,
+    'use_auth':False,
     'rcon': "MyPassword123",
     'rconip': "localhost:27960",
-    'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg" ,
+    'servercommand': "~/UrbanTerror/ioUrTded.i386 +set dedicated 2 +exec server.cfg",
     'serversocket': "/tmp/quake3_27961",
     'plugins':[],
     'leetlevel':5,
@@ -31,12 +33,10 @@ defaultcfg = {
         {'name':'admin', 'minlevel':1, 'maxlevel':5, 'levels':[]},
         {'name':'uberadmin', 'minlevel':1, 'maxlevel':6, 'levels':[]}
     ],
-    'permissions':{
-    },
+    'permissions':{}
 },
 
 'dbConfig':{
-    'connecter':'peewee',
     'type':'sqlite',
     'name':'urtbot.db',
     'args':{},
@@ -58,7 +58,7 @@ defaultcfg = {
     'ut4_maya','ut4_oildepot','ut4_prague','ut4_ramelle','ut4_ricochet',
     'ut4_riyadh','ut4_sanc','ut4_snoppis','ut4_suburbs','ut4_subway',
     'ut4_swim','ut4_thingley','ut4_tombs','ut4_toxic','ut4_tunis',
-    'ut4_turnpike','ut4_uptown' ],
+    'ut4_turnpike','ut4_uptown', 'ut4_raiders', 'ut4_cascade', 'ut4_kingpin'],
     # PK3s that aren't actually maps
     'ignoremaps' : [ 'zpak000', 'zpak000_assets', 'zpak001_assets',
                         'pak0^7', 'common-spog', 'zUrT42_0001',

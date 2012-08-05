@@ -24,6 +24,11 @@ events = {
 config = ConfigFile(os.path.join(A.configs_path, 'adminconfig.cfg'), default=default_config)
 kicks = []
 
+@command('register', 'Get some basic permissions!', '', level=0, alias=['reg'])
+def registerCmd(obj):
+    obj.client.setLevel(1)
+    obj.client.tell('You now have some basic permissions!')
+
 @command('cyclemap', 'Cycle the map.', '[delay (secs)]', level=4, alias=['cycle'])
 def cycleMapCmd(obj):
     m = obj.msg.split(' ', 1)

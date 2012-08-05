@@ -20,7 +20,7 @@ class API():
         self.Q3 = None
         self.config = None
 
-        self.configs_path = os.path.join('./', 'bot', 'mods', 'config')
+        self.configs_path = os.path.join('.', 'bot', 'mods', 'config')
 
     def finishBooting(self, bot, config):
         self.booted = True
@@ -215,7 +215,7 @@ class Event():
     def fire(self, data={}):
         A.fireEvent(self.name, obj=self.getObj(data))
 
-#CLIENT
+#BUILT-IN EVENTS
 Event('CLIENT_HIT_ATK'),
 Event('CLIENT_HIT_DEF'),
 Event('CLIENT_DIE_TK'),
@@ -242,7 +242,6 @@ Event('CLIENT_INFO_CHANGE'),
 Event('CLIENT_GEN_CALLVOTE'),
 Event('CLIENT_GEN_VOTE'),
 Event('CLIENT_GEN_RADIO'),
-#GAME
 Event('GAME_MATCH_START'),
 Event('GAME_ROUND_START'),
 Event('GAME_ROUND_END'),
@@ -259,6 +258,8 @@ Event('GAME_FLAG_CAPTURE'),
 Event('GAME_FLAG_PICKUP'),
 Event('GAME_FLAG_DROP'),
 Event('GAME_FLAG_HOTPOTATO'),
+Event('GAME_BOMB_PLANT'), #@TODO add this
+Event('GAME_BOMB_EXPLODE'), #@TODO add this
 
 def setup(BOT):
     global Q3, A

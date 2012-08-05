@@ -52,6 +52,10 @@ class Player():
         except Exception, e:
             log.debug(e)
 
+    def setLevel(self, lvl):
+        self.user.group = lvl
+        self.user.save()
+
     def setTeam(self):
         self.team = self.A.B.getPlayerTeam(self.cid)
 

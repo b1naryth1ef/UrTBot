@@ -21,9 +21,11 @@ class Bot():
         
         self.maplist = self.config.UrTConfig['maps']
         self.gameData = {}
+        self.serverData = {}
         self.currentMap = None
         self.loadingMap = False
         self.justChangedMap = False
+        self.authEnabled = False
 
         self.demos = {}
 
@@ -35,7 +37,7 @@ class Bot():
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
 
     def getGroup(gid):
-        return self.config.groups.get(gid)
+        return self.config.botConfig['groups'].get(gid)
 
     def removeClient(self, cid):
         if cid in self.Clients.keys():
@@ -142,8 +144,17 @@ class Bot():
         
         self.maplist += [i for i in self.Q.rcon("sv_pakNames").split('"')[3].split() if i not in self.config.UrTConfig['ignoremaps']]
 
-        self.hasauth = bool((self.Q.getCvar('auth_enable'))) #@NOTE this can fail !!
-        log.debug('Hasauth: %s' % self.hasauth)
+        self.serverData['hasauth'] = self.Q.getCvar('auth_enable')
+        if self.serverData['hasauth'].isdigit(): bool(int(self.serverData['hasauth']))
+        else: log.error('Error getting hasauth: %s' % self.serverData['hasauth'])
+
+        if self.serverData['hasauth'] and self.config.botConfig['use_auth']:
+            self.authEnabled = True
+            log.info('Auth is enabled!')
+        else:
+            self.authEnabled = False
+            log.info('Auth is disabled!')
+
         self.Q.rcon('sv_sayprefix "%s: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_tellprefix "%s [PM]: "' % self.config.botConfig['prefix'])
         self.Q.rcon('sv_demonotice ""')
@@ -168,6 +179,8 @@ class Bot():
                 #self.Clients[uid].setTeam()
                 self.Clients[uid].waitingForBegin = False
             self.getPlayers() #Set team/score for players
+
+    def refreshPlayers(self): pass
 
     def getClientTeam(self): pass
 
