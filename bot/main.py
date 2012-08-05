@@ -66,13 +66,11 @@ def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
     api.A.fireEvent('CLIENT_SAY_TEAM', info)
 
-#@CHECK untested
 def parseTell(inp): #saytell: 0 0 B1naryTh1ef: test
     inp = inp.split(' ', 4)
     info = {'client':BOT.getClient(int(inp[1])), 'to':BOT.getClient(int(inp[2])), 'msg':inp[4]}
     api.A.fireEvent('CLIENT_SAY_TELL', info) 
 
-#@CHECK 4.2
 def parseReconnect(inp): #68.255.111.133:27960:reconnect
     ip = inp.strip(':reconnect')
     for cli in BOT.Clients.values():
@@ -99,17 +97,17 @@ def parseClientUserInfo(inp):
         if not BOT.hasauth: BOT.getClient(cid).getUser()
         BOT.Clients[cid].waitingForBegin = True
 
-        #@TODO Check/fix this for 4.2
-        # if BOT.Clients[cid].cl_guid != None:
-        #     log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
-        #     pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
-        #     if len(pen):
-        #         for p in pen:
-        #             log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-        #             BOT.Clients[cid].kick(p.reason)
+        if BOT.Clients[cid].cl_guid != None:
+            log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
+            pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
+            penb = [i for i in database.Penalty.select().where(ip=BOT.getClient(cid).ip)]
+            if len(pen) or len(penb):
+                pen += penb
+                for p in pen:
+                    log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                    BOT.Clients[cid].kick(p.reason)
         
         f = {'client':BOT.getClient(cid), 'info':varz}
-        #api.A.fireEvent('CLIENT_CONN_CONNECTED', f)
         api.A.fireEvent('CLIENT_INFO_SET', f)
 
 def parseClientUserInfoChanged(inp):
@@ -212,9 +210,10 @@ def parseRadio(inp): #Radio: 0 - 7 - 2 - "New Alley" - "I'm going for the flag"
 def parsePlayerBegin(inp): 
     cli = BOT.getClient(int(inp.split(' ')[1]))
     if cli and cli.waitingForBegin: #@NOTE If the bot starts WHILE someone is loading, this can herpaderp
+        cli.waitingForBegin = False
         api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':cli})
 
-def parseShutdownGame(inp): #@FIXME need better rcon msgs before I can do this
+def parseShutdownGame(inp): #@DEV waiting for cleaner rcon messages
     api.A.fireEvent('GAME_SHUTDOWN', {})
     if BOT.logback[0] in ['cyclemap' or 'map']: BOT.matchEnd()
     else: log.debug('Sounds like server is going down...')
@@ -231,7 +230,7 @@ def parseSurvivorWinner(inp):
         BOT.roundEnd()
     else: log.warning('Wait... Got SurvivorWinner but we\'re not playing TS, BM, or FTL?')
 
-def parseClientKick(inp): #@FIXME Hopefully barb will add some better debug
+def parseClientKick(inp): #@DEV Silly lack of kick messages is silly
     def _user_kicked(inp):  
         time.sleep(5)
         cur = BOT.curClients()

@@ -1,10 +1,11 @@
 import socket, select, time, re, thread
 import bot, player, const, database, main
-from debug import log
-import thread_handler as thread
-from rcon import RCON
-from collections import deque
 import sys, os, time
+import thread_handler as thread
+from collections import deque
+from rcon import RCON
+from debug import log
+from datetime import datetime
 
 class Bot():
     def __init__(self, config=None, database=None):
@@ -12,6 +13,8 @@ class Bot():
         self.Q = RCON(config.botConfig['rconip'], config.botConfig['rcon'])
         self.database = database
         self.config = config
+
+        self.boottime = datetime.now() #@NOTE this could be more acurate but screw it
 
         self.enabled = True
         self.logback = deque()
@@ -30,6 +33,9 @@ class Bot():
         self.Clients = {} #AKA players
         self.ClientBacklog = deque()
         self.curClients = lambda: [int(i[0]) for i in self.getStatus()]
+
+    def getGroup(gid):
+        return self.config.groups.get(gid)
 
     def removeClient(self, cid):
         if cid in self.Clients.keys():
@@ -72,6 +78,16 @@ class Bot():
         line = re.findall('.*?(\\d+)', line)
         self.redScore = int(line[0])
         self.blueScore = int(line[1])
+
+    def getPlayerTeam(self, cid):
+        i = self.Q.rcon('players').split('\n')[4:]
+        out = []
+        for l in i:
+            l = re.findall('([0-9]+): (.*?) (.*?) k:([0-9]+) d:([0-9]+) ping:([0-9]+) (.*?)', l)
+            if len(l):
+                l = l[0]
+                if int(l[0]) == cid:
+                    return const.findTeam(l[2])
 
     def getPlayers(self): #0: Eduardodias2012 BLUE k:9 d:11 ping:196 200.181.147.46:44453
         r = self.Q.rcon('players').split('\n') #@DEV THIS IS BROKEN. FIX FOR 4.2!!!
@@ -149,6 +165,8 @@ class Bot():
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
                 self.Clients[uid].getUser()
+                #self.Clients[uid].setTeam()
+                self.Clients[uid].waitingForBegin = False
             self.getPlayers() #Set team/score for players
 
     def getClientTeam(self): pass

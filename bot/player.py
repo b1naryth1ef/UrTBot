@@ -13,7 +13,6 @@ class Player():
         self.score = [0,0]
         self.api = api
         self.A = self.api.A
-        self.group = 0 #@TODO 4.2
 
         self.waitingForBegin = True
 
@@ -53,19 +52,22 @@ class Player():
         except Exception, e:
             log.debug(e)
 
+    def setTeam(self):
+        self.team = self.A.B.getPlayerTeam(self.cid)
+
     def updateInfo(self, d):
         self.__dict__.update(d)
         
     def getUser(self):
-        log.debug('Attempting to get user for %s' % self.__repr__())
+        log.debug('Attempting to get user for %s' % self.cid)
         if self.authname and self.hasauth: q = [i for i in database.User.select().where(authname=self.authname)]
         q2 = [i for i in database.User.select().where(guid=self.cl_guid)]
         if self.hasauth and self.authname and len(q): 
             self.user = q[0]
-            log.debug('Found user from authinfo!')
+            log.debug('Found user from authinfo! (UID #%s)' % self.user.id)
         elif len(q2) and not self.hasauth: #@DEV dont find users that have auth? 
             self.user = q2[0]
-            log.debug('Found user w/o authinfo!')
+            log.debug('Found user w/o authinfo! (UID #%s)' % self.user.id)
         else: 
             self.user = database.User(
                 name=self.name, 
@@ -76,16 +78,21 @@ class Player():
                 level=self.authlevel,
                 guid=self.cl_guid,
                 ip=self.ip,
-                group=self.group,
+                group=0,
                 )
-            log.debug('Added user with authname "%s"' % self.authname)
+            log.debug('Added user!')
 
         self.user.lastjoin = datetime.now()
         self.user.joincount += 1
         self.user.save()
         self.uid = self.user.id
 
-    def checkTeam(self): pass #@CHECK 4.2
+    def checkTeam(self):
+        t = self.A.B.getPlayerTeam(self.cid)
+        if t != self.team:
+            log.debug('Player %s switched teams %s >> %s' % (self.cid, self.team, t))
+            self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':t, 'from':self.team})
+            self.team = t
 
     def tell(self, msg):
         self.api.Q3.tell(self, msg)
@@ -100,9 +107,9 @@ class Player():
         if 'name' in data.keys(): 
             self.name = data['name']
             #self.checkAlias()
-        if 'team' in data.keys() and self.team != None and self.team != data['team']:
-            self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
-            self.team = data['team']
+        if 'team' in data.keys() and self.team != None and self.team != data['team']: pass
+            #self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
+            #self.team = data['team']
         self.__dict__.update(data)
 
     def __repr__(self):

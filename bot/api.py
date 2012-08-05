@@ -73,26 +73,33 @@ class API():
                 self.listeners['cats']['_'.join(n)] = []
         log.debug('Event %s has been registered!' % '_'.join(name))
 
-    def addListener(self, name, func, cid=None, uid=None):
+    def addListener(self, name, func=None, cid=None, uid=None, obj=None):
         if isinstance(name, Event):
             name = name.name
-        if not self.booted: 
-            self.listenActions.append((name, func, cid, uid))
+        if not self.booted:
+            self.listenActions.append((name, func, cid, uid, obj))
             return
+        if not obj:
+            obj = Listener(func, [name], cid, uid)
         if name in self.listeners['eves']:
-            return self.listeners['eves'][name].append([func, cid, uid])
+            return self.listeners['eves'][name].append(obj)
         if name in self.listeners['cats']:
-            return self.listeners['cats'][name].append([func, cid, uid])
+            return self.listeners['cats'][name].append(obj)
         log.warning("Event %s has not been registered!" % (name))
 
-    def rmvListener(self, func, name=None): pass #@TODO write this
+    def rmvListener(self, obj): #@DEV This could be cleaner
+        for eve in obj.events:
+            for i in [i for i in self.listeners['eves'][eve]]+[i for i in self.listeners['cats'][eve]]:
+                if i == obj:
+                    del i
 
     def fireEvent(self, names, data={}, obj=None):
         def _feve(i):
             if 'client' in data:
-                if i[1] and i[1] != data['client'].cid: return
-                if i[2] and i[2] != data['client'].uid: return
-            thread.fireThread(i[0], obj)
+                if i.cid and i.cid != data['client'].cid: return
+                if i.uid and i.uid != data['client'].uid: return
+            thread.fireThread(i, obj)
+
         if type(names) in (str, int): names = [names]
         elif type(names) != list: names = list(names)
         for name in names:
@@ -141,11 +148,23 @@ def listener(eventz, cid=None, uid=None):
     def decorator(target):
         if not getattr(eventz, '__iter__', False):
             eventz = [eventz]
-        for i in events:
-            if isinstance(i, Event): i = i.name
-            A.addListener(i, target, cid, uid)
+        l = Listener(target, eventz, cid, uid)
         return target
     return decorator
+
+class Listener():
+    def __init__(self, func, events, cid, uid):
+        self.events = events
+        self.cid = cid
+        self.uid = uid
+        self.func = func
+
+        for i in events:
+            if isinstance(i, Event): i = i.name
+            A.addListener(i, obj=self)
+
+    def __call__(self, *args, **kwargs):
+        self.func(*args, **kwargs)
 
 class FiredCommand():
     def __init__(self, cmd, data, obj):
