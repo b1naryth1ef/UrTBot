@@ -81,6 +81,7 @@ class API():
             return
         if not obj:
             obj = Listener(func, [name], cid, uid)
+            return #@NOTE The listener will call us, this is to avoid dupes
         if name in self.listeners['eves']:
             return self.listeners['eves'][name].append(obj)
         if name in self.listeners['cats']:
@@ -207,7 +208,6 @@ class Event():
         self.n = self.name.split('_')
         self.cats = '_'.join(self.n[:-1])
         A.addEvent(self.n, self)
-        #EVENTS[name] = self
 
     def getObj(self, data={}):
         return FiredEvent(self.name, data, self.cats)
