@@ -24,7 +24,7 @@ class Player():
         try:
             self.name = None
             self.ip = None
-            self.team = self.A.B.getPlayerTeam(self.cid)
+            self.team = SPEC_TEAM
             self.model = None
             self.sex = None
             self.headmodel = None
@@ -52,6 +52,9 @@ class Player():
         except Exception, e:
             log.debug(e)
 
+    def setTeam(self):
+        self.team = self.A.B.getPlayerTeam(self.cid)
+
     def updateInfo(self, d):
         self.__dict__.update(d)
         
@@ -74,7 +77,7 @@ class Player():
                 firstjoin=datetime.now(),
                 level=self.authlevel,
                 guid=self.cl_guid,
-                ip=self.ip,
+                ip=self.ip,teamteam
                 group=0,
                 )
             log.debug('Added user!')

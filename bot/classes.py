@@ -165,6 +165,7 @@ class Bot():
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
                 self.Clients[uid].getUser()
+                self.Clients[uid].setTeam()
                 self.Clients[uid].waitingForBegin = False
             self.getPlayers() #Set team/score for players
 
