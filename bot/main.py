@@ -53,6 +53,7 @@ def renderUserInfoChange(inp):
 def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
     inp = inp.split(' ', 3)[1:]
     info = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
+    info['client'].lastMsg = time.time()
     if len(inp) > 2 and info['msg'].startswith(botConfig['cmd_prefix']):
         api.A.fireEvent('CLIENT_SAY_CMD', info)
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
@@ -61,7 +62,8 @@ def parseSay(inp): #say: 0 [WoC]*B1naryth1ef: blah blah
 def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
     inp = inp.split(' ', 3)[1:]
     info = {'name':inp[1][:-1], 'client':BOT.getClient(int(inp[0])), 'msg':inp[2]}
-    if len(inp) > 2 and info['msg'].startswith(botConfig['cmd_prefix']) and botConfig['cmd_on_team_say'] is True:
+    info['client'].lastMsg = time.time()
+    if len(inp) > 2 and info['msg'].startswith(botConfig['cmd_prefix']) and botConfig['cmd_on_sayteam'] is True:
         api.A.fireEvent('CLIENT_SAY_CMD', info)
         api.A.fireCommand(inp[2][1:].rstrip().split(' ')[0], info)
     api.A.fireEvent('CLIENT_SAY_TEAM', info)
@@ -69,7 +71,11 @@ def parseSayTeam(inp): #sayteam: 0 `SoC-B1nzy: yay?
 def parseTell(inp): #saytell: 0 0 B1naryTh1ef: test
     inp = inp.split(' ', 4)
     info = {'client':BOT.getClient(int(inp[1])), 'to':BOT.getClient(int(inp[2])), 'msg':inp[4]}
-    api.A.fireEvent('CLIENT_SAY_TELL', info) 
+    info['client'].lastMsg = time.time()
+    if info['msg'].startswith(botConfig['cmd_prefix']) and botConfig['cmd_on_saytell'] is True:
+        api.A.fireEvent('CLIENT_SAY_CMD', info)
+        api.A.fireCommand(info['msg'].split(' ')[0][1:], info)
+    api.A.fireEvent('CLIENT_SAY_TELL', info)
 
 def parseReconnect(inp): #68.255.111.133:27960:reconnect
     ip = inp.strip(':reconnect')
@@ -84,6 +90,8 @@ def parseReconnect(inp): #68.255.111.133:27960:reconnect
 def parseClientConnect(inp): #ClientConnect: 0
     cid = int(re.findall('ClientConnect\: ([0-9]+)', inp)[0])
     api.A.fireEvent('CLIENT_CONN_CONNECT', {"cid":cid})
+    if cid in BOT.Clients.keys():
+        BOT.removeClient(cid)
 
 def parseClientUserInfo(inp):
     cid, varz = renderUserInfo(inp)
@@ -100,12 +108,11 @@ def parseClientUserInfo(inp):
         if BOT.Clients[cid].cl_guid != None:
             log.info('User %s connected with Game ID %s and Database ID %s' % (BOT.Clients[cid].name, BOT.Clients[cid].cid, BOT.Clients[cid].uid))
             pen = [i for i in database.Penalty.select().where(user=BOT.Clients[cid].user, expire_date__gt=datetime.now(), penalty="ban", active=True)]
-            penb = [i for i in database.Penalty.select().where(ip=BOT.getClient(cid).ip)]
+            penb = [i for i in database.Penalty.select().where(ip=BOT.getClient(cid).ip, active=True)]
             if len(pen) or len(penb):
                 pen += penb
-                for p in pen:
-                    log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
-                    BOT.Clients[cid].kick(p.reason)
+                log.info('Disconnecting user %s because they have an outstanding ban!' % BOT.Clients[cid].name)
+                BOT.Clients[cid].kick(pen[0].reason)
         
         f = {'client':BOT.getClient(cid), 'info':varz}
         api.A.fireEvent('CLIENT_INFO_SET', f)
@@ -212,6 +219,7 @@ def parsePlayerBegin(inp):
     if cli and cli.waitingForBegin: #@NOTE If the bot starts WHILE someone is loading, this can herpaderp
         cli.waitingForBegin = False
         api.A.fireEvent('CLIENT_CONN_CONNECTED', {'client':cli})
+        BOT.refreshPlayers()
 
 def parseShutdownGame(inp): #@DEV waiting for cleaner rcon messages
     api.A.fireEvent('GAME_SHUTDOWN', {})
@@ -248,8 +256,7 @@ def parseTimeLimitHit(inp):
 
 def parseAccountValidated(inp): #@CHECK
     #AccountValidated: 0 - civil - -1 - "well known"
-    inp = inp.split('AccountValidated:')[-1]
-    inp = inp.split('-')
+    inp = inp.split('AccountValidated:')[-1].split('-')
     cid = int(inp[0])
     info = {
         'authname':inp[1],
@@ -307,19 +314,22 @@ def loadConfig(cfg):
         log.critical('Error loading main config... [%s]' % e)
         sys.exit()
 
+def loadMod(name):
+    log.info('Loading plugin %s' % name)
+    __import__('bot.mods.'+name)
+    i = sys.modules['bot.mods.'+name]
+    BOT.A.addPlugin(name, i)
+    try: 
+        if hasattr(i, 'onBoot'): thread.fireThread(i.onBoot)
+        log.info('Loaded plugin %s' % i.__name__)
+        modules.append(i)
+    except Exception, e:
+        log.warning('Error loading plugin %s [%s]' % (i, e))
+
 def loadMods():
     global BOT, config
     for name in config_plugins:
-        log.info('Loading plugin %s' % name)
-        __import__('bot.mods.'+name)
-        i = sys.modules['bot.mods.'+name]
-        BOT.A.addPlugin(name, i)
-        try: 
-            if hasattr(i, 'onBoot'): thread.fireThread(i.onBoot)
-            log.info('Loaded plugin %s' % i.__name__)
-            modules.append(i)
-        except Exception, e:
-            log.warning('Error loading plugin %s [%s]' % (i, e))
+        loadMod(name)
 
 def loop():
     """Round and round in circles we go!"""

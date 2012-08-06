@@ -3,6 +3,7 @@ import database, const
 from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
+from api import PlayerStorage
 
 class Player():
     def __init__(self, cid, data, api):
@@ -13,7 +14,9 @@ class Player():
         self.score = [0,0]
         self.api = api
         self.A = self.api.A
+        self.lastMsg = 0
 
+        self.storage = PlayerStorage(self.cid)
         self.waitingForBegin = True
 
         self.hasauth = False
@@ -111,10 +114,8 @@ class Player():
         if 'name' in data.keys(): 
             self.name = data['name']
             #self.checkAlias()
-        if 'team' in data.keys() and self.team != None and self.team != data['team']: pass
-            #self.A.fireEvent('CLIENT_TEAM_SWITCH', {'client':self, 'to':data['team'], 'from':self.team})
-            #self.team = data['team']
+        if 'team' in data.keys(): del data['team'] #@NOTE Dont overwrite team dict
         self.__dict__.update(data)
 
     def __repr__(self):
-        return "<Player '%s' with IP %s, CID %s, UID %s, GUID %s>" % (self.name, self.ip, self.cid, self.uid, self.cl_guid)
+        return "<Player '%s' with CID[%s] UID[%s]>" % (self.name, self.cid, self.uid)

@@ -139,6 +139,18 @@ class API():
 
 A = API()
 
+class FancyStorage(object):
+    def __getitem__(self, item):
+        return self.__dict__[item]
+    def __setitem__(self, item, value):
+        self.__dict__[item] = value
+    def __delitem__(self, item):
+        del self.__dict__[item]
+
+class PlayerStorage(FancyStorage): 
+    def __init__(self, player):
+        self.player = player
+
 def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
     def decorator(target):
         A.addCommand(cmd, target, desc, usage, level, alias)

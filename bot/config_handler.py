@@ -14,7 +14,7 @@ import pprint, json
 
 defaultcfg = {
 'botConfig':{
-    'prefix': "^1[^2BOT^1]: ",
+    'prefix': "^1[^2BOT^1]",
     'cmd_prefix':'!',
     'cmd_on_sayteam':True,
     'cmd_on_selftell':True,

@@ -41,8 +41,9 @@ class RCON:
 		self.socket.connect((self.server, self.port))
 		self.socket.settimeout(0.75)
 
-	def send(self, data):
-		self.socket.send('\xFF\xFF\xFF\xFF' + str(data))
+	def send(self, data, errmsg="Could not send rcon!"):
+		try: self.socket.send('\xFF\xFF\xFF\xFF' + str(data))
+		except socket.error: print errmsg
 
 	def recv(self):
 		data = None

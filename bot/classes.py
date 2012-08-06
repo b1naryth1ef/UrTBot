@@ -40,11 +40,15 @@ class Bot():
         return self.config.botConfig['groups'].get(gid)
 
     def removeClient(self, cid):
-        if cid in self.Clients.keys():
+        log.debug('Attempting to remove client #%s' % cid)
+        if int(cid) in self.Clients.keys():
             if len(self.ClientBacklog) > 10:
                 self.ClientBacklog.popleft()
             self.ClientBacklog.append(self.Clients[cid])
             del self.Clients[cid]
+            log.debug('Removed client w/ CID #%s' % cid)
+        else:
+            log.debug('Client w/ CID #%s could not be removed, the cid is invalid')
 
     def roundNew(self):
         log.debug('New round starting!')
@@ -65,9 +69,12 @@ class Bot():
         self.A.fireEvent('GAME_MATCH_END', {'redscore':self.redScore, 'bluescore':self.blueScore})
         self.loadingMap = True
     
-    def getClient(self, uid): 
-        if uid in self.Clients.keys():
-            return self.Clients[uid]
+    def getClient(self, cid):
+        log.debug('Attempting to get client #%s' % cid)
+        if cid in self.Clients.keys():
+            log.debug('Found client #%s' % cid)
+            return self.Clients[cid]
+        log.debug('Could not find client #%s' % cid)
 
     def getGameType(self):
         r = self.Q.rcon('g_gametype')
@@ -131,7 +138,7 @@ class Bot():
         self.Q3 = self.A.Q3
         log.info('SETUP: BOT')
 
-        resp = self.Q3.R("say \"^3Starting up...\"")
+        resp = self.Q3.R("say \"^3UrTBot is starting up...\"")
         if resp is None:
             log.critical('The server is not reachable. Check the ip/port and try again!')
             sys.exit()
@@ -176,7 +183,6 @@ class Bot():
                 uid = int(i[0])
                 self.Clients[uid] = player.Player(uid, self.dumpUser(uid), self.api)
                 self.Clients[uid].getUser()
-                #self.Clients[uid].setTeam()
                 self.Clients[uid].waitingForBegin = False
             self.getPlayers() #Set team/score for players
 

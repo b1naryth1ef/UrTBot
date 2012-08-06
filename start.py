@@ -2,7 +2,7 @@
 from bot.main import Start
 import sys, os, time
 
-_version_ = "0.4dev"
+_version_ = "0.4.1dev"
 _author_ = "B1naryth1ef"
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 from bot.config_handler import ConfigFile
-from bot.main import BOT
+from bot.main import BOT, loadMod
 from bot.api import listener, Event, command, A, Q3
 from bot.debug import log
 from datetime import datetime
@@ -38,7 +38,8 @@ def cycleMapCmd(obj):
             delay = int(m[1])
         else:
             return obj.client.tell('The delay value was invalid!')
-    if delay > 30: delay = 30
+    if delay > 60: delay = 60
+    obj.client.tell('The map will be cycled in ^1%s ^3seconds!' % delay)
     time.sleep(delay)
     Q3.R('cyclemap')
 
@@ -148,9 +149,9 @@ def banCmd(obj):
         database.Penalty(user=o.user, admin=obj.client.user, penalty="ban", reason=reason, creation_date=datetime.now(), expire_date=dur, active=True).save()
         events['ban'].fire({'client':o})
         events['kick'].fire({'client':o})
+        obj.client.tell('^1Successfully banned ^3%s!' % o.name)
         A.Q3.kick(o, reason)
-    else:
-        obj.usage()
+    else: obj.usage()
 
 @command('unban', 'Unban a user.', '<name/@uid>', 5, ['ub'])
 def unbanCmd(obj):
@@ -271,21 +272,21 @@ def cmdAlias(obj):
         obj.usage()
 
 @command('smite', 'Smite a user.', '<{user}> [msg]', 5, ['kill'])
-def cmdSmite(obj):
+def smiteCmd(obj):
     m = obj.msg.split(' ', 2)
     if len(m) >= 2:
         o = Q3.getObj(m[1], obj.client.tell)
         if not o: return
         Q3.smite(o)
         if len(m) == 3:
-            o.tell(msg[2:])
+            o.tell(m[2])
     else: obj.usage()
 
 @command('status', 'Get the bot status.', '', 4)
-def cmdStatus(obj):
+def statusCmd(obj):
     uptime = datetime.now()-BOT.boottime
     db_count = len([i for i in database.User.select()])
-    msg = "^3Uptime: ^1%s\n^3DB User Count: ^1%s" % (uptime, db_count)
+    msg = "^3Uptime: ^1%s\n^3DB User Count: ^1%s\n" % (uptime, db_count)
     obj.client.tell(msg)
 
 def clientInfoSetListener(obj):
