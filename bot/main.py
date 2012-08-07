@@ -141,7 +141,7 @@ def parseKill(inpz):
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_WORLD', obj)
     elif method in [7, 6, 10, 31, 32]: #Various suicides
-        if method == 10: vic.checkTeam() #Team switch
+        if method == 10 and vic: vic.checkTeam() #Team switch
         obj.update({'client':vic})
         api.A.fireEvent('CLIENT_DIE_SUICIDE', obj)
     elif atk and vic and atk.team == vic.team and atk.name != vic.name: 

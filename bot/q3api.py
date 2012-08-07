@@ -7,7 +7,7 @@ class Q3API():
         self.Q = bot.Q
         self.R = bot.Q.rcon
 
-        #@CHECK 4.2
+        #@TODO generate from prefixes
         self.prefix = self.B.prefix
         self.saylength = 69
         self.telllength = 64
@@ -26,12 +26,14 @@ class Q3API():
         return self.R('%sserverdemo %s' % (act, plyr))
 
     def say(self, msg):
+        msg = self.Q.format('^3'+msg, self.saylength)
         log.debug("Saying: %s" % msg)
-        return self.R('say "%s"' % (self.Q.format('^3'+msg, self.saylength)))
+        return self.R('say "%s"' % msg)
 
     def tell(self, plyr, msg):
+        msg = self.Q.format('^3'+msg, self.telllength)
         log.debug('Telling %s: %s' % (plyr, msg))
-        return self.R('tell %s "%s"' % (self._rp(plyr), self.Q.format('^3'+msg, self.telllength)))
+        return self.R('tell %s "%s"' % (self._rp(plyr), msg))
 
     def force(self, plyr, team):
         log.debug('Forcing %s to %s' % (plyr, team))
@@ -41,14 +43,14 @@ class Q3API():
         log.debug('Kicking %s' % plyr)
         return self.R('kick %s "%s"' % (self._rp(plyr), reason))
 
-    def smite(self, plyr): #@CHECK 4.2
+    def smite(self, plyr):
         log.debug('Smiting %s' % plyr)
         return self.R('smite %s' % self._rp(plyr))
 
-    def startDemo(self, plyr, allplyr=False): #@CHECK 4.2
+    def startDemo(self, plyr, allplyr=False):
         self._demo('start', plyr, allplyr)
 
-    def stopDemo(self, plyr, allplyr=False): #@CHECK 4.2
+    def stopDemo(self, plyr, allplyr=False):
         self._demo('stop', plyr, allplyr)
 
     def getObj(self, txt, reply=None):
