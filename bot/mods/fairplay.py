@@ -10,7 +10,7 @@ default_config = {
     	'hit':15,
     	'kill':100,
     	'max':300,
-    }
+    },
     'groups':{
     	1:{'max': 300},
     	2:{'max': 400},

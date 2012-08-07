@@ -151,6 +151,12 @@ class PlayerStorage(FancyStorage):
     def __init__(self, player):
         self.player = player
 
+    def addPlugin(self, name):
+        self[plugin] = FancyStorage()
+
+    def rmvPlugin(self, name):
+        del self[plugin]
+
 def command(cmd, desc='None', usage="{cmd}", level=0, alias=[]):
     def decorator(target):
         A.addCommand(cmd, target, desc, usage, level, alias)

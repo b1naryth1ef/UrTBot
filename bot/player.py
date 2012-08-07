@@ -3,7 +3,6 @@ import database, const
 from debug import log
 from datetime import datetime
 from const import RED_TEAM, BLUE_TEAM, SPEC_TEAM
-from api import PlayerStorage
 
 class Player():
     def __init__(self, cid, data, api):
@@ -16,7 +15,7 @@ class Player():
         self.A = self.api.A
         self.lastMsg = 0
 
-        self.storage = PlayerStorage(self.cid)
+        self.storage = self.api.PlayerStorage(self.cid)
         self.waitingForBegin = True
 
         self.hasauth = False
