@@ -92,24 +92,23 @@ class ConfigFile():
             f.write(s)
 
     def check(self):
-        for key in self.default:
-            if key not in self.config.keys():
-                log.warning('Could not find %s key! Adding to config...')
-                self.config[key] = self.default[key]
-            if type(self.default[key]) is dict:
-                for _key in self.default[key].keys():
-                    if _key not in self.config[key].keys():
-                        log.warning('Could not find subkey %s of %s. Adding...' % (key, _key))
-                        self.config[key][_key] = self.default[key][_key]
-        for key in self.config:
-            if key not in self.default:
-                log.warning('Found key %s which is no longer needed! Removing...')
-                del self.config[key]
-            if type(self.default[key]) is dict:
-                for _key in self.config[key].keys():
-                    if _key not in self.default[key].keys():
-                        log.warning('Extra subkey %s of %s. Removing...' % (key, _key))
-                        del self.config[key][_key]
+        def checkDict(a, b, rmv=False):
+            mark = []
+            for key in a:
+                if key not in b:
+                    if rmv: 
+                        log.info('Removing key %s' % key)
+                        mark.append(key)
+                    else: 
+                        log.info('Adding key %s' % key)
+                        b[key] = a[key]
+                if key in b and isinstance(b[key], dict):
+                    return checkDict(a[key], b[key], rmv)
+            for i in mark:
+                del a[i]
+
+        checkDict(self.default, self.config)
+        checkDict(self.config, self.default, rmv=True)
 
     def __getitem__(self, attr):
         return self.config[attr]
