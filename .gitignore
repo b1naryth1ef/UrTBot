@@ -5,3 +5,4 @@
 *.cfg
 *.log
 *.db
+config/*
