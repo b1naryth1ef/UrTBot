@@ -17,6 +17,11 @@ default_config = {
         "loglevel": "info",
         "logfile": "debug.log",
         "uselog": True
+    },
+    "database": {
+        "type": "sqlite",
+        "name": "data.db",
+        "args": []
     }
 }
 

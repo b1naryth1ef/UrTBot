@@ -1,4 +1,9 @@
 import const, thread, time
+from parser import PARSE_SW, PARSE_RE
+from api import FiredEvent, API
+
+CURRENT_PROTO_VER = 68
+
 
 class Bot(object):
     """
@@ -13,6 +18,9 @@ class Bot(object):
         self.rcon = rcon
         self.inter = inter
         self.log = log
+        self.api = API(self, self.log)
+
+        self.players = {}
 
         #Info
         self.alive = False
@@ -30,7 +38,7 @@ class Bot(object):
 
         if not isinstance(self.proto, int):
             return self.log.error("Protocol is not an integer: %s" % self.proto)
-        elif int(self.proto) != 68:
+        elif int(self.proto) != CURRENT_PROTO_VER:
             return self.log.error("Invalid protocol version: %s" % self.proto)
 
         if not isinstance(self.g_gametype, int):
@@ -40,11 +48,17 @@ class Bot(object):
 
         self.log.info('UrTBot detected server w/ Version: "%s" and Protocol: "%s"' % (self.version, self.proto))
         self.log.info("Server is on map %s playing gametype %s" % (self.mapname, const.GAMETYPES[self.g_gametype].upper()))
+        self.api.loadPlugins()
+
+        self.api.callHook("TEST", msg="boobs")
 
         return True
 
     def parse(self, line):
-        print line
+        self.log.debug("Parsing line '%s'" % line.strip())
+        for SW in PARSE_SW:
+            if line.startswith(SW):
+                PARSE_SW[SW](self, line)
 
     def run(self):
         if not self.startup(): return False
