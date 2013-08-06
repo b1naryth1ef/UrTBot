@@ -22,7 +22,8 @@ default_config = {
         "type": "sqlite",
         "name": "data.db",
         "args": []
-    }
+    },
+    "prefix": "!"
 }
 
 

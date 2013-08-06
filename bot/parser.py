@@ -4,6 +4,9 @@ from player import Player
 PARSE_SW = {}
 PARSE_RE = {}
 
+
+GENERIC_LINE_A = re.compile(r'^(?P<action>[a-z]+):\s*(?P<data>(?P<cid>[0-9]+)\s(?P<text>.*))$', re.IGNORECASE)
+
 def sw(typ):
     def deco(func):
         PARSE_SW[typ] = func
@@ -15,17 +18,32 @@ def getUserInfo(data):
 
 @sw("say:")
 def parseSay(g, inp):
-    _, data = inp.split("say: ")
-    cid, msg = data.split(" ", 1)
-    if g.players[int(cid)] is None:
-        return g.log.warning("Got SAY but we don't have a player @ CID: %s" % int(cid))
-    g.api.callHook("PLAYER_SAY", cid=int(cid), player=g.players[int(cid)], msg=msg)
+    m = GENERIC_LINE_A.match(inp)
+    if not m: g.log.warning("Failed to match say!")
+    cid = int(m.group("cid"))
+    if g.players[cid] is None: return g.log.warning("Failed to find player in say w/ cid %s" % cid)
+    obj = g.api.callHook("PLAYER_SAY_GLOBAL", cid=cid, player=g.players[cid], msg=m.group("text").split(":", 1)[-1].strip())
+    g.api.hookChat(obj)
 
 @sw("sayteam:")
-def parseSayTeam(g, inp): pass
+def parseSayTeam(g, inp):
+    m = GENERIC_LINE_A.match(inp)
+    if not m: g.log.warning("Failed to match sayteam!")
+    cid = int(m.group("cid"))
+    if g.players[cid] is None: return g.log.warning("Failed to find player in sayteam w/ cid %s" % cid)
+    obj = g.api.callHook("PLAYER_SAY_TEAM", cid=cid, player=g.players[cid], msg=m.group("text").split(":", 1)[-1].strip())
+    g.api.hookChat(obj)
 
 @sw("saytell:")
-def parseSayTell(g, inp): pass
+def parseSayTell(g, inp):
+    m = GENERIC_LINE_A.match(inp)
+    if not m: g.log.warning("Failed to match saytell!")
+    cid = int(m.group("cid"))
+    cidb = int(m.group("text").split(" ")[0])
+    if g.players[cid] is None or g.players[cidb] is None:
+        return g.log.warning("Failed to find player in saytell (cids %s and %s)" % (cid, cidb))
+    obj = g.api.callHook("PLAYER_SAY_TELL", cid=cid, cidto=cidb, player=g.players[cid], playerto=g.players[cidb], msg=m.group("text").split(":", 1)[-1].strip())
+    g.api.hookChat(obj)
 
 @sw("ClientConnect:")
 def parseClientConnect(g, inp):
@@ -42,4 +60,17 @@ def parseClientUserInfo(g, inp):
         g.players[cid] = Player(cid, g, data)
         g.players[cid].init()
         return g.api.callHook("PLAYER_LOADED", cid=cid, player=g.players[cid], data=data)
+    g.players[cid].handleUserInfo(data)
+    g.api.callHook("PLAYER_CUI", cid=cid, player=g.players[cid], data=data)
+
+@sw("ClientUserinfoChanged:")
+def parseClientUserInfoChanged(g, inp):
+    _, cid, data = inp.split(" ", 2)
+    cid = int(cid)
+    data = getUserInfo(data)
+    if g.players[cid] is None:
+        return g.log.warning("Failed to find player in CUI changed: %s" % cid)
+    g.players[cid].handleUserInfoChanged(data)
     g.api.callHook("PLAYER_CUI_CHANGE", cid=cid, player=g.players[cid], data=data)
+
+

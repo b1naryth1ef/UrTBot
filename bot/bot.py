@@ -1,4 +1,4 @@
-import const, thread, time
+import const, thread, time, random
 from parser import PARSE_SW, PARSE_RE
 from api import FiredEvent, API
 
@@ -24,10 +24,13 @@ class Bot(object):
 
         #Info
         self.alive = False
+        self.cmd_prefix = config.prefix
 
         #Cvars
         self.g_gametype = None
         self.mapname = None
+
+    def recover(self): pass
 
     def startup(self):
         self.proto = self.rcon.getCvar("protocol")
@@ -46,11 +49,18 @@ class Bot(object):
         elif self.g_gametype not in const.GAMETYPES:
             return self.log.error("Invalid g_gametype: %s" % self.g_gametype)
 
+        # Do we need to recover?
+        self.recover()
+
+        # Lets logs some shit...
         self.log.info('UrTBot detected server w/ Version: "%s" and Protocol: "%s"' % (self.version, self.proto))
         self.log.info("Server is on map %s playing gametype %s" % (self.mapname, const.GAMETYPES[self.g_gametype].upper()))
         self.api.loadPlugins()
 
-        self.api.callHook("TEST", msg="boobs")
+        # Get ready to chat
+        self.rcon.rcon(const.C('sv_sayprefix "{C_GREEN}[{C_RED}B0T{C_GREEN}] {C_ORANGE}"'))
+        self.rcon.rcon(const.C('sv_tellprefix "{C_GREEN}[{C_RED}B0T{C_GREEN}] {C_CYAN}"'))
+        self.rcon.rcon('say UrTBot Version %s started up! "%s" ' % (self.version, random.choice(const.MOTTOS)))
 
         return True
 

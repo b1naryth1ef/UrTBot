@@ -17,3 +17,7 @@ def playerLoaded(obj):
 @p.bind("onLoad")
 def onLoad():
     print "Plugin loaded!"
+
+@p.cmd("test")
+def commandTest(c, obj):
+    obj.reply("This is a test!")
