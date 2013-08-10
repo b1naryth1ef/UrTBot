@@ -1,6 +1,7 @@
 import const, thread, time, random
 from parser import PARSE_SW, PARSE_RE
 from api import FiredEvent, API
+from database import DatabaseManager
 
 CURRENT_PROTO_VER = 68
 
@@ -18,6 +19,7 @@ class Bot(object):
         self.rcon = rcon
         self.inter = inter
         self.log = log
+        self.db = DatabaseManager(self.config, self.log)
         self.api = API(self, self.log)
 
         self.players = {}

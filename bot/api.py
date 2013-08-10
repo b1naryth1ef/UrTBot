@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import os, sys, re, time
+from q3api import Q3API
 
 class FiredEvent(object):
     def __init__(self, api, name, data={}):
         self._name = name
         self._data = data
-        self._api = api
+        self.api = api
         self.__dict__.update(data)
 
         self._cancel = False
@@ -14,16 +15,19 @@ class FiredEvent(object):
 
     def reply(self, msg):
         if not hasattr(self, "player"):
-            return self._api.warning("Someone tried to call .reply() on a FiredEvent w/o player!")
+            return self.api.warning("Someone tried to call .reply() on a FiredEvent w/o player!")
         self.player.tell("[PM] {0}".format(msg))
 
 
 class Command(object):
-    def __init__(self, func, name, binds=[], doc="{prefix}{cmd}"):
+    def __init__(self, func, name, binds=[], doc=None, need_args=0):
         self.func = func
         self.binds = binds
         self.binds.append(name)
         self.name = name
+
+        self.need_args = need_args
+        self.doc = doc or self.func.__doc__
 
         self.log = None
 
@@ -41,9 +45,11 @@ class Command(object):
 class API(object):
     def __init__(self, bot, log):
         self.bot = bot
+        self.db = bot.db
         self.log = log
         self.hooks = {}
         self.plugins = {}
+        self.q3 = Q3API(bot)
 
         # Commands
         self.commands = []
@@ -55,12 +61,16 @@ class API(object):
             # Protect against some insane command spamming
             if time.time()-obj.player.last_cmd < .5:
                 return self.log.debug("User %s tried command-spamming!" % (obj.player))
+
             obj.player.last_cmd = time.time()
+            obj.args = obj.msg.split(" ")[1:]
 
             cmd = obj.msg[1:].split(" ", 1)[0]
             self.log.debug("User %s trying to call command %s" % (obj.player, cmd))
             if cmd in self.alias:
                 self.log.info("User %s called command %s" % (obj.player, cmd))
+                if self.alias[cmd].need_args and not len(obj.args) == self.alias[cmd].need_args:
+                    obj.reply(self.alias[cmd].doc.format(cmd=cmd, prefix=self.bot.cmd_prefix))
                 self.alias[cmd].fire(obj)
                 return
             self.log.debug("Aliases: %s" % self.alias)
@@ -155,6 +165,10 @@ class Plugin():
             self.cmds.append(c)
             return c
         return hook
+
+    def db(self, obj):
+        self.api.db.addModel(obj)
+        return obj
 
     # Tools
     def load(self, api, mod, log):

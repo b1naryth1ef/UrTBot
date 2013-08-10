@@ -63,6 +63,8 @@ def parseClientUserInfo(g, inp):
     g.players[cid].handleUserInfo(data)
     g.api.callHook("PLAYER_CUI", cid=cid, player=g.players[cid], data=data)
 
+    if not g.players[cid].user: g.players[cid].init()
+
 @sw("ClientUserinfoChanged:")
 def parseClientUserInfoChanged(g, inp):
     _, cid, data = inp.split(" ", 2)
@@ -72,5 +74,35 @@ def parseClientUserInfoChanged(g, inp):
         return g.log.warning("Failed to find player in CUI changed: %s" % cid)
     g.players[cid].handleUserInfoChanged(data)
     g.api.callHook("PLAYER_CUI_CHANGE", cid=cid, player=g.players[cid], data=data)
+
+@sw("InitAuth:")
+def parseInitAuth(g, inp): pass
+
+@sw("AccountValidated:")
+def parseAcctValidated(g, inp):
+    data = re.findall(r'[^- ]+', inp.split(":", 1))
+    if not data or not len(data) == 3:
+        return g.log.warning("Failed to parse AccountValidated line: %s" % inp)
+    cid, name, rcon, noto = data
+    cid = int(cid)
+
+    if g.players[cid] is None:
+        return g.log.warning("Invalid CID for AccountValidated line: %s (%s)" % (inp, cid))
+    g.players[cid].auth_name = name
+    g.players[cid].auth_level = int(rcon)
+    g.players[cid].auth_notoriety = noto.replace('"', "")
+    g.players[cid].init()
+    g.api.callHook("PLAYER_AUTHED", cid=cid, player=g.players[cid], auth_name=name, auth_level=int(rcon), auth_notoriety=noto.replace('"', ""))
+
+@sw("AccountBan:")
+def parseAcctBan(g, inp): pass
+
+@sw("AccountKick:")
+def parseAcctKick(g, inp): pass
+
+@sw("AccountRejected:")
+def parseAcctRejected(g, inp): pass
+
+
 
 

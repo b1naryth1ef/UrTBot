@@ -21,11 +21,13 @@ default_config = {
     "database": {
         "type": "sqlite",
         "name": "data.db",
-        "args": []
+        "args": {}
     },
-    "prefix": "!"
+    "settings":{
+        "prefix": "!",
+        "trackplayers": True,
+    }
 }
-
 
 def load():
     if not os.path.exists("config"): os.mkdir("config")
